@@ -1,0 +1,176 @@
+import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'emotion_chart.dart';
+import 'custom_layout.dart';
+import 'legend_dialog.dart';
+import 'package:fix_emotion/auth-modules/supabase_client.dart';
+
+class DashboardLayout extends StatefulWidget {
+  final String userName;
+
+  const DashboardLayout({Key? key, required this.userName}) : super(key: key);
+
+  @override
+  _DashboardLayoutState createState() => _DashboardLayoutState();
+}
+
+class _DashboardLayoutState extends State<DashboardLayout> {
+  String selectedEmotion = 'Hapiness';
+  final List<String> emotions = [
+    'Hapiness',
+    'Sadness',
+    'Anger',
+    'Neutral',
+    'Surprise',
+    'Disgust',
+    'Fear',
+  ];
+
+  final supabase = SupabaseClientService.instance.client;
+
+  @override
+  Widget build(BuildContext context) {
+    final brightness = MediaQuery.of(context).platformBrightness;
+    final isDarkMode = brightness == Brightness.dark;
+
+    return Scaffold(
+      backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
+      body: SafeArea(
+        child: DashboardBody(
+          userName: widget.userName,
+          selectedEmotion: selectedEmotion,
+          emotions: emotions,
+          onEmotionChanged: (newEmotion) {
+            setState(() {
+              selectedEmotion = newEmotion;
+            });
+          },
+          getEmotionData: getEmotionData,
+          onInfoButtonPressed: () => _showLegendDialog(context),
+        ),
+      ),
+    );
+  }
+
+  List<FlSpot> getEmotionData(String emotion) {
+    switch (emotion) {
+      case 'Hapiness':
+        return [FlSpot(0, 3), FlSpot(1, 4), FlSpot(2, 3), FlSpot(3, 5), FlSpot(4, 4), FlSpot(5, 3), FlSpot(6, 4)];
+      case 'Sadness':
+        return [FlSpot(0, 1), FlSpot(1, 2), FlSpot(2, 1), FlSpot(3, 1), FlSpot(4, 2), FlSpot(5, 1), FlSpot(6, 2)];
+      case 'Anger':
+        return [FlSpot(0, 1), FlSpot(1, 1), FlSpot(2, 1), FlSpot(3, 2), FlSpot(4, 1), FlSpot(5, 2), FlSpot(6, 1)];
+      default:
+        return [FlSpot(0, 0)];
+    }
+  }
+
+  void _showLegendDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return LegendDialog();
+      },
+    );
+  }
+}
+
+class DashboardBody extends StatelessWidget {
+  final String userName;
+  final String selectedEmotion;
+  final List<String> emotions;
+  final ValueChanged<String> onEmotionChanged;
+  final List<FlSpot> Function(String) getEmotionData;
+  final VoidCallback onInfoButtonPressed;
+
+  const DashboardBody({
+    Key? key,
+    required this.userName,
+    required this.selectedEmotion,
+    required this.emotions,
+    required this.onEmotionChanged,
+    required this.getEmotionData,
+    required this.onInfoButtonPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final brightness = MediaQuery.of(context).platformBrightness;
+    final isDarkMode = brightness == Brightness.dark;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            _buildHeader(isDarkMode),
+            const SizedBox(height: 10),
+            _buildGreeting(),
+            const SizedBox(height: 10),
+            EmotionChart(
+              selectedEmotion: selectedEmotion,
+              getEmotionData: getEmotionData,
+              emotions: emotions,
+              onEmotionChanged: onEmotionChanged,
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isDarkMode ? Color.fromARGB(255, 23, 57, 61) : const Color(0xFFF3FCFF),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+                child: CustomLayout(maxWidth: constraints.maxWidth, userName: userName),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildGreeting() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+      child: Text(
+        'Hello, $userName!',
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(bool isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Dashboard',
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.black,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.info_outline, color: isDarkMode ? Colors.white : Colors.black),
+                onPressed: onInfoButtonPressed,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -1,0 +1,51 @@
+name: fix_emotion
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.3.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  postgres: ^3.2.1
+  path: ^1.8.2
+  path_provider: ^2.1.0 
+  google_nav_bar: ^5.0.6
+  fl_chart: ^0.68.0
+  supabase_flutter: ^2.5.7
+  bcrypt: ^1.1.3
+  fluttertoast: ^8.2.6
+  tflite_v2: ^1.0.0
+  camera: ^0.11.0+1
+  shared_preferences: ^2.2.3
+  flutter_signin_button: ^2.0.0
+  google_sign_in: ^6.2.1
+  flutter_emoji: ^2.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets\images\logo2.png
+    - D:\Thesis\fix\fix_emotion\assets\images\Vector01.png
+    - D:\Thesis\fix\fix_emotion\assets\images\Vector6.png
+    - assets\images\logo.png
+    - assets\images\iconDashboard.png
+    - assets\images\House_01.png
+    - assets\images\Notebook.png
+    - assets\images\Settings_Future.png
+    - assets\images\aboutUs.png
+    - assets\images\emoDict.png
+    - assets\images\emoTrack.png
+    - assets\models\model.tflite
+    - assets\models\labels.txt
+    - D:\Thesis\fix\fix_emotion\assets\models\posenet_model.tflite
+    - assets\images\faq.png
+    - assets\models\ResNet_model_quantized.tflite  
