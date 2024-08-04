@@ -3,9 +3,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login_header.dart';
 import 'login_form.dart';
 import 'social_login_buttons.dart';
-import 'logo.dart';
+import '../logo.dart';
 import 'package:fix_emotion/dashboard-modules/dashboard.dart';
-import 'authentication_service.dart';
+import '../authentication_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);

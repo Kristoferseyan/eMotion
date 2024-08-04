@@ -1,7 +1,9 @@
+import 'dart:async';
+import 'package:fix_emotion/auth-modules/login-modules/login.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'supabase_client.dart';
-import 'login.dart';
-import 'package:supabase/supabase.dart';
+import '../supabase_client.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RegPage extends StatefulWidget {
   const RegPage({Key? key}) : super(key: key);
@@ -16,46 +18,82 @@ class _RegPageState extends State<RegPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
 
-  final supabase = SupabaseClientService.instance.client;
+  bool _isLoading = false;
+  late final StreamSubscription<AuthState> _authStateSubscription;
+
+  final supabase = SupabaseClientService.getInstance().client;
+
+  @override
+  void initState() {
+    super.initState();
+    _authStateSubscription = supabase.auth.onAuthStateChange.listen(
+      (data) {
+        final session = data.session;
+        if (session != null) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+          );
+        }
+      },
+    );
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     _usernameController.dispose();
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _ageController.dispose();
+    _authStateSubscription.cancel();
     super.dispose();
+  }
+
+  Future<void> _sendVerificationEmail() async {
+    try {
+      await supabase.auth.signInWithOtp(
+        email: _emailController.text.trim(),
+        emailRedirectTo: kIsWeb ? null : 'io.supabase.flutterquickstart://login-callback/',
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Check your email for a verification link!')),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${error.toString()}'), backgroundColor: Colors.red),
+      );
+    }
   }
 
   Future<void> _registerUser() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await supabase.from('users').insert({
-          'fName': _firstNameController.text,
-          'lName': _lastNameController.text,
-          'email': _emailController.text,
-          'password': _passwordController.text,
-          'username': _usernameController.text,
-          'age': int.tryParse(_ageController.text) ?? 0,
+        setState(() {
+          _isLoading = true;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration successful')));
+        await supabase.auth.signUp(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        await _sendVerificationEmail();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration successful! Please verify your email.')),
+        );
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginPage()),
         );
-      } on PostgrestException catch (error) {
-        // Handle Supabase specific exceptions
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
       } catch (error) {
-        // Handle other types of exceptions
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An unexpected error occurred.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${error.toString()}')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -81,19 +119,23 @@ class _RegPageState extends State<RegPage> {
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildLogo(),
+                          const SizedBox(height: 20.0),
+                          Text(
+                            'Account Information',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
                           _buildTextField(
                             labelText: 'Email',
                             keyboardType: TextInputType.emailAddress,
                             controller: _emailController,
-                            isDarkMode: isDarkMode,
-                          ),
-                          _buildTextField(
-                            labelText: 'Password',
-                            keyboardType: TextInputType.text,
-                            obscureText: true,
-                            controller: _passwordController,
                             isDarkMode: isDarkMode,
                           ),
                           _buildTextField(
@@ -103,25 +145,14 @@ class _RegPageState extends State<RegPage> {
                             isDarkMode: isDarkMode,
                           ),
                           _buildTextField(
-                            labelText: 'First name',
+                            labelText: 'Password',
                             keyboardType: TextInputType.text,
-                            controller: _firstNameController,
-                            isDarkMode: isDarkMode,
-                          ),
-                          _buildTextField(
-                            labelText: 'Last name',
-                            keyboardType: TextInputType.text,
-                            controller: _lastNameController,
-                            isDarkMode: isDarkMode,
-                          ),
-                          _buildTextField(
-                            labelText: 'Age',
-                            keyboardType: TextInputType.number,
-                            controller: _ageController,
+                            obscureText: true,
+                            controller: _passwordController,
                             isDarkMode: isDarkMode,
                           ),
                           const SizedBox(height: 20.0),
-                          _buildRegisterButton(),
+                          _buildNextButton(),
                         ],
                       ),
                     ),
@@ -171,7 +202,7 @@ class _RegPageState extends State<RegPage> {
   Widget _buildLogo() {
     return Image.asset(
       'assets/images/logo2.png',
-      height: 150,
+      height: 200,
       width: double.infinity,
     );
   }
@@ -186,7 +217,7 @@ class _RegPageState extends State<RegPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[800] : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
@@ -201,28 +232,29 @@ class _RegPageState extends State<RegPage> {
         controller: controller,
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+          labelStyle: TextStyle(color: Colors.black87),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
           ),
-          fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-          filled: true,
         ),
         keyboardType: keyboardType,
         obscureText: obscureText,
+        style: const TextStyle(color: Colors.black87),
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Please enter your $labelText';
+            return 'This field is required';
+          }
+          if (labelText == 'Email' && !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+            return 'Enter a valid email address';
           }
           return null;
         },
-        style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
       ),
     );
   }
 
-  Widget _buildRegisterButton() {
+  Widget _buildNextButton() {
     return ElevatedButton(
       onPressed: _registerUser,
       style: ElevatedButton.styleFrom(
@@ -237,7 +269,7 @@ class _RegPageState extends State<RegPage> {
         ),
       ),
       child: const Text(
-        'Register',
+        'Next',
         style: TextStyle(
           color: Colors.white,
         ),

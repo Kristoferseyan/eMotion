@@ -16,11 +16,19 @@ class SocialLoginButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 16.0),
-        SignInButton(
-          Buttons.Google,
-          text: "Sign in with Google",
-          onPressed: onGoogleSignIn),
+        const SizedBox(height: 0),
+        SizedBox(
+          width: 330, // Full width
+          height: 55.0, // Height to match your login button
+          child: SignInButton(
+            Buttons.Google,
+            text: "Sign in with Google",
+            onPressed: onGoogleSignIn,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(50),
+            ),
+          ),
+        ),
       ],
     );
   }

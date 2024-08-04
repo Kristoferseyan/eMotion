@@ -1,6 +1,9 @@
+import 'package:fix_emotion/settings-modules/privacy_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fix_emotion/auth-modules/authentication_service.dart';
-import 'package:fix_emotion/settings-modules/profile-section/edit_profile_page.dart';
+import 'package:fix_emotion/settings-modules/edit_profile_page.dart';
+
+import 'notification_settings_page.dart';
 
 class SettingsPage extends StatelessWidget {
   final AuthenticationService _authService = AuthenticationService();
@@ -38,12 +41,12 @@ class SettingsPage extends StatelessWidget {
                       SizedBox(height: 20),
                       _buildSectionHeader('Notifications', isDarkMode),
                       _buildSettingsTile(Icons.notifications, 'Notification Settings', isDarkMode, () {
-                        // Navigate to Notification Settings Page
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationSettingsPage()));
                       }),
                       SizedBox(height: 20),
                       _buildSectionHeader('Privacy', isDarkMode),
                       _buildSettingsTile(Icons.lock, 'Privacy Settings', isDarkMode, () {
-                        // Navigate to Privacy Settings Page
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacySettingsPage()));
                       }),
                       _buildSettingsTile(Icons.delete, 'Delete Data', isDarkMode, () {
                         // Navigate to Data Deletion Page

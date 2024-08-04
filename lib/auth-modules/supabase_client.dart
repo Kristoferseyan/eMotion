@@ -9,5 +9,12 @@ class SupabaseClientService {
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbnJobm5iZXRmZHZuZmZjcm1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE2MTUxMTcsImV4cCI6MjAzNzE5MTExN30.Dw3FMknFnLzuBeqJY7pTeCMCRwIoBl2ihyh_uXmRZJ8',
         );
 
-  static final SupabaseClientService instance = SupabaseClientService._internal();
+  static SupabaseClientService? _instance;
+
+  static SupabaseClientService getInstance() {
+    if (_instance == null) {
+      _instance = SupabaseClientService._internal();
+    }
+    return _instance!;
+  }
 }

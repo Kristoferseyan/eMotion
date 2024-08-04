@@ -1,14 +1,16 @@
+import 'package:fix_emotion/settings-modules/notification_settings_page.dart';
+import 'package:fix_emotion/settings-modules/privacy_settings_page.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart'; 
-import 'auth-modules/login.dart';
-import 'auth-modules/registration.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'settings-modules/settings_page.dart';
-import 'dashboard-modules/dashboard.dart'; 
+import 'dashboard-modules/dashboard.dart';
 import 'auth-modules/authentication_service.dart';
+import 'auth-modules/login-modules/login.dart';
+import 'auth-modules/reg-modules/registration.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Supabase
   await Supabase.initialize(
     url: 'https://zpnrhnnbetfdvnffcrmj.supabase.co',
@@ -16,7 +18,7 @@ void main() async {
   );
 
   final AuthenticationService authService = AuthenticationService();
-  final bool isAuthenticated = authService.isAuthenticated();
+  final bool isAuthenticated = await authService.isAuthenticated();
 
   runApp(MyApp(isAuthenticated: isAuthenticated));
 }
@@ -28,13 +30,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: isAuthenticated ? '/dashboard' :'/'  ,
+      initialRoute: isAuthenticated ? '/dashboard' : '/',
       routes: {
         '/': (context) => const LoginReg(),
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegPage(),
         '/settings': (context) => SettingsPage(),
-        '/dashboard': (context) => const Dashboard(userName: '', userEmail: '',),
+        '/dashboard': (context) => const Dashboard(userName: '', userEmail: ''),
+        '/notification-settings': (context) => NotificationSettingsPage(),
+        'privacy-settings': (context) => PrivacySettingsPage(),     
       },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -42,12 +46,14 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color.fromARGB(255, 49, 123, 133),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.black, backgroundColor: Colors.white, 
+            foregroundColor: Colors.black,
+            backgroundColor: Colors.white,
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.white, side: const BorderSide(color: Colors.white), 
+            foregroundColor: Colors.white,
+            side: const BorderSide(color: Colors.white),
           ),
         ),
       ),
@@ -56,12 +62,14 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color.fromARGB(255, 18, 46, 49),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.black, backgroundColor: Colors.white, 
+            foregroundColor: Colors.black,
+            backgroundColor: Colors.white,
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.white, side: const BorderSide(color: Colors.white), 
+            foregroundColor: Colors.white,
+            side: const BorderSide(color: Colors.white),
           ),
         ),
       ),
@@ -91,10 +99,10 @@ class LoginReg extends StatelessWidget {
                 'assets/images/logo.png',
                 height: 200,
               ),
-              const SizedBox(height: 40), 
+              const SizedBox(height: 40),
               SizedBox(
-                height: 50, 
-                width: double.infinity, 
+                height: 50,
+                width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
                     if (authService.isAuthenticated()) {

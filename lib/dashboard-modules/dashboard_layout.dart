@@ -15,9 +15,9 @@ class DashboardLayout extends StatefulWidget {
 }
 
 class _DashboardLayoutState extends State<DashboardLayout> {
-  String selectedEmotion = 'Hapiness';
+  String selectedEmotion = 'Happiness';
   final List<String> emotions = [
-    'Hapiness',
+    'Happiness',
     'Sadness',
     'Anger',
     'Neutral',
@@ -26,7 +26,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     'Fear',
   ];
 
-  final supabase = SupabaseClientService.instance.client;
+  final supabase = SupabaseClientService.getInstance().client;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +54,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 
   List<FlSpot> getEmotionData(String emotion) {
     switch (emotion) {
-      case 'Hapiness':
+      case 'Happiness':
         return [FlSpot(0, 3), FlSpot(1, 4), FlSpot(2, 3), FlSpot(3, 5), FlSpot(4, 4), FlSpot(5, 3), FlSpot(6, 4)];
       case 'Sadness':
         return [FlSpot(0, 1), FlSpot(1, 2), FlSpot(2, 1), FlSpot(3, 1), FlSpot(4, 2), FlSpot(5, 1), FlSpot(6, 2)];
@@ -69,7 +69,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return LegendDialog();
+        return const LegendDialog();
       },
     );
   }
@@ -118,7 +118,7 @@ class DashboardBody extends StatelessWidget {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: isDarkMode ? Color.fromARGB(255, 23, 57, 61) : const Color(0xFFF3FCFF),
+                  color: isDarkMode ? const Color.fromARGB(255, 23, 57, 61) : const Color(0xFFF3FCFF),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
@@ -139,7 +139,7 @@ class DashboardBody extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
       child: Text(
         'Hello, $userName!',
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
