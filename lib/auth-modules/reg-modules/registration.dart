@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field
+
 import 'dart:async';
 import 'package:fix_emotion/auth-modules/login-modules/login.dart';
 import 'package:flutter/foundation.dart';
