@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'emotion_chart.dart';
 import 'custom_layout.dart';
 import 'legend_dialog.dart';
-import 'package:fix_emotion/auth-modules/supabase_client.dart';
 
 class DashboardLayout extends StatefulWidget {
   final String userName;
@@ -26,7 +26,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     'Fear',
   ];
 
-  final supabase = SupabaseClientService.getInstance().client;
+  final supabase = Supabase.instance.client;
 
   @override
   Widget build(BuildContext context) {

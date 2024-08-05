@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../supabase_client.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fix_emotion/auth-modules/login-modules/login.dart';
 
@@ -22,7 +21,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   bool _isLoading = false;
   late final StreamSubscription<AuthState> _authStateSubscription;
 
-  final supabase = SupabaseClientService.getInstance().client;
+  final supabase = Supabase.instance.client;
 
   @override
   void initState() {
@@ -74,6 +73,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         await supabase.auth.signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
+          data: {'username': _usernameController.text.trim()},
         );
 
         await _sendVerificationEmail();
@@ -217,7 +217,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? Colors.grey[800] : Colors.white,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
@@ -232,15 +232,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
         controller: controller,
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: const TextStyle(color: Colors.black87),
+          labelStyle: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black87),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
           ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
         keyboardType: keyboardType,
         obscureText: obscureText,
-        style: const TextStyle(color: Colors.black87),
+        style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'This field is required';

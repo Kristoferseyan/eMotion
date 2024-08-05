@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'settings-modules/settings_page.dart';
 import 'dashboard-modules/dashboard.dart';
-import 'auth-modules/authentication_service.dart';
 import 'auth-modules/login-modules/login.dart';
 import 'auth-modules/reg-modules/registration.dart';
 
@@ -17,8 +16,10 @@ void main() async {
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbnJobm5iZXRmZHZuZmZjcm1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE2MTUxMTcsImV4cCI6MjAzNzE5MTExN30.Dw3FMknFnLzuBeqJY7pTeCMCRwIoBl2ihyh_uXmRZJ8',
   );
 
-  final AuthenticationService authService = AuthenticationService();
-  final bool isAuthenticated = await authService.isAuthenticated();
+  final supabase = Supabase.instance.client;
+
+  // Check if user is authenticated
+  final bool isAuthenticated = supabase.auth.currentSession != null;
 
   runApp(MyApp(isAuthenticated: isAuthenticated));
 }
@@ -85,7 +86,7 @@ class LoginReg extends StatelessWidget {
   Widget build(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
     final isDarkMode = brightness == Brightness.dark;
-    final AuthenticationService authService = AuthenticationService();
+    final supabase = Supabase.instance.client;
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFF317B85),
@@ -105,7 +106,7 @@ class LoginReg extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (authService.isAuthenticated()) {
+                    if (supabase.auth.currentSession != null) {
                       Navigator.pushNamed(context, '/dashboard');
                     } else {
                       Navigator.pushNamed(context, '/login');

@@ -1,5 +1,5 @@
-import 'package:fix_emotion/auth-modules/supabase_client.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -10,7 +10,7 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
-  final supabase = SupabaseClientService.getInstance().client;
+  final supabase = Supabase.instance.client;
 
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
