@@ -1,20 +1,18 @@
-// ignore_for_file: unused_field
-
 import 'dart:async';
-import 'package:fix_emotion/auth-modules/login-modules/login.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../supabase_client.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:fix_emotion/auth-modules/login-modules/login.dart';
 
-class RegPage extends StatefulWidget {
-  const RegPage({Key? key}) : super(key: key);
+class RegistrationPage extends StatefulWidget {
+  const RegistrationPage({Key? key}) : super(key: key);
 
   @override
-  _RegPageState createState() => _RegPageState();
+  _RegistrationPageState createState() => _RegistrationPageState();
 }
 
-class _RegPageState extends State<RegPage> {
+class _RegistrationPageState extends State<RegistrationPage> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _emailController = TextEditingController();
@@ -57,7 +55,7 @@ class _RegPageState extends State<RegPage> {
         emailRedirectTo: kIsWeb ? null : 'io.supabase.flutterquickstart://login-callback/',
       );
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Check your email for a verification link!')),
+        const SnackBar(content: Text('Check your email for a verification link!')),
       );
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -81,7 +79,7 @@ class _RegPageState extends State<RegPage> {
         await _sendVerificationEmail();
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration successful! Please verify your email.')),
+          const SnackBar(content: Text('Registration successful! Please verify your email.')),
         );
 
         Navigator.pushReplacement(
@@ -234,7 +232,7 @@ class _RegPageState extends State<RegPage> {
         controller: controller,
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: TextStyle(color: Colors.black87),
+          labelStyle: const TextStyle(color: Colors.black87),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
@@ -258,7 +256,7 @@ class _RegPageState extends State<RegPage> {
 
   Widget _buildNextButton() {
     return ElevatedButton(
-      onPressed: _registerUser,
+      onPressed: _isLoading ? null : _registerUser,
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF6EBBC5),
         minimumSize: const Size(double.infinity, 60),
@@ -270,12 +268,14 @@ class _RegPageState extends State<RegPage> {
           fontSize: 18,
         ),
       ),
-      child: const Text(
-        'Next',
-        style: TextStyle(
-          color: Colors.white,
-        ),
-      ),
+      child: _isLoading
+          ? const CircularProgressIndicator(color: Colors.white)
+          : const Text(
+              'Next',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
     );
   }
 }

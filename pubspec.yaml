@@ -36,8 +36,8 @@ flutter:
 
   assets:
     - assets\images\logo2.png
-    - D:\Thesis\fix\fix_emotion\assets\images\Vector01.png
-    - D:\Thesis\fix\fix_emotion\assets\images\Vector6.png
+    - assets\images\Vector01.png
+    - assets\images\Vector6.png
     - assets\images\logo.png
     - assets\images\iconDashboard.png
     - assets\images\House_01.png
@@ -48,6 +48,6 @@ flutter:
     - assets\images\emoTrack.png
     - assets\models\model.tflite
     - assets\models\labels.txt
-    - D:\Thesis\fix\fix_emotion\assets\models\posenet_model.tflite
+    - assets\models\posenet_model.tflite
     - assets\images\faq.png
     - assets\models\ResNet_model_quantized.tflite

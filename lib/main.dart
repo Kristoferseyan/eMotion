@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const LoginReg(),
         '/login': (context) => const LoginPage(),
-        '/register': (context) => const RegPage(),
+        '/register': (context) => const RegistrationPage(),
         '/settings': (context) => SettingsPage(),
         '/dashboard': (context) => const Dashboard(userName: '', userEmail: ''),
         '/notification-settings': (context) => NotificationSettingsPage(),
