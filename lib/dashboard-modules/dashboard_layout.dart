@@ -3,7 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'emotion_chart.dart';
 import 'custom_layout.dart';
-import 'legend_dialog.dart';
+import 'profile_page.dart'; // Import the new profile page
 
 class DashboardLayout extends StatefulWidget {
   final String userName;
@@ -46,7 +46,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
             });
           },
           getEmotionData: getEmotionData,
-          onInfoButtonPressed: () => _showLegendDialog(context),
+          onProfileButtonPressed: () => _navigateToProfilePage(context),
         ),
       ),
     );
@@ -65,12 +65,10 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     }
   }
 
-  void _showLegendDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return const LegendDialog();
-      },
+  void _navigateToProfilePage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName)),
     );
   }
 }
@@ -81,7 +79,7 @@ class DashboardBody extends StatelessWidget {
   final List<String> emotions;
   final ValueChanged<String> onEmotionChanged;
   final List<FlSpot> Function(String) getEmotionData;
-  final VoidCallback onInfoButtonPressed;
+  final VoidCallback onProfileButtonPressed;
 
   const DashboardBody({
     Key? key,
@@ -90,7 +88,7 @@ class DashboardBody extends StatelessWidget {
     required this.emotions,
     required this.onEmotionChanged,
     required this.getEmotionData,
-    required this.onInfoButtonPressed,
+    required this.onProfileButtonPressed,
   }) : super(key: key);
 
   @override
@@ -164,8 +162,8 @@ class DashboardBody extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                icon: Icon(Icons.info_outline, color: isDarkMode ? Colors.white : Colors.black),
-                onPressed: onInfoButtonPressed,
+                icon: Icon(Icons.account_circle, color: isDarkMode ? Colors.white : Colors.black),
+                onPressed: onProfileButtonPressed,
               ),
             ],
           ),
