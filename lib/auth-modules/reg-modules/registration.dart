@@ -126,12 +126,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           Text(
                             'Account Information',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: isDarkMode ? Colors.white : Colors.black,
                             ),
                           ),
-                          const SizedBox(height: 10.0),
+                          const SizedBox(height: 20.0),
                           _buildTextField(
                             labelText: 'Email',
                             keyboardType: TextInputType.emailAddress,
@@ -232,16 +232,24 @@ class _RegistrationPageState extends State<RegistrationPage> {
         controller: controller,
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black87),
+          labelStyle: TextStyle(
+            color: isDarkMode ? Colors.white70 : Colors.black87,
+            fontSize: 16,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          filled: true,
+          fillColor: isDarkMode ? Colors.grey[800] : Colors.white,
         ),
         keyboardType: keyboardType,
         obscureText: obscureText,
-        style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
+        style: TextStyle(
+          color: isDarkMode ? Colors.white : Colors.black87,
+          fontSize: 16,
+        ),
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'This field is required';
