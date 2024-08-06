@@ -2,10 +2,14 @@ import 'package:fix_emotion/settings-modules/privacy_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fix_emotion/auth-modules/authentication_service.dart';
 import 'package:fix_emotion/settings-modules/edit_profile_page.dart';
-
 import 'notification_settings_page.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
   final AuthenticationService _authService = AuthenticationService();
 
   @override
@@ -166,8 +170,11 @@ class SettingsPage extends StatelessWidget {
     try {
       await _authService.signOut();
 
+      if (!mounted) return; // Check if the widget is still mounted
+
       Navigator.pushReplacementNamed(context, '/');
     } catch (e) {
+      if (!mounted) return; // Check if the widget is still mounted
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error logging out: ${e.toString()}')),
