@@ -10,7 +10,6 @@ import 'auth-modules/reg-modules/registration.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Supabase
   await Supabase.initialize(
     url: 'https://zpnrhnnbetfdvnffcrmj.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbnJobm5iZXRmZHZuZmZjcm1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE2MTUxMTcsImV4cCI6MjAzNzE5MTExN30.Dw3FMknFnLzuBeqJY7pTeCMCRwIoBl2ihyh_uXmRZJ8',
@@ -18,7 +17,6 @@ void main() async {
 
   final supabase = Supabase.instance.client;
 
-  // Check if user is authenticated
   final bool isAuthenticated = supabase.auth.currentSession != null;
 
   runApp(MyApp(isAuthenticated: isAuthenticated));

@@ -3,7 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'emotion_chart.dart';
 import 'custom_layout.dart';
-import 'profile_page.dart'; // Import the new profile page
+import 'profile_page.dart';
 
 class DashboardLayout extends StatefulWidget {
   final String userName;
