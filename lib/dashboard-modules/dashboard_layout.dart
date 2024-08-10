@@ -6,9 +6,9 @@ import 'custom_layout.dart';
 import 'profile_page.dart';
 
 class DashboardLayout extends StatefulWidget {
-  final String userName;
+  final String userId;
 
-  const DashboardLayout({Key? key, required this.userName}) : super(key: key);
+  const DashboardLayout({Key? key, required this.userId}) : super(key: key);
 
   @override
   _DashboardLayoutState createState() => _DashboardLayoutState();
@@ -16,6 +16,7 @@ class DashboardLayout extends StatefulWidget {
 
 class _DashboardLayoutState extends State<DashboardLayout> {
   String selectedEmotion = 'Happiness';
+  String? userName; // This will be retrieved from the database
   final List<String> emotions = [
     'Happiness',
     'Sadness',
@@ -29,6 +30,31 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   final supabase = Supabase.instance.client;
 
   @override
+  void initState() {
+    super.initState();
+    _fetchUserName();
+  }
+
+  Future<void> _fetchUserName() async {
+    try {
+      final response = await supabase
+          .from('users') // Ensure this is the correct table name
+          .select('fName') // Ensure this is the correct column name
+          .eq('id', widget.userId) // Fetch based on the passed userId
+          .single();
+
+      setState(() {
+        userName = response['fName'] ?? 'User'; // Default to 'User' if name is not found
+      });
+    } catch (error) {
+      setState(() {
+        userName = 'User'; // Default to 'User' if there's an error
+      });
+      print('Error fetching user name: $error');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
     final isDarkMode = brightness == Brightness.dark;
@@ -36,18 +62,20 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
       body: SafeArea(
-        child: DashboardBody(
-          userName: widget.userName,
-          selectedEmotion: selectedEmotion,
-          emotions: emotions,
-          onEmotionChanged: (newEmotion) {
-            setState(() {
-              selectedEmotion = newEmotion;
-            });
-          },
-          getEmotionData: getEmotionData,
-          onProfileButtonPressed: () => _navigateToProfilePage(context),
-        ),
+        child: userName == null
+            ? const Center(child: CircularProgressIndicator()) // Show a loader while the name is being fetched
+            : DashboardBody(
+                userName: userName!,
+                selectedEmotion: selectedEmotion,
+                emotions: emotions,
+                onEmotionChanged: (newEmotion) {
+                  setState(() {
+                    selectedEmotion = newEmotion;
+                  });
+                },
+                getEmotionData: getEmotionData,
+                onProfileButtonPressed: () => _navigateToProfilePage(context),
+              ),
       ),
     );
   }
@@ -93,7 +121,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProfilePage(userName: widget.userName),
+        builder: (context) => ProfilePage(userId: widget.userId), // Pass userId
       ),
     );
   }

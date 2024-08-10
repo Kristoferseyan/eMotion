@@ -3,10 +3,9 @@ import 'package:fix_emotion/settings-modules/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:fix_emotion/analytics-modules/analytics_page.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Dashboard extends StatefulWidget {
-  final String userId; // Assuming you pass the userId here instead of userName
+  final String userId;
   final String userEmail;
 
   const Dashboard({super.key, required this.userId, required this.userEmail});
@@ -17,27 +16,6 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   int _selectedIndex = 0;
-  String? _userName;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserName();
-  }
-
-  Future<void> _fetchUserName() async {
-    final response = await Supabase.instance.client
-        .from('users') // Assuming your table name is 'users'
-        .select('fName') // Assuming the column name for the first name is 'fName'
-        .eq('id', widget.userId) // Assuming 'id' is the column for userId
-        .single();
-
-    if (response != null) {
-      setState(() {
-        _userName = response['fName'];
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +28,7 @@ class _DashboardState extends State<Dashboard> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          DashboardLayout(userName: _userName ?? 'User'), // Pass the fetched name or default 'User'
+          DashboardLayout(userId: widget.userId), // Only pass the userId
           AnalyticsPage(),
           SettingsPage(),
         ],
