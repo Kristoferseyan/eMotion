@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:fix_emotion/auth-modules/login-modules/login.dart';
+import 'package:fix_emotion/auth-modules/reg-modules/user_info_page.dart';
+import 'package:bcrypt/bcrypt.dart'; // Import bcrypt package for password hashing
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
@@ -19,48 +19,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _usernameController = TextEditingController();
 
   bool _isLoading = false;
-  late final StreamSubscription<AuthState> _authStateSubscription;
 
   final supabase = Supabase.instance.client;
-
-  @override
-  void initState() {
-    super.initState();
-    _authStateSubscription = supabase.auth.onAuthStateChange.listen(
-      (data) {
-        final session = data.session;
-        if (session != null) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const LoginPage()),
-          );
-        }
-      },
-    );
-  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     _usernameController.dispose();
-    _authStateSubscription.cancel();
     super.dispose();
-  }
-
-  Future<void> _sendVerificationEmail() async {
-    try {
-      await supabase.auth.signInWithOtp(
-        email: _emailController.text.trim(),
-        emailRedirectTo: kIsWeb ? null : 'io.supabase.flutterquickstart://login-callback/',
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Check your email for a verification link!')),
-      );
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${error.toString()}'), backgroundColor: Colors.red),
-      );
-    }
   }
 
   Future<void> _registerUser() async {
@@ -70,25 +37,34 @@ class _RegistrationPageState extends State<RegistrationPage> {
           _isLoading = true;
         });
 
-        await supabase.auth.signUp(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-          data: {'username': _usernameController.text.trim()},
-        );
+        // Hash the password before saving
+        String hashedPassword = BCrypt.hashpw(_passwordController.text.trim(), BCrypt.gensalt());
 
-        await _sendVerificationEmail();
+        // Insert the user data directly into the database
+        final response = await supabase.from('users').insert({
+          'email': _emailController.text.trim(),
+          'password': hashedPassword, // Store the hashed password
+          'username': _usernameController.text.trim(),
+        }).select().single();
+
+        if (response['error'] != null) {
+          throw Exception('Failed to insert user data: ${response['error'].message}');
+        }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration successful! Please verify your email.')),
+          const SnackBar(content: Text('Registration successful!')),
         );
 
+        // Redirect to the user information page
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
+          MaterialPageRoute(
+            builder: (context) => UserInfoPage(userId: response['id']),
+          ),
         );
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${error.toString()}')),
+          SnackBar(content: Text('Error: ${error.toString()}'), backgroundColor: Colors.red),
         );
       } finally {
         setState(() {
