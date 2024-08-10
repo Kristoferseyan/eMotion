@@ -55,11 +55,35 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   List<FlSpot> getEmotionData(String emotion) {
     switch (emotion) {
       case 'Happiness':
-        return [FlSpot(0, 3), FlSpot(1, 4), FlSpot(2, 3), FlSpot(3, 5), FlSpot(4, 4), FlSpot(5, 3), FlSpot(6, 4)];
+        return [
+          FlSpot(0, 3),
+          FlSpot(1, 4),
+          FlSpot(2, 3),
+          FlSpot(3, 5),
+          FlSpot(4, 4),
+          FlSpot(5, 3),
+          FlSpot(6, 4)
+        ];
       case 'Sadness':
-        return [FlSpot(0, 1), FlSpot(1, 2), FlSpot(2, 1), FlSpot(3, 1), FlSpot(4, 2), FlSpot(5, 1), FlSpot(6, 2)];
+        return [
+          FlSpot(0, 1),
+          FlSpot(1, 2),
+          FlSpot(2, 1),
+          FlSpot(3, 1),
+          FlSpot(4, 2),
+          FlSpot(5, 1),
+          FlSpot(6, 2)
+        ];
       case 'Anger':
-        return [FlSpot(0, 1), FlSpot(1, 1), FlSpot(2, 1), FlSpot(3, 2), FlSpot(4, 1), FlSpot(5, 2), FlSpot(6, 1)];
+        return [
+          FlSpot(0, 1),
+          FlSpot(1, 1),
+          FlSpot(2, 1),
+          FlSpot(3, 2),
+          FlSpot(4, 1),
+          FlSpot(5, 2),
+          FlSpot(6, 1)
+        ];
       default:
         return [FlSpot(0, 0)];
     }
@@ -68,7 +92,9 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   void _navigateToProfilePage(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName)),
+      MaterialPageRoute(
+        builder: (context) => ProfilePage(userName: widget.userName),
+      ),
     );
   }
 }
@@ -123,7 +149,10 @@ class DashboardBody extends StatelessWidget {
                   ),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-                child: CustomLayout(maxWidth: constraints.maxWidth, userName: userName),
+                child: CustomLayout(
+                  maxWidth: constraints.maxWidth,
+                  userName: userName,
+                ),
               ),
             ),
           ],
@@ -134,7 +163,7 @@ class DashboardBody extends StatelessWidget {
 
   Widget _buildGreeting() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Text(
         'Hello, $userName!',
         style: const TextStyle(

@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => Dashboard(
-            userName: userData['userName']!,
+            userId: userData['userId']!,
             userEmail: userData['userEmail']!,
           ),
         ),

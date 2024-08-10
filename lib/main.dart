@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegistrationPage(),
         '/settings': (context) => SettingsPage(),
-        '/dashboard': (context) => const Dashboard(userName: '', userEmail: ''),
+        '/dashboard': (context) => const Dashboard(userId: '', userEmail: '',),
         '/notification-settings': (context) => NotificationSettingsPage(),
         'privacy-settings': (context) => PrivacySettingsPage(),
       },
