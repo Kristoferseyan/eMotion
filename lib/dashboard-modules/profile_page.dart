@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:fix_emotion/auth-modules/login-modules/login.dart';
 
 class ProfilePage extends StatefulWidget {
   final String userId;
@@ -11,8 +12,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Map<String, dynamic>? _userData;
-  bool _isLoading = true;
+  final supabase = Supabase.instance.client;
+  Map<String, dynamic>? userData;
 
   @override
   void initState() {
@@ -22,22 +23,27 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _fetchUserData() async {
     try {
-      final response = await Supabase.instance.client
-          .from('users') // Your table name
-          .select('fName, lName, email, username, bDate, age') // Only select the important fields
-          .eq('id', widget.userId) // Fetch data based on the userId
+      final response = await supabase
+          .from('users')
+          .select('fName, lName, email, username, age, bDate')
+          .eq('id', widget.userId)
           .single();
 
       setState(() {
-        _userData = response;
-        _isLoading = false;
+        userData = response;
       });
     } catch (error) {
       print('Error fetching user data: $error');
-      setState(() {
-        _isLoading = false;
-      });
     }
+  }
+
+  void _logout() async {
+    await supabase.auth.signOut();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false,
+    );
   }
 
   @override
@@ -53,7 +59,7 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0,
         iconTheme: IconThemeData(color: isDarkMode ? Colors.white : Colors.black),
       ),
-      body: _isLoading
+      body: userData == null
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
@@ -65,8 +71,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: isDarkMode
-                              ? [Color(0xFF1D4D4F), Color(0xFF122E31)]
-                              : [Color(0xFFA2E3F6), Color(0xFFF3FCFF)],
+                              ? const [Color(0xFF1D4D4F), Color(0xFF122E31)]
+                              : const [Color(0xFFA2E3F6), Color(0xFFF3FCFF)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -86,7 +92,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             radius: 50,
                             backgroundColor: isDarkMode ? Colors.white : Colors.grey[300],
                             child: Text(
-                              _userData?['fName'][0].toUpperCase() ?? 'U',
+                              (userData!['fName'][0] as String).toUpperCase(),
                               style: TextStyle(
                                 fontSize: 40,
                                 color: isDarkMode ? Colors.black : Colors.white,
@@ -95,7 +101,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            '${_userData?['fName'] ?? 'User'} ${_userData?['lName'] ?? ''}',
+                            '${_capitalize(userData!['fName'])} ${_capitalize(userData!['lName'])}',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -110,7 +116,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       context,
                       icon: Icons.email,
                       title: 'Email',
-                      value: _userData?['email'] ?? 'N/A',
+                      value: userData!['email'] ?? '',
                       isDarkMode: isDarkMode,
                     ),
                     const SizedBox(height: 10),
@@ -118,26 +124,43 @@ class _ProfilePageState extends State<ProfilePage> {
                       context,
                       icon: Icons.person,
                       title: 'Username',
-                      value: _userData?['username'] ?? 'N/A',
-                      isDarkMode: isDarkMode,
-                    ),
-                    const SizedBox(height: 10),
-                    _buildProfileDetailCard(
-                      context,
-                      icon: Icons.cake,
-                      title: 'Birthdate',
-                      value: _userData?['bDate'] ?? 'N/A',
+                      value: userData!['username'] ?? '',
                       isDarkMode: isDarkMode,
                     ),
                     const SizedBox(height: 10),
                     _buildProfileDetailCard(
                       context,
                       icon: Icons.calendar_today,
-                      title: 'Age',
-                      value: _userData?['age']?.toString() ?? 'N/A',
+                      title: 'Birthdate',
+                      value: userData!['bDate'] ?? '',
                       isDarkMode: isDarkMode,
                     ),
-                    // Add more profile details as needed
+                    const SizedBox(height: 10),
+                    _buildProfileDetailCard(
+                      context,
+                      icon: Icons.cake,
+                      title: 'Age',
+                      value: userData!['age'].toString(),
+                      isDarkMode: isDarkMode,
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: _logout,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDarkMode ? const Color(0xFF1A3C40) : Colors.redAccent,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Logout',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -145,10 +168,14 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProfileDetailCard(BuildContext context,
-      {required IconData icon, required String title, required String value, required bool isDarkMode}) {
+  String _capitalize(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1).toLowerCase();
+  }
+
+  Widget _buildProfileDetailCard(BuildContext context, {required IconData icon, required String title, required String value, required bool isDarkMode}) {
     return Card(
-      color: isDarkMode ? Color(0xFF1A3C40) : Colors.white,
+      color: isDarkMode ? const Color(0xFF1A3C40) : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
