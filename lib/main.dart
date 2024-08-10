@@ -1,22 +1,26 @@
-import 'package:fix_emotion/settings-modules/notification_settings_page.dart';
-import 'package:fix_emotion/settings-modules/privacy_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'settings-modules/settings_page.dart';
 import 'dashboard-modules/dashboard.dart';
 import 'auth-modules/login-modules/login.dart';
 import 'auth-modules/reg-modules/registration.dart';
+import 'settings-modules/notification_settings_page.dart';
+import 'settings-modules/privacy_settings_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Load environment variables
+  await dotenv.load(fileName: "assets/auth.env");
+
+  // Initialize Supabase
   await Supabase.initialize(
-    url: 'https://zpnrhnnbetfdvnffcrmj.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbnJobm5iZXRmZHZuZmZjcm1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE2MTUxMTcsImV4cCI6MjAzNzE5MTExN30.Dw3FMknFnLzuBeqJY7pTeCMCRwIoBl2ihyh_uXmRZJ8',
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
   final supabase = Supabase.instance.client;
-
   final bool isAuthenticated = supabase.auth.currentSession != null;
 
   runApp(MyApp(isAuthenticated: isAuthenticated));
@@ -37,7 +41,7 @@ class MyApp extends StatelessWidget {
         '/settings': (context) => SettingsPage(),
         '/dashboard': (context) => const Dashboard(userName: '', userEmail: ''),
         '/notification-settings': (context) => NotificationSettingsPage(),
-        'privacy-settings': (context) => PrivacySettingsPage(),     
+        'privacy-settings': (context) => PrivacySettingsPage(),
       },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
