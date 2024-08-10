@@ -17,45 +17,85 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   int _selectedIndex = 0;
 
+  final List<Widget> _pages = [
+    DashboardLayout(userName: 'User'), // Main dashboard content
+    AnalyticsPage(),
+    SettingsPage(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = brightness == Brightness.dark;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          DashboardLayout(userName: widget.userName),
-          Positioned.fill(
-            child: IndexedStack(
-              index: _selectedIndex == 0 ? null : _selectedIndex - 1,
-              children: [
-                AnalyticsPage(),
-                SettingsPage(),
-              ],
-            ),
-          ),
-        ],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
       ),
-      bottomNavigationBar: GNav(
-        gap: 8,
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        tabMargin: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
-        tabBackgroundColor: isDarkMode ? const Color.fromARGB(255, 255, 245, 245) : Color.fromARGB(255, 49, 123, 136),
-        iconSize: 30,
-        tabBorderRadius: 20,
-        backgroundColor: isDarkMode ? Color.fromARGB(255, 18, 46, 49) : Colors.white,
-        tabs: [
-          GButton(icon: Icons.home, iconActiveColor: isDarkMode ? Color.fromARGB(255, 49, 123, 136) : Colors.white, iconColor: isDarkMode ? Color.fromARGB(255, 49, 123, 136) : Color.fromARGB(255, 49, 123, 136)),
-          GButton(icon: Icons.book, iconActiveColor: isDarkMode ? Color.fromARGB(255, 49, 123, 136) : Colors.white, iconColor: isDarkMode ? Color.fromARGB(255, 49, 123, 136) : Color.fromARGB(255, 49, 123, 136)),
-          GButton(icon: Icons.settings, iconActiveColor: isDarkMode ? Color.fromARGB(255, 49, 123, 136) : Colors.white, iconColor: isDarkMode ? Color.fromARGB(255, 49, 123, 136) : Color.fromARGB(255, 49, 123, 136)),
-        ],
-        selectedIndex: _selectedIndex,
-        onTabChange: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+      bottomNavigationBar: Container(
+        color: isDarkMode ? const Color.fromARGB(255, 18, 46, 49) : Colors.white,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.05, // 5% of screen width
+            vertical: screenHeight * 0.02, // 2% of screen height
+          ),
+          child: GNav(
+            gap: screenWidth * 0.02, // 2% of screen width
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.03, // 3% of screen width
+              vertical: screenHeight * 0.015, // 1.5% of screen height
+            ),
+            tabMargin: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.05, // 5% of screen width
+              vertical: screenHeight * 0.01, // 1% of screen height
+            ),
+            tabBackgroundColor: isDarkMode
+                ? const Color.fromARGB(255, 255, 245, 245)
+                : const Color.fromARGB(255, 49, 123, 136),
+            iconSize: screenWidth * 0.07, // Adjusted to 7% of screen width
+            tabBorderRadius: screenWidth * 0.05, // 5% of screen width
+            backgroundColor:
+                isDarkMode ? const Color.fromARGB(255, 18, 46, 49) : Colors.white,
+            tabs: [
+              GButton(
+                icon: Icons.home,
+                iconActiveColor: isDarkMode
+                    ? const Color.fromARGB(255, 49, 123, 136)
+                    : Colors.white,
+                iconColor: const Color.fromARGB(255, 49, 123, 136),
+                text: 'Home',
+                textSize: screenWidth * 0.035, // Adjusted text size
+              ),
+              GButton(
+                icon: Icons.book,
+                iconActiveColor: isDarkMode
+                    ? const Color.fromARGB(255, 49, 123, 136)
+                    : Colors.white,
+                iconColor: const Color.fromARGB(255, 49, 123, 136),
+                text: 'Analytics',
+                textSize: screenWidth * 0.035, // Adjusted text size
+              ),
+              GButton(
+                icon: Icons.settings,
+                iconActiveColor: isDarkMode
+                    ? const Color.fromARGB(255, 49, 123, 136)
+                    : Colors.white,
+                iconColor: const Color.fromARGB(255, 49, 123, 136),
+                text: 'Settings',
+                textSize: screenWidth * 0.035, // Adjusted text size
+              ),
+            ],
+            selectedIndex: _selectedIndex,
+            onTabChange: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+          ),
+        ),
       ),
     );
   }
