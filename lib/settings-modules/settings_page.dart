@@ -2,9 +2,14 @@ import 'package:fix_emotion/settings-modules/privacy_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fix_emotion/auth-modules/authentication_service.dart';
 import 'package:fix_emotion/settings-modules/edit_profile_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'notification_settings_page.dart';
 
 class SettingsPage extends StatefulWidget {
+  final String userId; // Add userId parameter
+
+  const SettingsPage({Key? key, required this.userId}) : super(key: key);
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
@@ -50,7 +55,12 @@ class _SettingsPageState extends State<SettingsPage> {
                       SizedBox(height: 20),
                       _buildSectionHeader('Privacy', isDarkMode),
                       _buildSettingsTile(Icons.lock, 'Privacy Settings', isDarkMode, () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacySettingsPage()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacySettingsPage(
+                          onSettingsChanged: (String setting, bool value) {
+                            _updatePrivacySettings(setting, value);
+                          },
+                          userId: widget.userId, // Pass userId here
+                        )));
                       }),
                       _buildSettingsTile(Icons.delete, 'Delete Data', isDarkMode, () {
                         // Navigate to Data Deletion Page
@@ -144,7 +154,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildLogOutButton(BuildContext context, bool isDarkMode) {
     return ElevatedButton(
       onPressed: () {
-        _handleLogOut(context);
+        _showLogOutConfirmationDialog(context, isDarkMode);
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: isDarkMode ? Colors.redAccent : Colors.red, // Background color
@@ -166,6 +176,34 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  void _showLogOutConfirmationDialog(BuildContext context, bool isDarkMode) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Log Out'),
+          content: Text('Are you sure you want to log out?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel', style: TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Log Out', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _handleLogOut(context);
+              },
+            ),
+          ],
+          backgroundColor: isDarkMode ? const Color(0xFF122E31) : Colors.white,
+        );
+      },
+    );
+  }
+
   void _handleLogOut(BuildContext context) async {
     try {
       await _authService.signOut();
@@ -178,6 +216,26 @@ class _SettingsPageState extends State<SettingsPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error logging out: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> _updatePrivacySettings(String setting, bool value) async {
+    try {
+      // Assuming you have a function to get the current user's ID
+      final userId = await _authService.getCurrentUserId();
+
+      await Supabase.instance.client
+          .from('user_permissions') // Make sure this matches your table name exactly
+          .update({setting: value})
+          .eq('user_id', userId!);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$setting updated successfully!')),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating $setting: ${error.toString()}')),
       );
     }
   }

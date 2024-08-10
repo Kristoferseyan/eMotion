@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 class PrivacySettingsPage extends StatefulWidget {
+  final String userId;
+
+  const PrivacySettingsPage({Key? key, required this.userId, required Null Function(String setting, bool value) onSettingsChanged}) : super(key: key);
+
   @override
   _PrivacySettingsPageState createState() => _PrivacySettingsPageState();
 }
@@ -8,6 +14,45 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
   bool _cameraAccess = false;
   bool _motionDataSharing = false;
   bool _anonymousDataCollection = false;
+
+  final supabase = Supabase.instance.client;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserPermissions();
+  }
+
+  Future<void> _loadUserPermissions() async {
+    try {
+      final response = await supabase
+          .from('user_permissions')
+          .select()
+          .eq('user_id', widget.userId)
+          .single();
+
+      if (response != null) {
+        setState(() {
+          _cameraAccess = response['camera_access'];
+          _motionDataSharing = response['motion_data_sharing'];
+          _anonymousDataCollection = response['anonymous_data_collection'];
+        });
+      }
+    } catch (error) {
+      print('Error loading user permissions: $error');
+    }
+  }
+
+  Future<void> _updateUserPermission(String field, bool value) async {
+    try {
+      await supabase
+          .from('user_permissions')
+          .update({field: value})
+          .eq('user_id', widget.userId);
+    } catch (error) {
+      print('Error updating user permissions: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +76,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 setState(() {
                   _cameraAccess = value;
                 });
+                _updateUserPermission('camera_access', value);
               },
               isDarkMode: isDarkMode,
             ),
@@ -41,6 +87,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 setState(() {
                   _motionDataSharing = value;
                 });
+                _updateUserPermission('motion_data_sharing', value);
               },
               isDarkMode: isDarkMode,
             ),
@@ -51,6 +98,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 setState(() {
                   _anonymousDataCollection = value;
                 });
+                _updateUserPermission('anonymous_data_collection', value);
               },
               isDarkMode: isDarkMode,
             ),

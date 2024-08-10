@@ -1,4 +1,4 @@
-import 'package:fix_emotion/auth-modules/login-modules/login.dart'; // Replace with your dashboard page
+import 'package:fix_emotion/auth-modules/login-modules/login.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
@@ -33,6 +33,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
         DateTime birthDate = DateFormat('yyyy-MM-dd').parse(_bDateController.text.trim());
         int age = _calculateAge(birthDate);
 
+        // Update user information in the 'users' table
         final response = await supabase.from('users').update({
           'fName': _fNameController.text.trim(),
           'lName': _lNameController.text.trim(),
@@ -40,18 +41,30 @@ class _UserInfoPageState extends State<UserInfoPage> {
           'bDate': _bDateController.text.trim(),
         }).eq('id', widget.userId).select();
 
-        if (response.isNotEmpty && response[0]['error'] != null) {
-          throw Exception('Failed to save user information: ${response[0]['error']['message']}');
+        if (response.isEmpty) {
+          throw Exception('Failed to save user information.');
+        }
+
+        // Insert default permissions for the user in 'user_permissions' table
+        final permissionResponse = await supabase.from('user_permissions').insert({
+          'user_id': widget.userId,
+          'camera_access': false,
+          'motion_data_sharing': false,
+          'anonymous_data_collection': false,
+        }).select();
+
+        if (permissionResponse.isEmpty) {
+          throw Exception('Failed to insert user permissions.');
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Information saved successfully!')),
         );
 
-        // Redirect to the dashboard or next step
+        // Redirect to the login page or another step
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const LoginPage()), // Replace with your dashboard page
+          MaterialPageRoute(builder: (context) => const LoginPage()),
         );
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(

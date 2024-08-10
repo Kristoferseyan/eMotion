@@ -28,9 +28,9 @@ class _DashboardState extends State<Dashboard> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          DashboardLayout(userId: widget.userId), // Only pass the userId
+          DashboardLayout(userId: widget.userId), // Pass userId to DashboardLayout
           AnalyticsPage(),
-          SettingsPage(),
+          SettingsPage(userId: widget.userId), // Pass userId to SettingsPage
         ],
       ),
       bottomNavigationBar: Container(

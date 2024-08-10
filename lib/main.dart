@@ -38,10 +38,10 @@ class MyApp extends StatelessWidget {
         '/': (context) => const LoginReg(),
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegistrationPage(),
-        '/settings': (context) => SettingsPage(),
+        '/settings': (context) => SettingsPage(userId: '',),
         '/dashboard': (context) => const Dashboard(userId: '', userEmail: '',),
         '/notification-settings': (context) => NotificationSettingsPage(),
-        'privacy-settings': (context) => PrivacySettingsPage(),
+        'privacy-settings': (context) => PrivacySettingsPage(userId: '', onSettingsChanged: (String setting, bool value) {  },),
       },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
