@@ -208,11 +208,11 @@ class _SettingsPageState extends State<SettingsPage> {
     try {
       await _authService.signOut();
 
-      if (!mounted) return; // Check if the widget is still mounted
+      if (!mounted) return; 
 
       Navigator.pushReplacementNamed(context, '/');
     } catch (e) {
-      if (!mounted) return; // Check if the widget is still mounted
+      if (!mounted) return; 
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error logging out: ${e.toString()}')),
@@ -222,11 +222,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _updatePrivacySettings(String setting, bool value) async {
     try {
-      // Assuming you have a function to get the current user's ID
       final userId = await _authService.getCurrentUserId();
 
       await Supabase.instance.client
-          .from('user_permissions') // Make sure this matches your table name exactly
+          .from('user_permissions')
           .update({setting: value})
           .eq('user_id', userId!);
 

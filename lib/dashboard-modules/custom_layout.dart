@@ -1,4 +1,5 @@
 import 'package:fix_emotion/dashboard-modules/module-boxes/emotion-dictionary/emotionDict.dart';
+import 'package:fix_emotion/dashboard-modules/module-boxes/tracking-modules/track_emo_layout.dart';
 import 'package:flutter/material.dart';
 
 
@@ -40,7 +41,12 @@ class CustomLayout extends StatelessWidget {
         'imagePath': 'assets/images/emoTrack.png',
         'text': 'Track Emotions',
         'textColor': Color.fromARGB(255, 209, 130, 130),
-        'onTap': null,
+        'onTap': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => TrackEmoLayout()),
+          );
+        },
       },
       {
         'color': Color(0xFFFFEBD8),

@@ -16,7 +16,7 @@ class DashboardLayout extends StatefulWidget {
 
 class _DashboardLayoutState extends State<DashboardLayout> {
   String selectedEmotion = 'Happiness';
-  String? userName; // This will be retrieved from the database
+  String? userName;
   final List<String> emotions = [
     'Happiness',
     'Sadness',
@@ -38,17 +38,17 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   Future<void> _fetchUserName() async {
     try {
       final response = await supabase
-          .from('users') // Ensure this is the correct table name
-          .select('fName') // Ensure this is the correct column name
-          .eq('id', widget.userId) // Fetch based on the passed userId
+          .from('users')
+          .select('fName')
+          .eq('id', widget.userId)
           .single();
 
       setState(() {
-        userName = response['fName'] ?? 'User'; // Default to 'User' if name is not found
+        userName = response['fName'] ?? 'User';
       });
     } catch (error) {
       setState(() {
-        userName = 'User'; // Default to 'User' if there's an error
+        userName = 'User';
       });
       print('Error fetching user name: $error');
     }
@@ -63,7 +63,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
       body: SafeArea(
         child: userName == null
-            ? const Center(child: CircularProgressIndicator()) // Show a loader while the name is being fetched
+            ? const Center(child: CircularProgressIndicator())
             : DashboardBody(
                 userName: userName!,
                 selectedEmotion: selectedEmotion,
@@ -121,7 +121,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProfilePage(userId: widget.userId), // Pass userId
+        builder: (context) => ProfilePage(userId: widget.userId),
       ),
     );
   }

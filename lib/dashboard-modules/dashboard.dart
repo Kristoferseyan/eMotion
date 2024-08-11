@@ -28,33 +28,33 @@ class _DashboardState extends State<Dashboard> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          DashboardLayout(userId: widget.userId), // Pass userId to DashboardLayout
+          DashboardLayout(userId: widget.userId), 
           AnalyticsPage(),
-          SettingsPage(userId: widget.userId), // Pass userId to SettingsPage
+          SettingsPage(userId: widget.userId),
         ],
       ),
       bottomNavigationBar: Container(
         color: isDarkMode ? const Color.fromARGB(255, 18, 46, 49) : Colors.white,
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.05, // 5% of screen width
-            vertical: screenHeight * 0.02, // 2% of screen height
+            horizontal: screenWidth * 0.05,
+            vertical: screenHeight * 0.02,
           ),
           child: GNav(
-            gap: screenWidth * 0.02, // 2% of screen width
+            gap: screenWidth * 0.02,
             padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.03, // 3% of screen width
-              vertical: screenHeight * 0.015, // 1.5% of screen height
+              horizontal: screenWidth * 0.03,
+              vertical: screenHeight * 0.015,
             ),
             tabMargin: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.05, // 5% of screen width
-              vertical: screenHeight * 0.01, // 1% of screen height
+              horizontal: screenWidth * 0.05,
+              vertical: screenHeight * 0.01,
             ),
             tabBackgroundColor: isDarkMode
                 ? const Color.fromARGB(255, 255, 245, 245)
                 : const Color.fromARGB(255, 49, 123, 136),
-            iconSize: screenWidth * 0.07, // Adjusted to 7% of screen width
-            tabBorderRadius: screenWidth * 0.05, // 5% of screen width
+            iconSize: screenWidth * 0.07, 
+            tabBorderRadius: screenWidth * 0.05, 
             backgroundColor:
                 isDarkMode ? const Color.fromARGB(255, 18, 46, 49) : Colors.white,
             tabs: [
@@ -65,7 +65,7 @@ class _DashboardState extends State<Dashboard> {
                     : Colors.white,
                 iconColor: const Color.fromARGB(255, 49, 123, 136),
                 text: 'Home',
-                textSize: screenWidth * 0.035, // Adjusted text size
+                textSize: screenWidth * 0.035, 
               ),
               GButton(
                 icon: Icons.book,
@@ -74,7 +74,7 @@ class _DashboardState extends State<Dashboard> {
                     : Colors.white,
                 iconColor: const Color.fromARGB(255, 49, 123, 136),
                 text: 'Analytics',
-                textSize: screenWidth * 0.035, // Adjusted text size
+                textSize: screenWidth * 0.035, 
               ),
               GButton(
                 icon: Icons.settings,
@@ -83,7 +83,7 @@ class _DashboardState extends State<Dashboard> {
                     : Colors.white,
                 iconColor: const Color.fromARGB(255, 49, 123, 136),
                 text: 'Settings',
-                textSize: screenWidth * 0.035, // Adjusted text size
+                textSize: screenWidth * 0.035, 
               ),
             ],
             selectedIndex: _selectedIndex,
