@@ -4,7 +4,7 @@ import 'package:tflite_v2/tflite_v2.dart';
 class ModelService {
   Future<void> loadModel() async {
     await Tflite.loadModel(
-      model: "assets/models/eMotion_tflite_model.tflite",
+      model: "assets/models/model.tflite",
       labels: "assets/models/labels.txt",
     );
   }
