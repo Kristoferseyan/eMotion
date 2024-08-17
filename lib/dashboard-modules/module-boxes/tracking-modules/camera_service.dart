@@ -5,18 +5,23 @@ class CameraService {
   late CameraController _cameraController;
   List<CameraDescription> _cameras = [];
 
-  Future<void> initializeCamera(bool isFrontCamera, void Function(CameraImage image) onImageAvailable) async {
+  Future<void> initializeCamera(void Function(CameraImage image) onImageAvailable) async {
     _cameras = await availableCameras();
     if (_cameras.isEmpty) {
       throw Exception('No cameras available.');
     }
 
-    final cameraDescription = isFrontCamera
-        ? _getCamera(CameraLensDirection.back)
-        : _getCamera(CameraLensDirection.front);
+    // Always use the back camera
+    final cameraDescription = _getCamera(CameraLensDirection.back);
 
     _cameraController = CameraController(cameraDescription, ResolutionPreset.medium);
-    await _cameraController.initialize();
+
+    try {
+      await _cameraController.initialize();
+    } catch (e) {
+      throw Exception('Failed to initialize camera: $e');
+    }
+
     _cameraController.startImageStream(onImageAvailable);
   }
 
@@ -28,15 +33,10 @@ class CameraService {
     return _cameras.firstWhere((camera) => camera.lensDirection == direction);
   }
 
-  void startStream(void Function(CameraImage image) onImageAvailable) {
-      _cameraController.startImageStream(onImageAvailable);
-  }
-
-  void stopStream() {
-    _cameraController.stopImageStream();
-  }
-
   Widget cameraPreviewWidget() {
+    if (!_cameraController.value.isInitialized) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return CameraPreview(_cameraController);
   }
 }

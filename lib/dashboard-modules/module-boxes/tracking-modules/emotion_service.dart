@@ -7,20 +7,22 @@ class EmotionService {
   }
 
   Map<String, double> calculateEmotionProbabilities() {
-    final Map<String, double> emotionProbabilities = {};
+    final emotionCounts = <String, int>{};
     final totalEmotions = savedData.length;
 
     if (totalEmotions == 0) {
-      return emotionProbabilities;
+      return {};
     }
 
-    savedData.forEach((emotion) {
-      if (emotionProbabilities.containsKey(emotion)) {
-        emotionProbabilities[emotion] = emotionProbabilities[emotion]! + 1 / totalEmotions;
-      } else {
-        emotionProbabilities[emotion] = 1 / totalEmotions;
-      }
-    });
+    // Count occurrences of each emotion
+    for (var emotion in savedData) {
+      emotionCounts.update(emotion, (value) => value + 1, ifAbsent: () => 1);
+    }
+
+    // Convert counts to probabilities
+    final emotionProbabilities = emotionCounts.map(
+      (emotion, count) => MapEntry(emotion, count / totalEmotions),
+    );
 
     return normalizeProbabilities(emotionProbabilities);
   }

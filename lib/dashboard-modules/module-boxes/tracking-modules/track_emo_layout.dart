@@ -5,7 +5,6 @@ import 'camera_service.dart';
 import 'model_service.dart';
 import 'emotion_service.dart';
 
-
 class TrackEmoLayout extends StatefulWidget {
   const TrackEmoLayout({Key? key}) : super(key: key);
 
@@ -18,8 +17,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
   final ModelService _modelService = ModelService();
   final EmotionService _emotionService = EmotionService();
 
-  bool _isCameraInitialized = false;
-  bool _isModelLoaded = false;
+  late Future<void> _initializationFuture;
   String _output = '';
   bool _isCameraPlaying = false;
   bool _isGraphVisible = false;
@@ -28,26 +26,34 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
   @override
   void initState() {
     super.initState();
-    _initializeApp();
+    _initializationFuture = _initializeApp();
   }
 
   Future<void> _initializeApp() async {
-    await _cameraService.initializeCamera(true, _processImageStream);
-    await _modelService.loadModel();
-    setState(() {
-      _isCameraInitialized = true;
-      _isModelLoaded = true;
-    });
+    try {
+      await _cameraService.initializeCamera(_processImageStream);
+      print('Camera initialized successfully.');
+      await _modelService.loadModel();
+      print('Model loaded successfully.');
+    } catch (e) {
+      print('Error during initialization: $e');
+    }
   }
 
   Future<void> _processImageStream(CameraImage image) async {
-    if (_isModelLoaded && _isCameraPlaying) {
+    if (_isCameraPlaying) {
+      print('Processing image frame...');
       final emotion = await _modelService.runModelOnFrame(image);
-      setState(() {
-        _output = emotion;
-        _emotionService.saveEmotion(emotion);
-        _scores = _emotionService.mapProbabilitiesToScores(_emotionService.calculateEmotionProbabilities());
-      });
+      if (emotion.isNotEmpty) {
+        setState(() {
+          _output = emotion;
+          _emotionService.saveEmotion(emotion);
+          _scores = _emotionService.mapProbabilitiesToScores(_emotionService.calculateEmotionProbabilities());
+        });
+        print('Emotion detected: $_output');
+      } else {
+        print('No emotion detected.');
+      }
     }
   }
 
@@ -62,53 +68,66 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
     return Scaffold(
       appBar: AppBar(title: const Text('Track Emotion')),
       body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isCameraPlaying = !_isCameraPlaying;
-                      });
-                    },
-                    child: Center(
-                      child: _isCameraInitialized
-                          ? _cameraService.cameraPreviewWidget()
-                          : const CircularProgressIndicator(),
-                    ),
-                  ),
-                ),
-                _buildControls(),
-                ElevatedButton(
-                  onPressed: _showSavedDataDialog,
-                  child: const Text('Check Saved Data'),
-                ),
-              ],
-            ),
-            if (_isGraphVisible)
-              Positioned(
-                bottom: 180,
-                left: 0,
-                right: 0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  height: 150,
-                  width: 350,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: myBarGraph(scores: _scores),
-                  ),
-                ),
-              ),
-          ],
+        child: FutureBuilder<void>(
+          future: _initializationFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              return _buildMainContent();
+            }
+          },
         ),
       ),
+    );
+  }
+
+  Widget _buildMainContent() {
+    return Stack(
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isCameraPlaying = !_isCameraPlaying;
+                  });
+                },
+                child: Center(
+                  child: _cameraService.cameraPreviewWidget(),
+                ),
+              ),
+            ),
+            _buildControls(),
+            ElevatedButton(
+              onPressed: _showSavedDataDialog,
+              child: const Text('Check Saved Data'),
+            ),
+          ],
+        ),
+        if (_isGraphVisible)
+          Positioned(
+            bottom: 180,
+            left: 0,
+            right: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              height: 150,
+              width: 350,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: myBarGraph(scores: _scores),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -125,10 +144,6 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
               });
             },
             icon: const Icon(Icons.bar_chart_rounded, size: 36),
-          ),
-          IconButton(
-            onPressed: () => _cameraService.initializeCamera(!_isCameraInitialized, _processImageStream),
-            icon: const Icon(Icons.flip_camera_android, size: 36),
           ),
           IconButton(
             onPressed: () {
