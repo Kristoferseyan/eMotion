@@ -2,12 +2,17 @@ import 'package:fix_emotion/dashboard-modules/module-boxes/emotion-dictionary/em
 import 'package:fix_emotion/dashboard-modules/module-boxes/tracking-modules/track_emo_layout.dart';
 import 'package:flutter/material.dart';
 
-
 class CustomLayout extends StatelessWidget {
   final double maxWidth;
   final String userName;
+  final String userId; // Add userId here
 
-  CustomLayout({Key? key, required this.maxWidth, required this.userName}) : super(key: key);
+  CustomLayout({
+    Key? key,
+    required this.maxWidth,
+    required this.userName,
+    required this.userId, // Include userId in the constructor
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +49,9 @@ class CustomLayout extends StatelessWidget {
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => TrackEmoLayout()),
+            MaterialPageRoute(
+              builder: (context) => TrackEmoLayout(userId: userId), // Pass the userId here
+            ),
           );
         },
       },

@@ -1,12 +1,17 @@
 import 'package:fix_emotion/graph/bar_graph.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
+import 'database_service.dart';
 import 'camera_service.dart';
 import 'model_service.dart';
 import 'emotion_service.dart';
 
 class TrackEmoLayout extends StatefulWidget {
-  const TrackEmoLayout({Key? key}) : super(key: key);
+  final String userId; // Added userId for session tracking
+
+  const TrackEmoLayout({Key? key, required this.userId}) : super(key: key);
 
   @override
   _TrackEmoLayoutState createState() => _TrackEmoLayoutState();
@@ -16,6 +21,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
   final CameraService _cameraService = CameraService();
   final ModelService _modelService = ModelService();
   final EmotionService _emotionService = EmotionService();
+  final DatabaseService _databaseService = DatabaseService(Supabase.instance.client);
 
   late Future<void> _initializationFuture;
   String _output = '';
@@ -104,8 +110,8 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
             ),
             _buildControls(),
             ElevatedButton(
-              onPressed: _showSavedDataDialog,
-              child: const Text('Check Saved Data'),
+              onPressed: _endSession, // Integrate with the new session management
+              child: const Text('End Session'),
             ),
           ],
         ),
@@ -164,41 +170,54 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
     );
   }
 
-  Future<void> _showSavedDataDialog() async {
-    final scores = _emotionService.mapProbabilitiesToScores(_emotionService.calculateEmotionProbabilities());
+  Future<void> _endSession() async {
+    print('End session button pressed.');
 
+    final sessionId = Uuid().v4(); // Generate UUID for session ID
+    final duration = 10; // Example duration in minutes
+
+    final mostFrequentEmotion = _emotionService.getMostFrequentEmotion();
+    final emotionDistribution = _emotionService.calculateEmotionProbabilities();
+
+    try {
+      await _databaseService.insertSessionData(
+        userId: widget.userId,
+        sessionId: sessionId,
+        emotion: mostFrequentEmotion,
+        emotionDistribution: emotionDistribution,
+        duration: duration,
+      );
+      print('Session data saved successfully.');
+    } catch (e) {
+      print('Error during session data save: $e');
+    }
+
+    // Clear session data
+    _emotionService.savedData.clear();
+
+    // Update UI or provide feedback
+    setState(() {
+      _isGraphVisible = false; // Hide graph if it was visible
+      _output = ''; // Clear emotion output
+    });
+
+    // Provide feedback to the user
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Saved Data'),
-          content: Container(
-            color: Colors.grey[200],
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: scores.entries.map((entry) {
-                return ListTile(
-                  title: Row(
-                    children: [
-                      Text('${entry.key}: ${entry.value}'),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
+      builder: (context) => AlertDialog(
+        title: Text('Session Ended'),
+        content: Text('Your session has been successfully saved.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK'),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
+        ],
+      ),
     );
+
+    print('Session ended, data saved.');
   }
 }

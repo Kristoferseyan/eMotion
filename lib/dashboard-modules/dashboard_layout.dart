@@ -65,6 +65,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
         child: userName == null
             ? const Center(child: CircularProgressIndicator())
             : DashboardBody(
+                userId: widget.userId, // Pass userId to DashboardBody
                 userName: userName!,
                 selectedEmotion: selectedEmotion,
                 emotions: emotions,
@@ -128,6 +129,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 }
 
 class DashboardBody extends StatelessWidget {
+  final String userId; // Add userId here
   final String userName;
   final String selectedEmotion;
   final List<String> emotions;
@@ -137,6 +139,7 @@ class DashboardBody extends StatelessWidget {
 
   const DashboardBody({
     Key? key,
+    required this.userId, // Include userId in the constructor
     required this.userName,
     required this.selectedEmotion,
     required this.emotions,
@@ -180,6 +183,7 @@ class DashboardBody extends StatelessWidget {
                 child: CustomLayout(
                   maxWidth: constraints.maxWidth,
                   userName: userName,
+                  userId: userId, // Pass userId to CustomLayout
                 ),
               ),
             ),
