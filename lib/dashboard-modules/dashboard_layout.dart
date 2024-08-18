@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'emotion_chart.dart';
+import '../graph/emotion_chart.dart';
 import 'custom_layout.dart';
 import 'profile_page.dart';
 

@@ -9,7 +9,7 @@ import 'model_service.dart';
 import 'emotion_service.dart';
 
 class TrackEmoLayout extends StatefulWidget {
-  final String userId; // Added userId for session tracking
+  final String userId;
 
   const TrackEmoLayout({Key? key, required this.userId}) : super(key: key);
 
@@ -29,6 +29,8 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
   bool _isGraphVisible = false;
   Map<String, int> _scores = {};
 
+  DateTime? _sessionStartTime;
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +46,22 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
     } catch (e) {
       print('Error during initialization: $e');
     }
+  }
+
+  void _startSession() {
+    setState(() {
+      _isCameraPlaying = true;
+      _sessionStartTime = DateTime.now();
+    });
+  }
+
+  void _toggleCamera() {
+    setState(() {
+      _isCameraPlaying = !_isCameraPlaying;
+      if (_isCameraPlaying) {
+        _startSession();
+      }
+    });
   }
 
   Future<void> _processImageStream(CameraImage image) async {
@@ -98,11 +116,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
           children: [
             Expanded(
               child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _isCameraPlaying = !_isCameraPlaying;
-                  });
-                },
+                onTap: _toggleCamera,
                 child: Center(
                   child: _cameraService.cameraPreviewWidget(),
                 ),
@@ -110,7 +124,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
             ),
             _buildControls(),
             ElevatedButton(
-              onPressed: _endSession, // Integrate with the new session management
+              onPressed: _endSession,
               child: const Text('End Session'),
             ),
           ],
@@ -152,11 +166,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
             icon: const Icon(Icons.bar_chart_rounded, size: 36),
           ),
           IconButton(
-            onPressed: () {
-              setState(() {
-                _isCameraPlaying = !_isCameraPlaying;
-              });
-            },
+            onPressed: _toggleCamera,
             icon: Icon(_isCameraPlaying ? Icons.pause : Icons.play_arrow, size: 36),
           ),
           const SizedBox(width: 16),
@@ -173,8 +183,9 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
   Future<void> _endSession() async {
     print('End session button pressed.');
 
-    final sessionId = Uuid().v4(); // Generate UUID for session ID
-    final duration = 10; // Example duration in minutes
+    final sessionId = Uuid().v4();
+    final sessionEndTime = DateTime.now();
+    final duration = sessionEndTime.difference(_sessionStartTime!).inSeconds;
 
     final mostFrequentEmotion = _emotionService.getMostFrequentEmotion();
     final emotionDistribution = _emotionService.calculateEmotionProbabilities();
@@ -192,27 +203,24 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
       print('Error during session data save: $e');
     }
 
-    // Clear session data
     _emotionService.savedData.clear();
 
-    // Update UI or provide feedback
     setState(() {
-      _isGraphVisible = false; // Hide graph if it was visible
-      _output = ''; // Clear emotion output
+      _isGraphVisible = false;
+      _output = '';
     });
 
-    // Provide feedback to the user
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Session Ended'),
-        content: Text('Your session has been successfully saved.'),
+        title: const Text('Session Ended'),
+        content: const Text('Your session has been successfully saved.'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
