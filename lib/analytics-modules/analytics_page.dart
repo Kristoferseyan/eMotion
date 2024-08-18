@@ -1,36 +1,97 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'pie_chart_widget.dart';
 import 'recent_tracking_list.dart';
 
-class AnalyticsPage extends StatelessWidget {
+class AnalyticsPage extends StatefulWidget {
+  final String userId;
+
+  const AnalyticsPage({Key? key, required this.userId}) : super(key: key);
+
+  @override
+  _AnalyticsPageState createState() => _AnalyticsPageState();
+}
+
+class _AnalyticsPageState extends State<AnalyticsPage> {
+  final supabase = Supabase.instance.client;
+  Map<String, double> emotionData = {};
+  List<Map<String, dynamic>> recentTrackings = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEmotionData();
+    _fetchRecentTrackings();
+  }
+
+  Future<void> _fetchEmotionData() async {
+    try {
+      final response = await supabase
+          .from('emotion_tracking')
+          .select('emotion')
+          .eq('user_id', widget.userId); // Filter by user ID from the emotion_tracking table
+
+      Map<String, int> emotionCount = {};
+
+      // Count the occurrences of each emotion
+      for (var record in response as List<dynamic>) {
+        String emotion = record['emotion'];
+        if (emotionCount.containsKey(emotion)) {
+          emotionCount[emotion] = emotionCount[emotion]! + 1;
+        } else {
+          emotionCount[emotion] = 1;
+        }
+      }
+
+      // Convert the counts to percentages for the chart
+      int total = emotionCount.values.fold(0, (sum, count) => sum + count);
+      setState(() {
+        emotionData = {
+          for (var entry in emotionCount.entries)
+            entry.key: (entry.value / total) * 100, // Convert to percentage
+        };
+      });
+    } catch (error) {
+      print('Error fetching emotion data: $error');
+    }
+  }
+
+  Future<void> _fetchRecentTrackings() async {
+    try {
+      final response = await supabase
+          .from('emotion_tracking')
+          .select('emotion, timestamp, user_feedback')
+          .eq('user_id', widget.userId) // Filter by user ID from the emotion_tracking table
+          .order('timestamp', ascending: false)
+          .limit(10);
+
+      if (response != null && response.isNotEmpty) {
+        setState(() {
+          recentTrackings = List<Map<String, dynamic>>.from(response as List<dynamic>).map((tracking) {
+            // Parse the timestamp and separate date and time
+            final DateTime timestamp = DateTime.parse(tracking['timestamp']);
+            final String date = '${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}';
+            final String time = '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
+
+            // Return the tracking data with separated date and time
+            return {
+              'emotion': tracking['emotion'],
+              'date': date, // Store the formatted date
+              'time': time, // Store the formatted time
+              'user_feedback': tracking['user_feedback'],
+            };
+          }).toList();
+        });
+      } else {
+        print('No tracking data found.');
+      }
+    } catch (error) {
+      print('Error fetching recent tracking data: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Map<String, double> emotionData = {
-      'Happiness': 40,
-      'Sadness': 20,
-      'Anger': 10,
-      'Surprise': 15,
-      'Disgust': 5,
-      'Fear': 10,
-    };
-
-    // Example data for recent tracking
-    final List<Map<String, dynamic>> recentTrackings = [
-      {
-        'emotion': 'Happiness',
-        'date': '2024-07-19',
-        'details': 'Happiness is a state of well-being and contentment. It involves positive emotions and life satisfaction.',
-        'description': 'Feeling happy about recent achievements.',
-      },
-      {
-        'emotion': 'Sadness',
-        'date': '2024-07-18',
-        'details': 'Sadness is an emotional pain associated with, or characterized by, feelings of disadvantage, loss, despair, grief, helplessness, disappointment and sorrow.',
-        'description': 'Feeling sad due to recent losses.',
-      },
-    ];
-
     final brightness = MediaQuery.of(context).platformBrightness;
     final isDarkMode = brightness == Brightness.dark;
 

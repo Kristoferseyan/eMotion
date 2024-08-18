@@ -22,9 +22,9 @@ class RecentTrackingList extends StatelessWidget {
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: _getColor(tracking['emotion']),
-              child: Icon(
-                _getIcon(tracking['emotion']),
-                color: Colors.white,
+              child: Text(
+                _getEmoji(tracking['emotion']),
+                style: TextStyle(fontSize: 24),
               ),
             ),
             title: Text(
@@ -32,7 +32,7 @@ class RecentTrackingList extends StatelessWidget {
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
             subtitle: Text(
-              tracking['date'],
+              '${tracking['date']} | ${tracking['time']}',
               style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
             ),
             onTap: () {
@@ -49,29 +49,29 @@ class RecentTrackingList extends StatelessWidget {
     );
   }
 
-  IconData _getIcon(String emotion) {
+  String _getEmoji(String emotion) {
     switch (emotion) {
       case 'Happiness':
-        return Icons.sentiment_satisfied;
+        return '😊';
       case 'Sadness':
-        return Icons.sentiment_dissatisfied;
+        return '😢';
       case 'Anger':
-        return Icons.sentiment_very_dissatisfied;
+        return '😡';
       case 'Surprise':
-        return Icons.sentiment_very_satisfied;
+        return '😲';
       case 'Disgust':
-        return Icons.sentiment_neutral;
+        return '🤢';
       case 'Fear':
-        return Icons.sentiment_very_dissatisfied;
+        return '😨';
       default:
-        return Icons.sentiment_neutral;
+        return '😐';
     }
   }
 
   Color _getColor(String emotion) {
     switch (emotion) {
       case 'Happiness':
-        return Colors.amber; 
+        return Colors.amber;
       case 'Sadness':
         return Colors.blueAccent;
       case 'Anger':

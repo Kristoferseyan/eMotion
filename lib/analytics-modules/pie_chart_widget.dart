@@ -26,7 +26,7 @@ class PieChartWidget extends StatelessWidget {
       children: [
         Container(
           width: double.infinity,
-          height: 200, // Set a fixed height
+          height: 200,
           child: PieChart(
             PieChartData(
               sections: sections,
@@ -70,9 +70,9 @@ class PieChartWidget extends StatelessWidget {
       case 'Sadness':
         return Colors.blueAccent;
       case 'Anger':
-        return Colors.redAccent; 
+        return Colors.redAccent;
       case 'Surprise':
-        return Colors.orangeAccent; 
+        return Colors.orangeAccent;
       case 'Disgust':
         return Colors.green;
       case 'Fear':

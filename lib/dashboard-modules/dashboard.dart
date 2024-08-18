@@ -29,7 +29,7 @@ class _DashboardState extends State<Dashboard> {
         index: _selectedIndex,
         children: [
           DashboardLayout(userId: widget.userId), 
-          AnalyticsPage(),
+          AnalyticsPage(userId: widget.userId,),
           SettingsPage(userId: widget.userId),
         ],
       ),
