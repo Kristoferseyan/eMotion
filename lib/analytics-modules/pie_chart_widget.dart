@@ -9,8 +9,13 @@ class PieChartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<PieChartSectionData> sections = emotionData.entries.map((entry) {
+      // Trim the emotion key to remove any leading or trailing spaces
+      String emotionKey = entry.key.trim();
+      Color color = _getColor(emotionKey);
+      print('Emotion: $emotionKey, Color: $color'); // Debug log
+
       return PieChartSectionData(
-        color: _getColor(entry.key),
+        color: color,
         value: entry.value,
         title: '${entry.value.toInt()}%',
         radius: 50,
@@ -47,16 +52,17 @@ class PieChartWidget extends StatelessWidget {
       spacing: 10,
       runSpacing: 10,
       children: emotionData.keys.map((emotion) {
+        String emotionKey = emotion.trim(); // Trim the emotion key here as well
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               width: 16,
               height: 16,
-              color: _getColor(emotion),
+              color: _getColor(emotionKey),
             ),
             const SizedBox(width: 8),
-            Text(emotion),
+            Text(emotionKey),
           ],
         );
       }).toList(),

@@ -8,14 +8,21 @@ import 'auth-modules/reg-modules/registration.dart';
 import 'settings-modules/notification_settings_page.dart';
 import 'settings-modules/privacy_settings_page.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Load environment variables and handle any missing keys
   await dotenv.load(fileName: "assets/auth.env");
+  final String? supabaseUrl = dotenv.env['SUPABASE_URL'];
+  final String? supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+
+  if (supabaseUrl == null || supabaseAnonKey == null) {
+    throw Exception("Environment variables for Supabase are missing!");
+  }
 
   await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
   );
 
   final supabase = Supabase.instance.client;
@@ -26,55 +33,100 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final bool isAuthenticated;
+
   const MyApp({Key? key, required this.isAuthenticated}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       initialRoute: isAuthenticated ? '/dashboard' : '/',
-      routes: {
-        '/': (context) => const LoginReg(),
-        '/login': (context) => const LoginPage(),
-        '/register': (context) => const RegistrationPage(),
-        '/settings': (context) => SettingsPage(userId: '',),
-        '/dashboard': (context) => const Dashboard(userId: '', userEmail: '',),
-        '/notification-settings': (context) => NotificationSettingsPage(),
-        'privacy-settings': (context) => PrivacySettingsPage(userId: '', onSettingsChanged: (String setting, bool value) {  },),
-      },
+      onGenerateRoute: _onGenerateRoute,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primaryColor: const Color.fromARGB(255, 49, 123, 133),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.black,
-            backgroundColor: Colors.white,
-          ),
-        ),
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.white,
-            side: const BorderSide(color: Colors.white),
-          ),
-        ),
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: const Color.fromARGB(255, 18, 46, 49),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.black,
-            backgroundColor: Colors.white,
-          ),
-        ),
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.white,
-            side: const BorderSide(color: Colors.white),
-          ),
-        ),
-      ),
+      theme: _buildLightTheme(),
+      darkTheme: _buildDarkTheme(),
       themeMode: ThemeMode.system,
+    );
+  }
+
+  Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
+    final args = getRouteArguments(settings);
+
+    switch (settings.name) {
+      case '/':
+        return MaterialPageRoute(builder: (_) => const LoginReg());
+      case '/login':
+        return MaterialPageRoute(builder: (_) => const LoginPage());
+      case '/register':
+        return MaterialPageRoute(builder: (_) => const RegistrationPage());
+      case '/dashboard':
+        return MaterialPageRoute(
+          builder: (_) => Dashboard(
+            userId: args['userId'] ?? '',
+            userEmail: args['userEmail'] ?? '',
+          ),
+        );
+      case '/settings':
+        return MaterialPageRoute(
+          builder: (_) => SettingsPage(userId: args['userId'] ?? ''),
+        );
+      case '/notification-settings':
+        return MaterialPageRoute(builder: (_) => NotificationSettingsPage());
+      case '/privacy-settings':
+        return MaterialPageRoute(
+          builder: (_) => PrivacySettingsPage(
+            userId: args['userId'] ?? '',
+            onSettingsChanged: (String setting, bool value) {
+            },
+          ),
+        );
+      default:
+        return MaterialPageRoute(builder: (_) => const LoginReg());
+    }
+  }
+
+  // Extract route arguments safely
+  Map<String, dynamic> getRouteArguments(RouteSettings settings) {
+    return settings.arguments as Map<String, dynamic>? ?? {};
+  }
+
+  ThemeData _buildLightTheme() {
+    return ThemeData(
+      brightness: Brightness.light,
+      primaryColor: const Color.fromARGB(255, 49, 123, 133),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: _buttonStyle(Colors.white, Colors.black),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: _outlinedButtonStyle(Colors.white),
+      ),
+    );
+  }
+
+  ThemeData _buildDarkTheme() {
+    return ThemeData(
+      brightness: Brightness.dark,
+      primaryColor: const Color.fromARGB(255, 18, 46, 49),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: _buttonStyle(Colors.white, Colors.black),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: _outlinedButtonStyle(Colors.white),
+      ),
+    );
+  }
+
+  // Reusable button styles
+  ButtonStyle _buttonStyle(Color backgroundColor, Color foregroundColor) {
+    return ElevatedButton.styleFrom(
+      foregroundColor: foregroundColor,
+      backgroundColor: backgroundColor,
+    );
+  }
+
+  ButtonStyle _outlinedButtonStyle(Color borderColor) {
+    return OutlinedButton.styleFrom(
+      foregroundColor: borderColor,
+      side: BorderSide(color: borderColor),
     );
   }
 }
@@ -98,7 +150,7 @@ class LoginReg extends StatelessWidget {
             children: <Widget>[
               Image.asset(
                 'assets/images/logo.png',
-                height: 200,
+                height: MediaQuery.of(context).size.height * 0.25, // Responsive height
               ),
               const SizedBox(height: 40),
               SizedBox(
@@ -106,11 +158,7 @@ class LoginReg extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (supabase.auth.currentSession != null) {
-                      Navigator.pushNamed(context, '/dashboard');
-                    } else {
-                      Navigator.pushNamed(context, '/login');
-                    }
+                    _navigateBasedOnAuth(supabase, context);
                   },
                   child: const Text(
                     'Login',
@@ -143,5 +191,13 @@ class LoginReg extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _navigateBasedOnAuth(SupabaseClient supabase, BuildContext context) {
+    if (supabase.auth.currentSession != null) {
+      Navigator.pushNamed(context, '/dashboard');
+    } else {
+      Navigator.pushNamed(context, '/login');
+    }
   }
 }

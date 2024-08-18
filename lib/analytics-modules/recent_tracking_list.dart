@@ -12,19 +12,20 @@ class RecentTrackingList extends StatelessWidget {
     final isDarkMode = brightness == Brightness.dark;
 
     return ListView.builder(
-      shrinkWrap: true,
       itemCount: recentTrackings.length,
+      shrinkWrap: true,
+      physics: const AlwaysScrollableScrollPhysics(), // Enables scrolling within the list
       itemBuilder: (context, index) {
         final tracking = recentTrackings[index];
         return Card(
           color: isDarkMode ? Color.fromARGB(255, 23, 57, 61) : Colors.white,
-          margin: EdgeInsets.symmetric(vertical: 8.0),
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: _getColor(tracking['emotion']),
               child: Text(
                 _getEmoji(tracking['emotion']),
-                style: TextStyle(fontSize: 24),
+                style: const TextStyle(fontSize: 24),
               ),
             ),
             title: Text(
