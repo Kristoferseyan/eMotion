@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'pie_chart_widget.dart';
+import '../graph/pie_chart_widget.dart';
 import 'recent_tracking_list.dart';
 
 class AnalyticsPage extends StatefulWidget {

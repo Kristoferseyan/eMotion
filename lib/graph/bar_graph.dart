@@ -1,8 +1,6 @@
 import  'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-
-
 class myBarGraph extends StatelessWidget {
   final Map<String, int> scores;
   final bool showEmojis;
@@ -17,7 +15,7 @@ class myBarGraph extends StatelessWidget {
   Widget build(BuildContext context) {
     final sortedScores = Map.fromEntries(
       scores.entries.toList()
-        ..sort((a, b) => a.key.compareTo(b.key)), // Sort by emotion names
+        ..sort((a, b) => a.key.compareTo(b.key)),
     );
 
     return BarChart(

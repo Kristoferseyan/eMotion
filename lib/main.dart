@@ -10,8 +10,6 @@ import 'settings-modules/privacy_settings_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Load environment variables and handle any missing keys
   await dotenv.load(fileName: "assets/auth.env");
   final String? supabaseUrl = dotenv.env['SUPABASE_URL'];
   final String? supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
@@ -84,7 +82,6 @@ class MyApp extends StatelessWidget {
     }
   }
 
-  // Extract route arguments safely
   Map<String, dynamic> getRouteArguments(RouteSettings settings) {
     return settings.arguments as Map<String, dynamic>? ?? {};
   }
@@ -150,7 +147,7 @@ class LoginReg extends StatelessWidget {
             children: <Widget>[
               Image.asset(
                 'assets/images/logo.png',
-                height: MediaQuery.of(context).size.height * 0.25, // Responsive height
+                height: MediaQuery.of(context).size.height * 0.25,
               ),
               const SizedBox(height: 40),
               SizedBox(

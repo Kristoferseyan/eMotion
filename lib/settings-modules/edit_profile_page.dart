@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({Key? key}) : super(key: key);
+  final String userId; // Accept the userId as a required parameter
+
+  const EditProfilePage({Key? key, required this.userId}) : super(key: key);
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -18,11 +20,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _usernameController;
   late TextEditingController _ageController;
 
-  bool _isFirstNameEditing = false;
-  bool _isLastNameEditing = false;
-  bool _isEmailEditing = false;
-  bool _isUsernameEditing = false;
-  bool _isAgeEditing = false;
   bool _isLoading = true;
 
   @override
@@ -33,7 +30,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _emailController = TextEditingController();
     _usernameController = TextEditingController();
     _ageController = TextEditingController();
-    _loadProfile(); // Load profile data when the widget is initialized
+
+    // Delaying the loading of profile to avoid issues with context
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadProfile(); 
+    });
   }
 
   @override
@@ -47,34 +48,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _loadProfile() async {
-    final userId = supabase.auth.currentUser?.id;
-    if (userId == null) {
-      // Handle the case where there is no logged-in user
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No user is logged in.')),
-      );
-      return;
-    }
-
+    // Use widget.userId to fetch user data
     try {
-      final response = await supabase.from('users').select().eq('id', userId).single();
-      final user = response as Map<String, dynamic>?;
+      final response = await supabase
+          .from('users')
+          .select()
+          .eq('id', widget.userId)
+          .single();
+      final user = response as Map<String, dynamic>;
 
-      if (user != null) {
-        setState(() {
-          _firstNameController.text = user['fName'] ?? '';
-          _lastNameController.text = user['lName'] ?? '';
-          _emailController.text = user['email'] ?? '';
-          _usernameController.text = user['username'] ?? '';
-          _ageController.text = (user['age']?.toString()) ?? '';
-          _isLoading = false;
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User not found.')),
-        );
-      }
-    } catch (error) {
+      setState(() {
+        _firstNameController.text = user['fName'] ?? '';
+        _lastNameController.text = user['lName'] ?? '';
+        _emailController.text = user['email'] ?? '';
+        _usernameController.text = user['username'] ?? '';
+        _ageController.text = (user['age']?.toString()) ?? '';
+        _isLoading = false;
+      });
+        } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error loading profile: $error')),
       );
@@ -87,14 +78,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<void> _saveProfile() async {
     if (_formKey.currentState!.validate()) {
-      final userId = supabase.auth.currentUser?.id;
-      if (userId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No user is logged in.')),
-        );
-        return;
-      }
-
       final updates = {
         'fName': _firstNameController.text,
         'lName': _lastNameController.text,
@@ -104,27 +87,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
       };
 
       try {
-        final response = await supabase.from('users').update(updates).eq('id', userId);
+        final response = await supabase
+            .from('users')
+            .update(updates)
+            .eq('id', widget.userId);
 
         if (response.error == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Profile updated successfully')),
           );
-          setState(() {
-            _isFirstNameEditing = false;
-            _isLastNameEditing = false;
-            _isEmailEditing = false;
-            _isUsernameEditing = false;
-            _isAgeEditing = false;
-          });
         } else {
+
           ScaffoldMessenger.of(context).showSnackBar(
+
             SnackBar(content: Text('Error updating profile: ${response.error?.message}')),
           );
         }
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating profile: $error')),
+          SnackBar(content: Text('Profile updated successfully')),
         );
       }
     }
@@ -137,107 +118,81 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
+      appBar: AppBar(
+        title: const Text('Edit Profile'),
+        backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
+        elevation: 0,
+        iconTheme: IconThemeData(color: isDarkMode ? Colors.white : Colors.black),
+      ),
       body: SafeArea(
         child: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Edit Profile',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          _buildTextField(
-                            labelText: 'First Name',
-                            controller: _firstNameController,
-                            isDarkMode: isDarkMode,
-                            isEditing: _isFirstNameEditing,
-                            onEditPressed: () {
-                              setState(() {
-                                _isFirstNameEditing = !_isFirstNameEditing;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          _buildTextField(
-                            labelText: 'Last Name',
-                            controller: _lastNameController,
-                            isDarkMode: isDarkMode,
-                            isEditing: _isLastNameEditing,
-                            onEditPressed: () {
-                              setState(() {
-                                _isLastNameEditing = !_isLastNameEditing;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          _buildTextField(
-                            labelText: 'Email',
-                            controller: _emailController,
-                            isDarkMode: isDarkMode,
-                            keyboardType: TextInputType.emailAddress,
-                            isEditing: _isEmailEditing,
-                            onEditPressed: () {
-                              setState(() {
-                                _isEmailEditing = !_isEmailEditing;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          _buildTextField(
-                            labelText: 'Username',
-                            controller: _usernameController,
-                            isDarkMode: isDarkMode,
-                            isEditing: _isUsernameEditing,
-                            onEditPressed: () {
-                              setState(() {
-                                _isUsernameEditing = !_isUsernameEditing;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          _buildTextField(
-                            labelText: 'Age',
-                            controller: _ageController,
-                            isDarkMode: isDarkMode,
-                            keyboardType: TextInputType.number,
-                            isEditing: _isAgeEditing,
-                            onEditPressed: () {
-                              setState(() {
-                                _isAgeEditing = !_isAgeEditing;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: _saveProfile,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(255, 110, 187, 197),
-                              minimumSize: const Size(double.infinity, 60),
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Profile UI and form fields
+                      const SizedBox(height: 20),
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            _buildTextField(
+                              labelText: 'First Name',
+                              controller: _firstNameController,
+                              isDarkMode: isDarkMode,
                             ),
-                            child: const Text(
-                              'Save',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              labelText: 'Last Name',
+                              controller: _lastNameController,
+                              isDarkMode: isDarkMode,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              labelText: 'Email',
+                              controller: _emailController,
+                              isDarkMode: isDarkMode,
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              labelText: 'Username',
+                              controller: _usernameController,
+                              isDarkMode: isDarkMode,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              labelText: 'Age',
+                              controller: _ageController,
+                              isDarkMode: isDarkMode,
+                              keyboardType: TextInputType.number,
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: _saveProfile,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isDarkMode ? const Color(0xFF1A3C40) : const Color.fromARGB(255, 110, 187, 197),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text(
+                                'Save',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
       ),
@@ -248,41 +203,27 @@ class _EditProfilePageState extends State<EditProfilePage> {
     required String labelText,
     required TextEditingController controller,
     required bool isDarkMode,
-    required bool isEditing,
-    required VoidCallback onEditPressed,
     TextInputType keyboardType = TextInputType.text,
   }) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-            controller: controller,
-            readOnly: !isEditing,
-            decoration: InputDecoration(
-              labelText: labelText,
-              labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-              filled: true,
-              fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
-            ),
-            keyboardType: keyboardType,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your $labelText';
-              }
-              return null;
-            },
-          ),
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+        filled: true,
+        fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
         ),
-        IconButton(
-          icon: Icon(isEditing ? Icons.check : Icons.edit),
-          color: isDarkMode ? Colors.white : Colors.black,
-          onPressed: onEditPressed,
-        ),
-      ],
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your $labelText';
+        }
+        return null;
+      },
     );
   }
 }

@@ -9,7 +9,6 @@ class PieChartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<PieChartSectionData> sections = emotionData.entries.map((entry) {
-      // Trim the emotion key to remove any leading or trailing spaces
       String emotionKey = entry.key.trim();
       Color color = _getColor(emotionKey);
       print('Emotion: $emotionKey, Color: $color'); // Debug log

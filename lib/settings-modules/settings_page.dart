@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'notification_settings_page.dart';
 
 class SettingsPage extends StatefulWidget {
-  final String userId; // Add userId parameter
+  final String userId; 
 
   const SettingsPage({Key? key, required this.userId}) : super(key: key);
 
@@ -41,11 +41,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       _buildSettingsTile(Icons.person, 'Edit Profile', isDarkMode, () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => EditProfilePage()),
+                          MaterialPageRoute(builder: (context) => EditProfilePage(userId: widget.userId)),
                         );
                       }),
                       _buildSettingsTile(Icons.lock, 'Change Password', isDarkMode, () {
-                        // Navigate to Change Password Page
                       }),
                       SizedBox(height: 20),
                       _buildSectionHeader('Notifications', isDarkMode),
@@ -59,38 +58,30 @@ class _SettingsPageState extends State<SettingsPage> {
                           onSettingsChanged: (String setting, bool value) {
                             _updatePrivacySettings(setting, value);
                           },
-                          userId: widget.userId, // Pass userId here
+                          userId: widget.userId, 
                         )));
                       }),
                       _buildSettingsTile(Icons.delete, 'Delete Data', isDarkMode, () {
-                        // Navigate to Data Deletion Page
                       }),
                       SizedBox(height: 20),
                       _buildSectionHeader('Application', isDarkMode),
                       _buildSettingsTile(Icons.brightness_6, 'Theme', isDarkMode, () {
-                        // Navigate to Theme Settings Page
                       }),
                       _buildSettingsTile(Icons.language, 'Language', isDarkMode, () {
-                        // Navigate to Language Settings Page
                       }),
                       SizedBox(height: 20),
                       _buildSectionHeader('Security', isDarkMode),
                       _buildSettingsTile(Icons.security, 'Two-Factor Authentication', isDarkMode, () {
-                        // Navigate to Two-Factor Authentication Page
                       }),
                       _buildSettingsTile(Icons.history, 'Login Activity', isDarkMode, () {
-                        // Navigate to Login Activity Page
                       }),
                       SizedBox(height: 20),
                       _buildSectionHeader('About', isDarkMode),
                       _buildSettingsTile(Icons.info, 'App Version', isDarkMode, () {
-                        // Show App Version Dialog
                       }),
                       _buildSettingsTile(Icons.developer_mode, 'Developer Info', isDarkMode, () {
-                        // Show Developer Info Dialog
                       }),
                       _buildSettingsTile(Icons.description, 'Open Source Licenses', isDarkMode, () {
-                        // Show Open Source Licenses Dialog
                       }),
                       SizedBox(height: 20),
                       _buildLogOutButton(context, isDarkMode),
@@ -157,7 +148,7 @@ class _SettingsPageState extends State<SettingsPage> {
         _showLogOutConfirmationDialog(context, isDarkMode);
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: isDarkMode ? Colors.redAccent : Colors.red, // Background color
+        backgroundColor: isDarkMode ? Colors.redAccent : Colors.red,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
