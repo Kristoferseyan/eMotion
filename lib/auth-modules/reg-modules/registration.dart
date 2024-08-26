@@ -37,13 +37,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
           _isLoading = true;
         });
 
-        // Hash the password before saving
         String hashedPassword = BCrypt.hashpw(_passwordController.text.trim(), BCrypt.gensalt());
 
-        // Insert the user data directly into the database
         final response = await supabase.from('users').insert({
           'email': _emailController.text.trim(),
-          'password': hashedPassword, // Store the hashed password
+          'password': hashedPassword, 
           'username': _usernameController.text.trim(),
         }).select().single();
 
@@ -54,8 +52,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registration successful!')),
         );
-
-        // Redirect to the user information page
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -183,61 +179,62 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Widget _buildTextField({
-    required String labelText,
-    required TextInputType keyboardType,
-    bool obscureText = false,
-    required TextEditingController controller,
-    required bool isDarkMode,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[800] : Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: labelText,
-          labelStyle: TextStyle(
-            color: isDarkMode ? Colors.white70 : Colors.black87,
-            fontSize: 16,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          filled: true,
-          fillColor: isDarkMode ? Colors.grey[800] : Colors.white,
+Widget _buildTextField({
+  required String labelText,
+  required TextInputType keyboardType,
+  bool obscureText = false,
+  required TextEditingController controller,
+  required bool isDarkMode,
+}) {
+  return Container(
+    margin: const EdgeInsets.only(bottom: 16),
+    decoration: BoxDecoration(
+      color: isDarkMode ? Colors.grey[800] : Colors.white70,
+      borderRadius: BorderRadius.circular(10),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.5),
+          spreadRadius: 2,
+          blurRadius: 5,
+          offset: const Offset(0, 3),
         ),
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        style: TextStyle(
-          color: isDarkMode ? Colors.white : Colors.black87,
+      ],
+    ),
+    child: TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: TextStyle(
+          color: isDarkMode ? Colors.black87: Colors.black87,
           fontSize: 16,
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'This field is required';
-          }
-          if (labelText == 'Email' && !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-            return 'Enter a valid email address';
-          }
-          return null;
-        },
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        filled: true,
+        fillColor: isDarkMode ? Colors.white : Colors.white70, 
       ),
-    );
-  }
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      style: TextStyle(
+        color: isDarkMode ? Colors.black : Colors.black87, 
+        fontSize: 16,
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'This field is required';
+        }
+        if (labelText == 'Email' && !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+          return 'Enter a valid email address';
+        }
+        return null;
+      },
+    ),
+  );
+}
+
 
   Widget _buildNextButton() {
     return ElevatedButton(

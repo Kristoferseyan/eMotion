@@ -90,10 +90,10 @@ class LoginForm extends StatelessWidget {
       ),
       child: TextFormField(
         controller: controller,
-        style: const TextStyle(color: Colors.black87), // Darker color for input text
+        style: const TextStyle(color: Colors.black87),
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: const TextStyle(color: Colors.black87), // Darker color for label text
+          labelStyle: const TextStyle(color: Colors.black87),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
