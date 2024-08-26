@@ -54,9 +54,7 @@ class _EmotionChartState extends State<EmotionChart> {
         }
       }
 
-      final data = response as List<dynamic>? ?? [];
-
-      print('Supabase response: $data');  // Debugging output
+      print('Supabase response: $response');  // Debugging output
 
       // Initialize a map to hold sums and counts for each day of the week
       Map<int, double> dailyEmotionSum = {};
@@ -68,7 +66,7 @@ class _EmotionChartState extends State<EmotionChart> {
       }
 
       // Populate the counts and sum based on the response data
-      for (var entry in data) {
+      for (var entry in response) {
         DateTime timestamp = DateTime.parse(entry['timestamp']);
         int dayIndex = DateTime.now().difference(timestamp).inDays;
 

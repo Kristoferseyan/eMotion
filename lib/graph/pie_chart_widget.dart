@@ -8,18 +8,21 @@ class PieChartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = MediaQuery.of(context).platformBrightness;
+    final isDarkMode = brightness == Brightness.dark;
+
     List<PieChartSectionData> sections = emotionData.entries.map((entry) {
       String emotionKey = entry.key.trim();
       Color color = _getColor(emotionKey);
-      print('Emotion: $emotionKey, Color: $color'); // Debug log
+      double value = entry.value;
 
       return PieChartSectionData(
         color: color,
-        value: entry.value,
-        title: '${entry.value.toInt()}%',
-        radius: 50,
+        value: value,
+        title: '${value.toStringAsFixed(1)}%',
+        radius: 60,
         titleStyle: TextStyle(
-          fontSize: 16,
+          fontSize: _getTitleFontSize(value), // Adjust font size based on value
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -27,45 +30,66 @@ class PieChartWidget extends StatelessWidget {
     }).toList();
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           width: double.infinity,
-          height: 200,
+          height: 250,
           child: PieChart(
             PieChartData(
               sections: sections,
-              centerSpaceRadius: 40,
+              centerSpaceRadius: 50,
               borderData: FlBorderData(show: false),
               sectionsSpace: 2,
+              startDegreeOffset: 270,
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        _buildLegend(),
+        const SizedBox(height: 20),
+        _buildLegend(isDarkMode),
       ],
     );
   }
 
-  Widget _buildLegend() {
+  Widget _buildLegend(bool isDarkMode) {
     return Wrap(
-      spacing: 10,
-      runSpacing: 10,
+      spacing: 12,
+      runSpacing: 12,
       children: emotionData.keys.map((emotion) {
-        String emotionKey = emotion.trim(); // Trim the emotion key here as well
+        String emotionKey = emotion.trim();
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 16,
-              height: 16,
-              color: _getColor(emotionKey),
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: _getColor(emotionKey),
+                borderRadius: BorderRadius.circular(4),
+              ),
             ),
             const SizedBox(width: 8),
-            Text(emotionKey),
+            Text(
+              emotionKey,
+              style: TextStyle(
+                fontSize: 16,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
           ],
         );
       }).toList(),
     );
+  }
+
+  double _getTitleFontSize(double value) {
+    if (value > 20) {
+      return 16;
+    } else if (value > 10) {
+      return 14;
+    } else {
+      return 12;
+    }
   }
 
   Color _getColor(String emotion) {
