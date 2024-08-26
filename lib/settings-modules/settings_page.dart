@@ -1,3 +1,4 @@
+import 'package:fix_emotion/settings-modules/delete_data_page.dart';
 import 'package:fix_emotion/settings-modules/privacy_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fix_emotion/auth-modules/authentication_service.dart';
@@ -62,6 +63,12 @@ class _SettingsPageState extends State<SettingsPage> {
                         )));
                       }),
                       _buildSettingsTile(Icons.delete, 'Delete Data', isDarkMode, () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => DeletePage(
+                          userId: widget.userId,
+                          onDeleteConfirmed: () {
+                            Navigator.pop(context);
+                          },
+                        )));
                       }),
                       SizedBox(height: 20),
                       _buildSectionHeader('Application', isDarkMode),

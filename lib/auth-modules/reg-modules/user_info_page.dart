@@ -65,7 +65,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Information saved successfully!')),
         );
-
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginPage()),
