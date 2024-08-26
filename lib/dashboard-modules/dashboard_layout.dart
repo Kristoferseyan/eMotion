@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../graph/emotion_chart.dart';
 import 'custom_layout.dart';
@@ -65,7 +64,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
         child: userName == null
             ? const Center(child: CircularProgressIndicator())
             : DashboardBody(
-                userId: widget.userId, // Pass userId to DashboardBody
+                userId: widget.userId,
                 userName: userName!,
                 selectedEmotion: selectedEmotion,
                 emotions: emotions,
@@ -74,48 +73,10 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                     selectedEmotion = newEmotion;
                   });
                 },
-                getEmotionData: getEmotionData,
                 onProfileButtonPressed: () => _navigateToProfilePage(context),
               ),
       ),
     );
-  }
-
-  List<FlSpot> getEmotionData(String emotion) {
-    switch (emotion) {
-      case 'Happiness':
-        return [
-          FlSpot(0, 3),
-          FlSpot(1, 4),
-          FlSpot(2, 3),
-          FlSpot(3, 5),
-          FlSpot(4, 4),
-          FlSpot(5, 3),
-          FlSpot(6, 4)
-        ];
-      case 'Sadness':
-        return [
-          FlSpot(0, 1),
-          FlSpot(1, 2),
-          FlSpot(2, 1),
-          FlSpot(3, 1),
-          FlSpot(4, 2),
-          FlSpot(5, 1),
-          FlSpot(6, 2)
-        ];
-      case 'Anger':
-        return [
-          FlSpot(0, 1),
-          FlSpot(1, 1),
-          FlSpot(2, 1),
-          FlSpot(3, 2),
-          FlSpot(4, 1),
-          FlSpot(5, 2),
-          FlSpot(6, 1)
-        ];
-      default:
-        return [FlSpot(0, 0)];
-    }
   }
 
   void _navigateToProfilePage(BuildContext context) {
@@ -129,22 +90,20 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 }
 
 class DashboardBody extends StatelessWidget {
-  final String userId; // Add userId here
+  final String userId;
   final String userName;
   final String selectedEmotion;
   final List<String> emotions;
   final ValueChanged<String> onEmotionChanged;
-  final List<FlSpot> Function(String) getEmotionData;
   final VoidCallback onProfileButtonPressed;
 
   const DashboardBody({
     Key? key,
-    required this.userId, // Include userId in the constructor
+    required this.userId,
     required this.userName,
     required this.selectedEmotion,
     required this.emotions,
     required this.onEmotionChanged,
-    required this.getEmotionData,
     required this.onProfileButtonPressed,
   }) : super(key: key);
 
@@ -161,11 +120,8 @@ class DashboardBody extends StatelessWidget {
             const SizedBox(height: 10),
             _buildHeader(isDarkMode),
             const SizedBox(height: 10),
-            _buildGreeting(),
-            const SizedBox(height: 10),
             EmotionChart(
               selectedEmotion: selectedEmotion,
-              getEmotionData: getEmotionData,
               emotions: emotions,
               onEmotionChanged: onEmotionChanged,
             ),
@@ -183,26 +139,13 @@ class DashboardBody extends StatelessWidget {
                 child: CustomLayout(
                   maxWidth: constraints.maxWidth,
                   userName: userName,
-                  userId: userId, // Pass userId to CustomLayout
+                  userId: userId,
                 ),
               ),
             ),
           ],
         );
       },
-    );
-  }
-
-  Widget _buildGreeting() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Text(
-        'Hello, $userName!',
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
     );
   }
 

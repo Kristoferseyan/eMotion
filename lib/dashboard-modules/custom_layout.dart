@@ -1,17 +1,17 @@
+import 'package:flutter/material.dart';
 import 'package:fix_emotion/dashboard-modules/module-boxes/emotion-dictionary/emotionDict.dart';
 import 'package:fix_emotion/dashboard-modules/module-boxes/tracking-modules/track_emo_layout.dart';
-import 'package:flutter/material.dart';
 
 class CustomLayout extends StatelessWidget {
   final double maxWidth;
   final String userName;
-  final String userId; // Add userId here
+  final String userId;
 
-  CustomLayout({
+  const CustomLayout({
     Key? key,
     required this.maxWidth,
     required this.userName,
-    required this.userId, // Include userId in the constructor
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -21,7 +21,7 @@ class CustomLayout extends StatelessWidget {
       itemBuilder: (context, index) {
         double width = maxWidth * 0.9;
         return Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Center(
             child: _buildRectangle(
               context: context,
@@ -41,26 +41,26 @@ class CustomLayout extends StatelessWidget {
   }) {
     List<Map<String, dynamic>> rectangles = [
       {
-        'color': Color(0xFFFFC5C5),
-        'borderColor': Color.fromARGB(255, 240, 166, 166),
+        'color': const Color(0xFFFFC5C5),
+        'borderColor': const Color.fromARGB(255, 240, 166, 166),
         'imagePath': 'assets/images/emoTrack.png',
         'text': 'Track Emotions',
-        'textColor': Color.fromARGB(255, 209, 130, 130),
+        'textColor': const Color.fromARGB(255, 209, 130, 130),
         'onTap': () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => TrackEmoLayout(userId: userId), // Pass the userId here
+              builder: (context) => TrackEmoLayout(userId: userId),
             ),
           );
         },
       },
       {
-        'color': Color(0xFFFFEBD8),
-        'borderColor': Color.fromARGB(255, 216, 176, 139),
+        'color': const Color(0xFFFFEBD8),
+        'borderColor': const Color.fromARGB(255, 216, 176, 139),
         'imagePath': 'assets/images/emoDict.png',
         'text': 'Emotion Dictionary',
-        'textColor': Color.fromARGB(255, 184, 146, 111),
+        'textColor': const Color.fromARGB(255, 184, 146, 111),
         'onTap': () {
           Navigator.push(
             context,
@@ -69,11 +69,11 @@ class CustomLayout extends StatelessWidget {
         },
       },
       {
-        'color': Color(0xFFADC4CE),
-        'borderColor': Color.fromARGB(255, 128, 163, 179),
+        'color': const Color(0xFFADC4CE),
+        'borderColor': const Color.fromARGB(255, 128, 163, 179),
         'imagePath': 'assets/images/aboutUs.png',
         'text': 'About Us',
-        'textColor': Color.fromARGB(255, 94, 130, 146),
+        'textColor': const Color.fromARGB(255, 94, 130, 146),
         'onTap': null,
       },
     ];
@@ -85,7 +85,6 @@ class CustomLayout extends StatelessWidget {
       child: Container(
         width: width,
         height: 80,
-        margin: EdgeInsets.symmetric(vertical: 0),
         decoration: BoxDecoration(
           color: rectangle['color'],
           borderRadius: BorderRadius.circular(12),
@@ -95,22 +94,22 @@ class CustomLayout extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
+              color: Colors.black.withOpacity(0.1),
+              spreadRadius: 4,
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Row(
           children: [
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Image.asset(
               rectangle['imagePath'],
               width: 36,
               height: 36,
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Text(
               rectangle['text'],
               style: TextStyle(

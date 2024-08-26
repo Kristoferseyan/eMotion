@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditProfilePage extends StatefulWidget {
-  final String userId; // Accept the userId as a required parameter
+  final String userId;
 
   const EditProfilePage({Key? key, required this.userId}) : super(key: key);
 
@@ -31,9 +31,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _usernameController = TextEditingController();
     _ageController = TextEditingController();
 
-    // Delaying the loading of profile to avoid issues with context
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadProfile(); 
+      _loadProfile();
     });
   }
 
@@ -48,13 +47,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _loadProfile() async {
-    // Use widget.userId to fetch user data
     try {
       final response = await supabase
           .from('users')
           .select()
           .eq('id', widget.userId)
           .single();
+
       final user = response as Map<String, dynamic>;
 
       setState(() {
@@ -62,10 +61,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _lastNameController.text = user['lName'] ?? '';
         _emailController.text = user['email'] ?? '';
         _usernameController.text = user['username'] ?? '';
-        _ageController.text = (user['age']?.toString()) ?? '';
+        _ageController.text = user['age']?.toString() ?? '';
         _isLoading = false;
       });
-        } catch (error) {
+    } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error loading profile: $error')),
       );
@@ -97,15 +96,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
             const SnackBar(content: Text('Profile updated successfully')),
           );
         } else {
-
           ScaffoldMessenger.of(context).showSnackBar(
-
-            SnackBar(content: Text('Error updating profile: ${response.error?.message}')),
+            SnackBar(content: Text('Error updating profile: ${response.error!.message}')),
           );
         }
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Profile updated successfully')),
+          SnackBar(content: Text('Error updating profile: $error')),
         );
       }
     }
@@ -133,7 +130,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Profile UI and form fields
+                      const SizedBox(height: 20),
+                      _buildProfileAvatar(),
                       const SizedBox(height: 20),
                       Form(
                         key: _formKey,
@@ -171,23 +169,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               keyboardType: TextInputType.number,
                             ),
                             const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: _saveProfile,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: isDarkMode ? const Color(0xFF1A3C40) : const Color.fromARGB(255, 110, 187, 197),
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: const Text(
-                                'Save',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
+                            _buildSaveButton(isDarkMode),
                           ],
                         ),
                       ),
@@ -196,6 +178,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
       ),
+    );
+  }
+
+  Widget _buildProfileAvatar() {
+    return CircleAvatar(
+      radius: 50,
+      backgroundColor: Colors.grey[200],
+      child: Icon(Icons.person, size: 50, color: Colors.grey[400]),
     );
   }
 
@@ -224,6 +214,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
         }
         return null;
       },
+    );
+  }
+
+  Widget _buildSaveButton(bool isDarkMode) {
+    return ElevatedButton(
+      onPressed: _saveProfile,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isDarkMode ? const Color(0xFF1A3C40) : const Color.fromARGB(255, 110, 187, 197),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      child: const Text(
+        'Save',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+        ),
+      ),
     );
   }
 }

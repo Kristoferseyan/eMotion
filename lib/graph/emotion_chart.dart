@@ -1,19 +1,104 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class EmotionChart extends StatelessWidget {
+class EmotionChart extends StatefulWidget {
   final String selectedEmotion;
-  final List<FlSpot> Function(String) getEmotionData;
   final List<String> emotions;
   final ValueChanged<String> onEmotionChanged;
 
   const EmotionChart({
     Key? key,
     required this.selectedEmotion,
-    required this.getEmotionData,
     required this.emotions,
     required this.onEmotionChanged,
   }) : super(key: key);
+
+  @override
+  _EmotionChartState createState() => _EmotionChartState();
+}
+
+class _EmotionChartState extends State<EmotionChart> {
+  final supabase = Supabase.instance.client;
+  late Future<List<FlSpot>> _emotionDataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _emotionDataFuture = _fetchEmotionData(widget.selectedEmotion);
+  }
+
+  @override
+  void didUpdateWidget(EmotionChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedEmotion != widget.selectedEmotion) {
+      setState(() {
+        _emotionDataFuture = _fetchEmotionData(widget.selectedEmotion);
+      });
+    }
+  }
+
+  Future<List<FlSpot>> _fetchEmotionData(String emotion) async {
+    try {
+      final response = await supabase
+          .from('emotion_tracking')
+          .select('emotion_distribution, timestamp')
+          .gte('timestamp', DateTime.now().subtract(Duration(days: 7)).toIso8601String())
+          .order('timestamp', ascending: true);
+
+      if (response.isNotEmpty) {
+        final firstResponse = response.first;
+        if (firstResponse.containsKey('error')) {
+          print('Supabase error: ${firstResponse['error']}');
+          return [];
+        }
+      }
+
+      final data = response as List<dynamic>? ?? [];
+
+      print('Supabase response: $data');  // Debugging output
+
+      // Initialize a map to hold sums and counts for each day of the week
+      Map<int, double> dailyEmotionSum = {};
+      Map<int, int> dailyEmotionCounts = {};
+
+      for (var i = 0; i < 7; i++) {
+        dailyEmotionSum[i] = 0.0;
+        dailyEmotionCounts[i] = 0;
+      }
+
+      // Populate the counts and sum based on the response data
+      for (var entry in data) {
+        DateTime timestamp = DateTime.parse(entry['timestamp']);
+        int dayIndex = DateTime.now().difference(timestamp).inDays;
+
+        if (dayIndex < 7) {
+          // Reverse the index to align with the chart (Mon-Sun)
+          int chartIndex = 6 - dayIndex;
+          double emotionValue = (entry['emotion_distribution'] as Map<String, dynamic>)[emotion] ?? 0.0;
+
+          dailyEmotionSum[chartIndex] = dailyEmotionSum[chartIndex]! + emotionValue;
+          dailyEmotionCounts[chartIndex] = dailyEmotionCounts[chartIndex]! + 1;
+        }
+      }
+
+      // Calculate the average emotion value per day
+      List<FlSpot> spots = [];
+      for (var i = 0; i < 7; i++) {
+        double averageEmotionValue = dailyEmotionCounts[i] != 0
+            ? dailyEmotionSum[i]! / dailyEmotionCounts[i]!
+            : 0.0;
+        spots.add(FlSpot(i.toDouble(), averageEmotionValue));
+        print('Day $i: Average $emotion = $averageEmotionValue');  // Debugging output
+      }
+
+      print('Generated spots: $spots');  // Debugging output
+      return spots;
+    } catch (e) {
+      print('Error fetching emotion data: $e');
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,53 +106,52 @@ class EmotionChart extends StatelessWidget {
     final isDarkMode = brightness == Brightness.dark;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Container(
-        height: 280,
+        height: 300,
         decoration: BoxDecoration(
-          color: isDarkMode ? const Color.fromARGB(255, 23, 57, 61) : const Color(0xFFF3FCFF),
-          borderRadius: BorderRadius.circular(12),
+          color: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: Offset(0, 3),
+              color: Colors.black.withOpacity(0.1),
+              spreadRadius: 4,
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Stack(
+        child: Column(
           children: [
-            Positioned(
-              top: 0,
-              left: 20,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Weekly Emotions',
                     style: TextStyle(
                       color: isDarkMode ? Colors.white : Colors.black,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: 115),
                   DropdownButton<String>(
-                    value: selectedEmotion,
-                    icon: const Icon(Icons.arrow_downward),
-                    iconSize: 20,
+                    value: widget.selectedEmotion,
+                    icon: Icon(Icons.arrow_drop_down, color: isDarkMode ? Colors.white : Colors.black),
+                    iconSize: 24,
                     elevation: 16,
                     style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                     underline: Container(
                       height: 1,
-                      color: isDarkMode ? const Color.fromARGB(0, 255, 255, 255) : Colors.black,
+                      color: Colors.transparent,
                     ),
                     onChanged: (String? newValue) {
                       if (newValue != null) {
-                        onEmotionChanged(newValue);
+                        widget.onEmotionChanged(newValue);
                       }
                     },
-                    items: emotions.map<DropdownMenuItem<String>>((String value) {
+                    items: widget.emotions.map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
@@ -77,64 +161,111 @@ class EmotionChart extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 40, left: 15, right: 15, bottom: 10),
-              child: LineChart(
-                LineChartData(
-                  gridData: FlGridData(show: false),
-                  titlesData: FlTitlesData(
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 22,
-                        getTitlesWidget: bottomTitleWidgets,
-                      ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 28,
-                        getTitlesWidget: (value, meta) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 5.0),
-                            child: Text(
-                              value.toInt().toString(),
-                              style: TextStyle(
-                                color: isDarkMode ? Colors.white : const Color(0xff68737d),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                child: FutureBuilder<List<FlSpot>>(
+                  future: _emotionDataFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('No data available'));
+                    } else {
+                      return LineChart(
+                        LineChartData(
+                          gridData: FlGridData(
+                            show: true,
+                            drawVerticalLine: true,
+                            horizontalInterval: 1,
+                            verticalInterval: 1,
+                            getDrawingHorizontalLine: (value) {
+                              return FlLine(
+                                color: isDarkMode ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.1),
+                                strokeWidth: 1,
+                              );
+                            },
+                            getDrawingVerticalLine: (value) {
+                              return FlLine(
+                                color: isDarkMode ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.1),
+                                strokeWidth: 1,
+                              );
+                            },
+                          ),
+                          titlesData: FlTitlesData(
+                            bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 32,
+                                getTitlesWidget: bottomTitleWidgets,
                               ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                  ),
-                  borderData: FlBorderData(
-                    show: true,
-                    border: Border.all(color: isDarkMode ? const Color(0xff37434d) : const Color(0xff37434d), width: 1),
-                  ),
-                  minX: 0,
-                  maxX: 6,
-                  minY: 0,
-                  maxY: 5,
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: getEmotionData(selectedEmotion),
-                      isCurved: true,
-                      color: Colors.blue,
-                      barWidth: 2,
-                      isStrokeCapRound: true,
-                      dotData: FlDotData(show: false),
-                      belowBarData: BarAreaData(show: true, color: Colors.blue.withOpacity(0.3)),
-                    ),
-                  ],
+                            leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 40,
+                                getTitlesWidget: (value, meta) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 5.0),
+                                    child: Text(
+                                      value.toInt().toString(),
+                                      style: TextStyle(
+                                        color: isDarkMode ? Colors.white : const Color(0xff68737d),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            rightTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                            topTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                          ),
+                          borderData: FlBorderData(
+                            show: true,
+                            border: Border.all(color: isDarkMode ? const Color(0xff37434d) : const Color(0xff37434d), width: 1),
+                          ),
+                          minX: 0,
+                          maxX: 6,
+                          minY: 0,
+                          maxY: 5,
+                          lineBarsData: [
+                            LineChartBarData(
+                              spots: snapshot.data!,
+                              isCurved: true,
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.blue.withOpacity(0.6),
+                                  Colors.blue.withOpacity(0.1),
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                              barWidth: 3,
+                              isStrokeCapRound: true,
+                              dotData: FlDotData(show: false),
+                              belowBarData: BarAreaData(
+                                show: true,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.blue.withOpacity(0.3),
+                                    Colors.blue.withOpacity(0.1),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  },
                 ),
               ),
             ),
@@ -153,32 +284,33 @@ class EmotionChart extends StatelessWidget {
     Widget text;
     switch (value.toInt()) {
       case 0:
-        text = Text('Mon', style: style);
+        text = const Text('Mon', style: style);
         break;
       case 1:
-        text = Text('Tue', style: style);
+        text = const Text('Tue', style: style);
         break;
       case 2:
-        text = Text('Wed', style: style);
+        text = const Text('Wed', style: style);
         break;
       case 3:
-        text = Text('Thu', style: style);
+        text = const Text('Thu', style: style);
         break;
       case 4:
-        text = Text('Fri', style: style);
+        text = const Text('Fri', style: style);
         break;
       case 5:
-        text = Text('Sat', style: style);
+        text = const Text('Sat', style: style);
         break;
       case 6:
-        text = Text('Sun', style: style);
+        text = const Text('Sun', style: style);
         break;
       default:
-        text = Text('', style: style);
+        text = const Text('', style: style);
         break;
     }
     return SideTitleWidget(
       axisSide: meta.axisSide,
+      space: 4.0,
       child: text,
     );
   }
