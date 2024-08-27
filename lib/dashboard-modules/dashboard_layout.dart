@@ -120,10 +120,14 @@ class DashboardBody extends StatelessWidget {
             const SizedBox(height: 10),
             _buildHeader(isDarkMode),
             const SizedBox(height: 10),
-            EmotionChart(
-              selectedEmotion: selectedEmotion,
-              emotions: emotions,
-              onEmotionChanged: onEmotionChanged,
+            // Increase the height of the EmotionChart
+            SizedBox(
+              height: 350, // Increased height for the emotion chart
+              child: EmotionChart(
+                selectedEmotion: selectedEmotion,
+                emotions: emotions,
+                onEmotionChanged: onEmotionChanged,
+              ),
             ),
             const SizedBox(height: 20),
             Expanded(
@@ -135,7 +139,7 @@ class DashboardBody extends StatelessWidget {
                     topRight: Radius.circular(30),
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
                 child: CustomLayout(
                   maxWidth: constraints.maxWidth,
                   userName: userName,

@@ -2,7 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fix_emotion/auth-modules/reg-modules/user_info_page.dart';
-import 'package:bcrypt/bcrypt.dart'; // Import bcrypt package for password hashing
+import 'package:bcrypt/bcrypt.dart';
+import 'package:fix_emotion/main.dart';
+
+import 'terms_and_conditions_dialog.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
@@ -19,6 +22,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _usernameController = TextEditingController();
 
   bool _isLoading = false;
+  bool _agreedToTerms = false;
+  bool _termsRead = false;
 
   final supabase = Supabase.instance.client;
 
@@ -32,6 +37,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   Future<void> _registerUser() async {
     if (_formKey.currentState!.validate()) {
+      if (!_agreedToTerms) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginReg(),
+          ),
+        );
+        return;
+      }
+
       try {
         setState(() {
           _isLoading = true;
@@ -41,7 +56,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
         final response = await supabase.from('users').insert({
           'email': _emailController.text.trim(),
-          'password': hashedPassword, 
+          'password': hashedPassword,
           'username': _usernameController.text.trim(),
         }).select().single();
 
@@ -123,7 +138,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             controller: _passwordController,
                             isDarkMode: isDarkMode,
                           ),
-                          const SizedBox(height: 20.0),
+                          _buildTermsButton(),
+                          _buildTermsCheckbox(),
                           _buildNextButton(),
                         ],
                       ),
@@ -179,62 +195,102 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-Widget _buildTextField({
-  required String labelText,
-  required TextInputType keyboardType,
-  bool obscureText = false,
-  required TextEditingController controller,
-  required bool isDarkMode,
-}) {
-  return Container(
-    margin: const EdgeInsets.only(bottom: 16),
-    decoration: BoxDecoration(
-      color: isDarkMode ? Colors.grey[800] : Colors.white70,
-      borderRadius: BorderRadius.circular(10),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.5),
-          spreadRadius: 2,
-          blurRadius: 5,
-          offset: const Offset(0, 3),
+  Widget _buildTextField({
+    required String labelText,
+    required TextInputType keyboardType,
+    bool obscureText = false,
+    required TextEditingController controller,
+    required bool isDarkMode,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[800] : Colors.white70,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: TextStyle(
+            color: isDarkMode ? Colors.black87 : Colors.black87,
+            fontSize: 16,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          filled: true,
+          fillColor: isDarkMode ? Colors.white : Colors.white70,
         ),
-      ],
-    ),
-    child: TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: TextStyle(
-          color: isDarkMode ? Colors.black87: Colors.black87,
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        style: TextStyle(
+          color: isDarkMode ? Colors.black : Colors.black87,
           fontSize: 16,
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        filled: true,
-        fillColor: isDarkMode ? Colors.white : Colors.white70, 
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'This field is required';
+          }
+          if (labelText == 'Email' && !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+            return 'Enter a valid email address';
+          }
+          return null;
+        },
       ),
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      style: TextStyle(
-        color: isDarkMode ? Colors.black : Colors.black87, 
-        fontSize: 16,
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'This field is required';
-        }
-        if (labelText == 'Email' && !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-          return 'Enter a valid email address';
-        }
-        return null;
-      },
-    ),
-  );
-}
+    );
+  }
 
+  Widget _buildTermsButton() {
+    return TextButton(
+      onPressed: () {
+        _showTermsAndConditions();
+      },
+      child: const Text(
+        'Read Terms and Conditions',
+        style: TextStyle(
+          color: Colors.blue,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTermsCheckbox() {
+    return Row(
+      children: [
+        Checkbox(
+          value: _agreedToTerms,
+          onChanged: _termsRead
+              ? (bool? value) {
+                  setState(() {
+                    _agreedToTerms = value ?? false;
+                  });
+                }
+              : null,
+        ),
+        Expanded(
+          child: Text(
+            'I agree to the Terms and Conditions',
+            style: TextStyle(
+              fontSize: 14,
+              color: _agreedToTerms ? Colors.black : Colors.red,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
   Widget _buildNextButton() {
     return ElevatedButton(
@@ -259,5 +315,18 @@ Widget _buildTextField({
               ),
             ),
     );
+  }
+
+  void _showTermsAndConditions() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return const TermsAndConditionsDialog();
+      },
+    ).then((_) {
+      setState(() {
+        _termsRead = true;
+      });
+    });
   }
 }

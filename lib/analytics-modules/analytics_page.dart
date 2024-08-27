@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../graph/pie_chart_widget.dart';
+import 'tracking_detail_page.dart'; // Import the new page
 
 class AnalyticsPage extends StatefulWidget {
   final String userId;
@@ -23,7 +24,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       // Fetch emotion data
       final emotionResponse = await supabase
           .from('emotion_tracking')
-          .select('emotion')
+          .select('emotion, emotion_distribution, timestamp, user_feedback')
           .eq('user_id', widget.userId);
 
       Map<String, int> emotionCount = {};
@@ -44,19 +45,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       };
 
       // Fetch recent trackings
-      final trackingResponse = await supabase
-          .from('emotion_tracking')
-          .select('emotion, timestamp, user_feedback')
-          .eq('user_id', widget.userId)
-          .order('timestamp', ascending: false);
-
-      recentTrackings = List<Map<String, dynamic>>.from(trackingResponse as List<dynamic>).map((tracking) {
+      recentTrackings = List<Map<String, dynamic>>.from(emotionResponse).map((tracking) {
         final DateTime timestamp = DateTime.parse(tracking['timestamp']);
         final String date = '${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}';
         final String time = '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
 
         return {
           'emotion': tracking['emotion'],
+          'emotion_distribution': tracking['emotion_distribution'],
           'date': date,
           'time': time,
           'user_feedback': tracking['user_feedback'],
@@ -212,29 +208,44 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         itemCount: recentTrackings.length,
         itemBuilder: (context, index) {
           final tracking = recentTrackings[index];
-          return Container(
-            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: isDarkMode ? Color.fromARGB(255, 28, 66, 71) : Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: isDarkMode ? Colors.black.withOpacity(0.15) : Colors.grey.withOpacity(0.15),
-                  spreadRadius: 2,
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: ListTile(
-              title: Text(
-                tracking['emotion'],
-                style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TrackingDetailPage(
+                      emotion: tracking['emotion'],
+                      date: tracking['date'],
+                      time: tracking['time'],
+                      emotionDistributionJson: tracking['emotion_distribution'], // Pass the JSON string directly
+                    ),
+                  ),
+                );
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: isDarkMode ? Color.fromARGB(255, 28, 66, 71) : Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: isDarkMode ? Colors.black.withOpacity(0.15) : Colors.grey.withOpacity(0.15),
+                    spreadRadius: 2,
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              subtitle: Text(
-                '${tracking['date']} ${tracking['time']}',
-                style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
+              child: ListTile(
+                title: Text(
+                  tracking['emotion'],
+                  style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                ),
+                subtitle: Text(
+                  '${tracking['date']} ${tracking['time']}',
+                  style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
+                ),
               ),
             ),
           );

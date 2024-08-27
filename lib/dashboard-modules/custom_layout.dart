@@ -16,80 +16,68 @@ class CustomLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: 3,
-      itemBuilder: (context, index) {
-        double width = maxWidth * 0.9;
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Center(
-            child: _buildRectangle(
-              context: context,
-              index: index,
-              width: width,
-            ),
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min, // Center vertically
+        children: [
+          _buildRectangle(
+            context: context,
+            width: maxWidth * 0.85, // Slightly reduced width for better fit
+            color: const Color(0xFFFFC5C5),
+            borderColor: const Color.fromARGB(255, 240, 166, 166),
+            imagePath: 'assets/images/emoTrack.png',
+            text: 'Track Emotions',
+            textColor: const Color.fromARGB(255, 209, 130, 130),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TrackEmoLayout(userId: userId),
+                ),
+              );
+            },
           ),
-        );
-      },
+          const SizedBox(height: 16), // Reduced spacing between boxes
+          _buildRectangle(
+            context: context,
+            width: maxWidth * 0.85, // Slightly reduced width for better fit
+            color: const Color(0xFFFFEBD8),
+            borderColor: const Color.fromARGB(255, 216, 176, 139),
+            imagePath: 'assets/images/emoDict.png',
+            text: 'Emotion Dictionary',
+            textColor: const Color.fromARGB(255, 184, 146, 111),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EmotionDict()),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildRectangle({
     required BuildContext context,
-    required int index,
     required double width,
+    required Color color,
+    required Color borderColor,
+    required String imagePath,
+    required String text,
+    required Color textColor,
+    required VoidCallback onTap,
   }) {
-    List<Map<String, dynamic>> rectangles = [
-      {
-        'color': const Color(0xFFFFC5C5),
-        'borderColor': const Color.fromARGB(255, 240, 166, 166),
-        'imagePath': 'assets/images/emoTrack.png',
-        'text': 'Track Emotions',
-        'textColor': const Color.fromARGB(255, 209, 130, 130),
-        'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TrackEmoLayout(userId: userId),
-            ),
-          );
-        },
-      },
-      {
-        'color': const Color(0xFFFFEBD8),
-        'borderColor': const Color.fromARGB(255, 216, 176, 139),
-        'imagePath': 'assets/images/emoDict.png',
-        'text': 'Emotion Dictionary',
-        'textColor': const Color.fromARGB(255, 184, 146, 111),
-        'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => EmotionDict()),
-          );
-        },
-      },
-      {
-        'color': const Color(0xFFADC4CE),
-        'borderColor': const Color.fromARGB(255, 128, 163, 179),
-        'imagePath': 'assets/images/aboutUs.png',
-        'text': 'About Us',
-        'textColor': const Color.fromARGB(255, 94, 130, 146),
-        'onTap': null,
-      },
-    ];
-
-    final Map<String, dynamic> rectangle = rectangles[index % rectangles.length];
-
     return GestureDetector(
-      onTap: rectangle['onTap'],
+      onTap: onTap,
       child: Container(
         width: width,
-        height: 80,
+        height: 90, // Slightly reduced height for better fit
         decoration: BoxDecoration(
-          color: rectangle['color'],
+          color: color,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: rectangle['borderColor'],
+            color: borderColor,
             width: 2,
           ),
           boxShadow: [
@@ -103,19 +91,21 @@ class CustomLayout extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const SizedBox(width: 10),
+            const SizedBox(width: 16), // Reduced padding
             Image.asset(
-              rectangle['imagePath'],
-              width: 36,
-              height: 36,
+              imagePath,
+              width: 44, // Adjusted image size for better fit
+              height: 44,
             ),
-            const SizedBox(width: 10),
-            Text(
-              rectangle['text'],
-              style: TextStyle(
-                color: rectangle['textColor'],
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+            const SizedBox(width: 16), // Reduced padding
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 20, // Slightly reduced text size
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],

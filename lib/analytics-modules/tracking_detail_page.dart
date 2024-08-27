@@ -1,89 +1,62 @@
+import 'dart:convert';  // Import to use jsonDecode
 import 'package:flutter/material.dart';
+import '../graph/pie_chart_widget.dart';  // Assuming you have a PieChartWidget ready
 
 class TrackingDetailPage extends StatelessWidget {
-  final Map<String, dynamic> tracking;
+  final String emotion;
+  final String date;
+  final String time;
+  final String emotionDistributionJson;
 
-  const TrackingDetailPage({Key? key, required this.tracking}) : super(key: key);
+  const TrackingDetailPage({
+    Key? key,
+    required this.emotion,
+    required this.date,
+    required this.time,
+    required this.emotionDistributionJson,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final isDarkMode = brightness == Brightness.dark;
+    // Parse the JSON string to a Map<String, double>
+    final Map<String, double> emotionDistribution = Map<String, double>.from(
+      jsonDecode(emotionDistributionJson).map(
+        (key, value) => MapEntry(key, value.toDouble()),
+      ),
+    );
 
     return Scaffold(
-      backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Icon(Icons.arrow_back, color: isDarkMode ? Colors.white : Colors.black),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Tracking Details',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Emotion: ${tracking['emotion']}',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Date: ${tracking['date']}',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: isDarkMode ? Colors.white70 : Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Description:',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                tracking['description'] ?? 'No description available.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: isDarkMode ? Colors.white70 : Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Relevant Information:',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                tracking['details'] ?? 'No additional information available.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: isDarkMode ? Colors.white70 : Colors.black87,
-                ),
-              ),
-            ],
-          ),
+      appBar: AppBar(
+        title: Text('Tracking Details'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Dominant Emotion: $emotion',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'Date: $date',
+              style: TextStyle(fontSize: 16),
+            ),
+            Text(
+              'Time: $time',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Emotion Distribution:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            // Display emotion distribution as a pie chart
+            Expanded(
+              child: PieChartWidget(emotionData: emotionDistribution),
+            ),
+          ],
         ),
       ),
     );
