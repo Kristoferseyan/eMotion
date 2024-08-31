@@ -294,7 +294,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   Widget _buildNextButton() {
     return ElevatedButton(
-      onPressed: _isLoading ? null : _registerUser,
+      onPressed: (_isLoading || !_agreedToTerms) ? null : _registerUser, // Disable button if terms are not agreed
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF6EBBC5),
         minimumSize: const Size(double.infinity, 60),

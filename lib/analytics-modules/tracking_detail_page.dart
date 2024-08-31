@@ -1,6 +1,6 @@
-import 'dart:convert';  // Import to use jsonDecode
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../graph/pie_chart_widget.dart';  // Assuming you have a PieChartWidget ready
+import '../graph/pie_chart_widget.dart';
 
 class TrackingDetailPage extends StatelessWidget {
   final String emotion;

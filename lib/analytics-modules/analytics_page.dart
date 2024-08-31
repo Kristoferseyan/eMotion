@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../graph/pie_chart_widget.dart';
-import 'tracking_detail_page.dart'; // Import the new page
+import 'tracking_detail_page.dart';
 
 class AnalyticsPage extends StatefulWidget {
   final String userId;
