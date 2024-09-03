@@ -1,3 +1,4 @@
+import 'package:fix_emotion/settings-modules/change_password_page.dart';
 import 'package:fix_emotion/settings-modules/delete_data_page.dart';
 import 'package:fix_emotion/settings-modules/privacy_settings_page.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,10 @@ class _SettingsPageState extends State<SettingsPage> {
                         );
                       }),
                       _buildSettingsTile(Icons.lock, 'Change Password', isDarkMode, () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ChangePasswordPage(userId: widget.userId,)),
+                        );
                       }),
                       SizedBox(height: 20),
                       _buildSectionHeader('Notifications', isDarkMode),

@@ -1,3 +1,4 @@
+import 'package:fix_emotion/auth-modules/login-modules/forgot_password.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login_header.dart';
@@ -101,6 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                           });
                         },
                         onLogin: _loginUser,
+                        onForgotPassword: _navigateToForgotPassword, 
                       ),
                       SocialLoginButtons(
                         onGoogleSignIn: _googleSignIn,
@@ -163,6 +165,12 @@ class _LoginPageState extends State<LoginPage> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _navigateToForgotPassword() async {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+    );
   }
 
   Widget _buildBackgroundImage(String assetPath) {

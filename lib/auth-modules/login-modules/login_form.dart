@@ -7,6 +7,7 @@ class LoginForm extends StatelessWidget {
   final bool isLoading;
   final ValueChanged<bool> onRememberMeChanged;
   final VoidCallback onLogin;
+  final VoidCallback onForgotPassword;
 
   const LoginForm({
     Key? key,
@@ -16,6 +17,7 @@ class LoginForm extends StatelessWidget {
     required this.isLoading,
     required this.onRememberMeChanged,
     required this.onLogin,
+    required this.onForgotPassword, // Add this line
   }) : super(key: key);
 
   @override
@@ -38,14 +40,26 @@ class LoginForm extends StatelessWidget {
           ),
           const SizedBox(height: 16.0),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligns items to the edges
             children: [
-              Checkbox(
-                value: rememberMe,
-                onChanged: (bool? newValue) {
-                  onRememberMeChanged(newValue ?? false);
-                },
+              Row(
+                children: [
+                  Checkbox(
+                    value: rememberMe,
+                    onChanged: (bool? newValue) {
+                      onRememberMeChanged(newValue ?? false);
+                    },
+                  ),
+                  const Text('Remember Me'),
+                ],
               ),
-              const Text('Remember Me'),
+              TextButton(
+                onPressed: onForgotPassword,
+                child: const Text(
+                  'Forgot Password?',
+                  style: TextStyle(color: Color(0xFF6EBBC5)), // Match the color to the theme
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16.0),

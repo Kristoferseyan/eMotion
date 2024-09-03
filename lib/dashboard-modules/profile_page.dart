@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fix_emotion/auth-modules/login-modules/login.dart';
+import '../auth-modules/authentication_service.dart'; // Import your AuthenticationService
 
 class ProfilePage extends StatefulWidget {
   final String userId;
@@ -13,6 +14,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final supabase = Supabase.instance.client;
+  final AuthenticationService authService = AuthenticationService(); // Create an instance of AuthenticationService
   Map<String, dynamic>? userData;
 
   @override
@@ -37,8 +39,8 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _logout() async {
-    await supabase.auth.signOut();
+  Future<void> _logout() async {
+    await authService.signOut();
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),

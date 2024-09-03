@@ -1,12 +1,16 @@
+import 'package:fix_emotion/auth-modules/login-modules/reset_password.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:logging/logging.dart';
 import 'settings-modules/settings_page.dart';
 import 'dashboard-modules/dashboard.dart';
 import 'auth-modules/login-modules/login.dart';
 import 'auth-modules/reg-modules/registration.dart';
 import 'settings-modules/notification_settings_page.dart';
 import 'settings-modules/privacy_settings_page.dart';
+
+final _logger = Logger('MyApp');
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +19,7 @@ Future<void> main() async {
   final String? supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
 
   if (supabaseUrl == null || supabaseAnonKey == null) {
+    _logger.severe("Environment variables for Supabase are missing!");
     throw Exception("Environment variables for Supabase are missing!");
   }
 
@@ -37,7 +42,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: isAuthenticated ? '/dashboard' : '/',
       onGenerateRoute: _onGenerateRoute,
       debugShowCheckedModeBanner: false,
       theme: _buildLightTheme(),
@@ -47,7 +51,22 @@ class MyApp extends StatelessWidget {
   }
 
   Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
+    Uri uri = Uri.parse(settings.name ?? '');
+
+    _logger.info('Navigating to: ${settings.name}');
+    _logger.info('URI Scheme: ${uri.scheme}');
+    _logger.info('URI Path: ${uri.path}');
+    _logger.info('Query Parameters: ${uri.queryParameters}');
+
     final args = getRouteArguments(settings);
+
+    if (uri.scheme == 'emotion' && uri.path == '/reset-password') {
+      final token = uri.queryParameters['token'] ?? '';
+      _logger.info('Reset Password Token from Deep Link: $token');
+      return MaterialPageRoute(
+        builder: (_) => ResetPasswordPage(accessToken: token),
+      );
+    }
 
     switch (settings.name) {
       case '/':
@@ -69,15 +88,21 @@ class MyApp extends StatelessWidget {
         );
       case '/notification-settings':
         return MaterialPageRoute(builder: (_) => NotificationSettingsPage());
+      case '/reset-password':
+        final token = args['token'] ?? '';
+        _logger.info('Navigating to ResetPasswordPage with token: $token');
+        return MaterialPageRoute(
+          builder: (_) => ResetPasswordPage(accessToken: token),
+        );
       case '/privacy-settings':
         return MaterialPageRoute(
           builder: (_) => PrivacySettingsPage(
             userId: args['userId'] ?? '',
-            onSettingsChanged: (String setting, bool value) {
-            },
+            onSettingsChanged: (String setting, bool value) {},
           ),
         );
       default:
+        _logger.warning('Unknown route: ${settings.name}');
         return MaterialPageRoute(builder: (_) => const LoginReg());
     }
   }

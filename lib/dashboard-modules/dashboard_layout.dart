@@ -3,6 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../graph/emotion_chart.dart';
 import 'custom_layout.dart';
 import 'profile_page.dart';
+import '../auth-modules/login-modules/login.dart';
+import '../auth-modules/authentication_service.dart'; // Import your AuthenticationService
 
 class DashboardLayout extends StatefulWidget {
   final String userId;
@@ -26,7 +28,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     'Fear',
   ];
 
-  final supabase = Supabase.instance.client;
+  final AuthenticationService authService = AuthenticationService(); // Create an instance of AuthenticationService
 
   @override
   void initState() {
@@ -36,7 +38,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 
   Future<void> _fetchUserName() async {
     try {
-      final response = await supabase
+      final response = await authService.client
           .from('users')
           .select('fName')
           .eq('id', widget.userId)
@@ -53,28 +55,63 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     }
   }
 
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Log Out'),
+            content: const Text('Are you sure you want to log out?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await _logout();
+                },
+                child: const Text('Log Out'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
+  }
+
+  Future<void> _logout() async {
+    await authService.signOut();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
     final isDarkMode = brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
-      body: SafeArea(
-        child: userName == null
-            ? const Center(child: CircularProgressIndicator())
-            : DashboardBody(
-                userId: widget.userId,
-                userName: userName!,
-                selectedEmotion: selectedEmotion,
-                emotions: emotions,
-                onEmotionChanged: (newEmotion) {
-                  setState(() {
-                    selectedEmotion = newEmotion;
-                  });
-                },
-                onProfileButtonPressed: () => _navigateToProfilePage(context),
-              ),
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
+        body: SafeArea(
+          child: userName == null
+              ? const Center(child: CircularProgressIndicator())
+              : DashboardBody(
+                  userId: widget.userId,
+                  userName: userName!,
+                  selectedEmotion: selectedEmotion,
+                  emotions: emotions,
+                  onEmotionChanged: (newEmotion) {
+                    setState(() {
+                      selectedEmotion = newEmotion;
+                    });
+                  },
+                  onProfileButtonPressed: () => _navigateToProfilePage(context),
+                ),
+        ),
       ),
     );
   }
