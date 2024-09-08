@@ -4,7 +4,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class PrivacySettingsPage extends StatefulWidget {
   final String userId;
 
-  const PrivacySettingsPage({Key? key, required this.userId, required Null Function(String setting, bool value) onSettingsChanged}) : super(key: key);
+  const PrivacySettingsPage({
+    Key? key, 
+    required this.userId, 
+    required Null Function(String setting, bool value) onSettingsChanged
+  }) : super(key: key);
 
   @override
   _PrivacySettingsPageState createState() => _PrivacySettingsPageState();
@@ -56,13 +60,13 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final isDarkMode = brightness == Brightness.dark;
+    // Using Theme.of(context).brightness to check for dark mode
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
       appBar: AppBar(
-        title: Text('Privacy Settings'),
+        title: const Text('Privacy Settings'),
         backgroundColor: isDarkMode ? const Color(0xFF0D2C2D) : const Color(0xFFB6DDF2),
       ),
       body: Padding(
@@ -117,7 +121,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     return Card(
       color: isDarkMode ? const Color.fromARGB(255, 23, 57, 61) : Colors.white,
       elevation: 3,
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: SwitchListTile(
         title: Text(

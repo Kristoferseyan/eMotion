@@ -18,7 +18,7 @@ class DeletePage extends StatefulWidget {
 class _DeletePageState extends State<DeletePage> {
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = MediaQuery.of(context).platformBrightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
@@ -78,7 +78,7 @@ class _DeletePageState extends State<DeletePage> {
   }
 
   void _showConfirmationDialog(BuildContext context) {
-    final isDarkMode = MediaQuery.of(context).platformBrightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     showDialog(
       context: context,

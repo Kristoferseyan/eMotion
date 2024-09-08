@@ -40,70 +40,61 @@ class _EmotionChartState extends State<EmotionChart> {
     }
   }
 
-Future<List<FlSpot>> _fetchEmotionData(String emotion) async {
-  try {
-    final response = await supabase
-        .from('emotion_tracking')
-        .select('emotion_distribution, timestamp')
-        .gte('timestamp', DateTime.now().subtract(Duration(days: 7)).toIso8601String())
-        .order('timestamp', ascending: true);
+  Future<List<FlSpot>> _fetchEmotionData(String emotion) async {
+    try {
+      final response = await supabase
+          .from('emotion_tracking')
+          .select('emotion_distribution, timestamp')
+          .gte('timestamp', DateTime.now().subtract(const Duration(days: 7)).toIso8601String())
+          .order('timestamp', ascending: true);
 
-    if (response.isEmpty) {
+      if (response.isEmpty) {
+        return [];
+      }
+
+      Map<int, double> dailyEmotionSum = {};
+      Map<int, int> dailyEmotionCounts = {};
+
+      for (var i = 0; i < 7; i++) {
+        dailyEmotionSum[i] = 0.0;
+        dailyEmotionCounts[i] = 0;
+      }
+
+      for (var entry in response) {
+        DateTime timestamp = DateTime.parse(entry['timestamp']);
+        int dayIndex = DateTime.now().difference(timestamp).inDays;
+
+        if (dayIndex < 7) {
+          int chartIndex = 6 - dayIndex;
+
+          final emotionDistributionJson = entry['emotion_distribution'];
+          final Map<String, dynamic> emotionDistributionMap = jsonDecode(emotionDistributionJson);
+
+          double emotionValue = (emotionDistributionMap[emotion] ?? 0.0).toDouble();
+
+          dailyEmotionSum[chartIndex] = dailyEmotionSum[chartIndex]! + emotionValue;
+          dailyEmotionCounts[chartIndex] = dailyEmotionCounts[chartIndex]! + 1;
+        }
+      }
+
+      List<FlSpot> spots = [];
+      for (var i = 0; i < 7; i++) {
+        double averageEmotionValue = dailyEmotionCounts[i] != 0
+            ? dailyEmotionSum[i]! / dailyEmotionCounts[i]!
+            : 0.0;
+        spots.add(FlSpot(i.toDouble(), averageEmotionValue));
+      }
+
+      return spots;
+    } catch (e) {
+      print('Error fetching emotion data: $e');
       return [];
     }
-
-    // Initialize a map to hold sums and counts for each day of the week
-    Map<int, double> dailyEmotionSum = {};
-    Map<int, int> dailyEmotionCounts = {};
-
-    for (var i = 0; i < 7; i++) {
-      dailyEmotionSum[i] = 0.0;
-      dailyEmotionCounts[i] = 0;
-    }
-
-    // Populate the counts and sum based on the response data
-    for (var entry in response) {
-      DateTime timestamp = DateTime.parse(entry['timestamp']);
-      int dayIndex = DateTime.now().difference(timestamp).inDays;
-
-      if (dayIndex < 7) {
-        // Reverse the index to align with the chart (Mon-Sun)
-        int chartIndex = 6 - dayIndex;
-
-        // Parse the emotion_distribution JSON correctly
-        final emotionDistributionJson = entry['emotion_distribution'];
-        final Map<String, dynamic> emotionDistributionMap = jsonDecode(emotionDistributionJson);
-
-        // Convert the specific emotion value to double
-        double emotionValue = (emotionDistributionMap[emotion] ?? 0.0).toDouble();
-
-        dailyEmotionSum[chartIndex] = dailyEmotionSum[chartIndex]! + emotionValue;
-        dailyEmotionCounts[chartIndex] = dailyEmotionCounts[chartIndex]! + 1;
-      }
-    }
-
-    // Calculate the average emotion value per day
-    List<FlSpot> spots = [];
-    for (var i = 0; i < 7; i++) {
-      double averageEmotionValue = dailyEmotionCounts[i] != 0
-          ? dailyEmotionSum[i]! / dailyEmotionCounts[i]!
-          : 0.0;
-      spots.add(FlSpot(i.toDouble(), averageEmotionValue));
-      print('Day $i: Average $emotion = $averageEmotionValue');  // Debugging output
-    }
-
-    return spots;
-  } catch (e) {
-    print('Error fetching emotion data: $e');
-    return [];
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final isDarkMode = brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

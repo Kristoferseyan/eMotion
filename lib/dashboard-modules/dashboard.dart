@@ -19,8 +19,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final Brightness brightness = MediaQuery.of(context).platformBrightness;
-    final bool isDarkMode = brightness == Brightness.dark;
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
 
@@ -28,8 +27,8 @@ class _DashboardState extends State<Dashboard> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          DashboardLayout(userId: widget.userId), 
-          AnalyticsPage(userId: widget.userId,),
+          DashboardLayout(userId: widget.userId),
+          AnalyticsPage(userId: widget.userId),
           SettingsPage(userId: widget.userId),
         ],
       ),
@@ -53,10 +52,11 @@ class _DashboardState extends State<Dashboard> {
             tabBackgroundColor: isDarkMode
                 ? const Color.fromARGB(255, 255, 245, 245)
                 : const Color.fromARGB(255, 49, 123, 136),
-            iconSize: screenWidth * 0.07, 
-            tabBorderRadius: screenWidth * 0.05, 
-            backgroundColor:
-                isDarkMode ? const Color.fromARGB(255, 18, 46, 49) : Colors.white,
+            iconSize: screenWidth * 0.07,
+            tabBorderRadius: screenWidth * 0.05,
+            backgroundColor: isDarkMode
+                ? const Color.fromARGB(255, 18, 46, 49)
+                : Colors.white,
             tabs: [
               GButton(
                 icon: Icons.home,
@@ -65,7 +65,7 @@ class _DashboardState extends State<Dashboard> {
                     : Colors.white,
                 iconColor: const Color.fromARGB(255, 49, 123, 136),
                 text: 'Home',
-                textSize: screenWidth * 0.035, 
+                textSize: screenWidth * 0.035,
               ),
               GButton(
                 icon: Icons.book,
@@ -74,7 +74,7 @@ class _DashboardState extends State<Dashboard> {
                     : Colors.white,
                 iconColor: const Color.fromARGB(255, 49, 123, 136),
                 text: 'Analytics',
-                textSize: screenWidth * 0.035, 
+                textSize: screenWidth * 0.035,
               ),
               GButton(
                 icon: Icons.settings,
@@ -83,7 +83,7 @@ class _DashboardState extends State<Dashboard> {
                     : Colors.white,
                 iconColor: const Color.fromARGB(255, 49, 123, 136),
                 text: 'Settings',
-                textSize: screenWidth * 0.035, 
+                textSize: screenWidth * 0.035,
               ),
             ],
             selectedIndex: _selectedIndex,

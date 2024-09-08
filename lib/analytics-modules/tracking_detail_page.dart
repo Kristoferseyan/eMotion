@@ -18,6 +18,8 @@ class TrackingDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     // Parse the JSON string to a Map<String, double>
     final Map<String, double> emotionDistribution = Map<String, double>.from(
       jsonDecode(emotionDistributionJson).map(
@@ -27,7 +29,8 @@ class TrackingDetailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tracking Details'),
+        title: const Text('Tracking Details'),
+        backgroundColor: isDarkMode ? const Color(0xFF0D2C2D) : const Color(0xFFB6DDF2),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -36,29 +39,45 @@ class TrackingDetailPage extends StatelessWidget {
           children: [
             Text(
               'Dominant Emotion: $emotion',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
             ),
+            const SizedBox(height: 8),
             Text(
               'Date: $date',
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(
+                fontSize: 16,
+                color: isDarkMode ? Colors.white70 : Colors.black87,
+              ),
             ),
+            const SizedBox(height: 4),
             Text(
               'Time: $time',
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(
+                fontSize: 16,
+                color: isDarkMode ? Colors.white70 : Colors.black87,
+              ),
             ),
             const SizedBox(height: 20),
             Text(
               'Emotion Distribution:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
             ),
             const SizedBox(height: 10),
-            // Display emotion distribution as a pie chart
             Expanded(
               child: PieChartWidget(emotionData: emotionDistribution),
             ),
           ],
         ),
       ),
+      backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
     );
   }
 }

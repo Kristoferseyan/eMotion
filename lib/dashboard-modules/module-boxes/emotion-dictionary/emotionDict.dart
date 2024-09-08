@@ -34,13 +34,12 @@ class EmotionDict extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final isDarkMode = brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
       appBar: AppBar(
-        title: Text('Emotion Dictionary'),
+        title: const Text('Emotion Dictionary'),
         backgroundColor: isDarkMode ? const Color(0xFF0D2C2D) : const Color(0xFFB6DDF2),
       ),
       body: Padding(
@@ -56,7 +55,7 @@ class EmotionDict extends StatelessWidget {
             return Card(
               color: isDarkMode ? const Color.fromARGB(255, 23, 57, 61) : Colors.white,
               elevation: 3,
-              margin: EdgeInsets.symmetric(vertical: 8.0),
+              margin: const EdgeInsets.symmetric(vertical: 8.0),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
               child: ListTile(
                 leading: Text(
@@ -79,7 +78,7 @@ class EmotionDict extends StatelessWidget {
                         color: isDarkMode ? Colors.white70 : Colors.black87,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       citation,
                       style: TextStyle(

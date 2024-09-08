@@ -1,6 +1,7 @@
 import 'package:fix_emotion/settings-modules/change_password_page.dart';
 import 'package:fix_emotion/settings-modules/delete_data_page.dart';
 import 'package:fix_emotion/settings-modules/privacy_settings_page.dart';
+import 'package:fix_emotion/settings-modules/theme_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fix_emotion/auth-modules/authentication_service.dart';
 import 'package:fix_emotion/settings-modules/edit_profile_page.dart';
@@ -8,7 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'notification_settings_page.dart';
 
 class SettingsPage extends StatefulWidget {
-  final String userId; 
+  final String userId;
 
   const SettingsPage({Key? key, required this.userId}) : super(key: key);
 
@@ -21,8 +22,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final isDarkMode = brightness == Brightness.dark;
+    // Use the current theme's brightness instead of MediaQuery
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
@@ -37,7 +38,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(height: 10),
                 Expanded(
                   child: ListView(
-                    padding: EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0),
                     children: [
                       _buildSectionHeader('Profile', isDarkMode),
                       _buildSettingsTile(Icons.person, 'Edit Profile', isDarkMode, () {
@@ -49,22 +50,22 @@ class _SettingsPageState extends State<SettingsPage> {
                       _buildSettingsTile(Icons.lock, 'Change Password', isDarkMode, () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => ChangePasswordPage(userId: widget.userId,)),
+                          MaterialPageRoute(builder: (context) => ChangePasswordPage(userId: widget.userId)),
                         );
                       }),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       _buildSectionHeader('Notifications', isDarkMode),
                       _buildSettingsTile(Icons.notifications, 'Notification Settings', isDarkMode, () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationSettingsPage()));
                       }),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       _buildSectionHeader('Privacy', isDarkMode),
                       _buildSettingsTile(Icons.lock, 'Privacy Settings', isDarkMode, () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacySettingsPage(
                           onSettingsChanged: (String setting, bool value) {
                             _updatePrivacySettings(setting, value);
                           },
-                          userId: widget.userId, 
+                          userId: widget.userId,
                         )));
                       }),
                       _buildSettingsTile(Icons.delete, 'Delete Data', isDarkMode, () {
@@ -75,27 +76,25 @@ class _SettingsPageState extends State<SettingsPage> {
                           },
                         )));
                       }),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       _buildSectionHeader('Application', isDarkMode),
                       _buildSettingsTile(Icons.brightness_6, 'Theme', isDarkMode, () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ThemeSettingsPage()),
+                        );
                       }),
-                      _buildSettingsTile(Icons.language, 'Language', isDarkMode, () {
-                      }),
-                      SizedBox(height: 20),
+                      _buildSettingsTile(Icons.language, 'Language', isDarkMode, () {}),
+                      const SizedBox(height: 20),
                       _buildSectionHeader('Security', isDarkMode),
-                      _buildSettingsTile(Icons.security, 'Two-Factor Authentication', isDarkMode, () {
-                      }),
-                      _buildSettingsTile(Icons.history, 'Login Activity', isDarkMode, () {
-                      }),
-                      SizedBox(height: 20),
+                      _buildSettingsTile(Icons.security, 'Two-Factor Authentication', isDarkMode, () {}),
+                      _buildSettingsTile(Icons.history, 'Login Activity', isDarkMode, () {}),
+                      const SizedBox(height: 20),
                       _buildSectionHeader('About', isDarkMode),
-                      _buildSettingsTile(Icons.info, 'App Version', isDarkMode, () {
-                      }),
-                      _buildSettingsTile(Icons.developer_mode, 'Developer Info', isDarkMode, () {
-                      }),
-                      _buildSettingsTile(Icons.description, 'Open Source Licenses', isDarkMode, () {
-                      }),
-                      SizedBox(height: 20),
+                      _buildSettingsTile(Icons.info, 'App Version', isDarkMode, () {}),
+                      _buildSettingsTile(Icons.developer_mode, 'Developer Info', isDarkMode, () {}),
+                      _buildSettingsTile(Icons.description, 'Open Source Licenses', isDarkMode, () {}),
+                      const SizedBox(height: 20),
                       _buildLogOutButton(context, isDarkMode),
                     ],
                   ),
@@ -140,7 +139,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Card(
       color: isDarkMode ? const Color.fromARGB(255, 23, 57, 61) : Colors.white,
       elevation: 3,
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: ListTile(
         leading: Icon(icon, color: isDarkMode ? Colors.white70 : const Color(0xFF317B85)),
@@ -164,7 +163,7 @@ class _SettingsPageState extends State<SettingsPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
-        padding: EdgeInsets.symmetric(vertical: 16.0),
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
       ),
       child: Center(
         child: Text(
@@ -184,8 +183,8 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Log Out'),
-          content: Text('Are you sure you want to log out?'),
+          title: const Text('Log Out'),
+          content: const Text('Are you sure you want to log out?'),
           actions: <Widget>[
             TextButton(
               child: Text('Cancel', style: TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
@@ -194,7 +193,7 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
             TextButton(
-              child: Text('Log Out', style: TextStyle(color: Colors.red)),
+              child: const Text('Log Out', style: TextStyle(color: Colors.red)),
               onPressed: () {
                 Navigator.of(context).pop();
                 _handleLogOut(context);
@@ -211,11 +210,11 @@ class _SettingsPageState extends State<SettingsPage> {
     try {
       await _authService.signOut();
 
-      if (!mounted) return; 
+      if (!mounted) return;
 
       Navigator.pushReplacementNamed(context, '/');
     } catch (e) {
-      if (!mounted) return; 
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error logging out: ${e.toString()}')),

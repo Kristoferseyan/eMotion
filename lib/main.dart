@@ -34,10 +34,25 @@ Future<void> main() async {
   runApp(MyApp(isAuthenticated: isAuthenticated));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final bool isAuthenticated;
 
   const MyApp({Key? key, required this.isAuthenticated}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState();
+
+  static _MyAppState? of(BuildContext context) => context.findAncestorStateOfType<_MyAppState>();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  void setTheme(ThemeMode themeMode) {
+    setState(() {
+      _themeMode = themeMode;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +61,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: _buildLightTheme(),
       darkTheme: _buildDarkTheme(),
-      themeMode: ThemeMode.system,
+      themeMode: _themeMode, // Apply the dynamically updated theme
     );
   }
 
@@ -121,7 +136,7 @@ class MyApp extends StatelessWidget {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: _outlinedButtonStyle(Colors.white),
       ),
-    );
+    );  
   }
 
   ThemeData _buildDarkTheme() {

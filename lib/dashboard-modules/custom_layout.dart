@@ -16,18 +16,20 @@ class CustomLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Center(
       child: Column(
-        mainAxisSize: MainAxisSize.min, // Center vertically
+        mainAxisSize: MainAxisSize.min,
         children: [
           _buildRectangle(
             context: context,
-            width: maxWidth * 0.85, // Slightly reduced width for better fit
-            color: const Color(0xFFFFC5C5),
-            borderColor: const Color.fromARGB(255, 240, 166, 166),
+            width: maxWidth * 0.85,
+            color: isDarkMode ? const Color(0xFF1D4D4F) : const Color(0xFFFFC5C5),
+            borderColor: isDarkMode ? const Color(0xFF122E31) : const Color.fromARGB(255, 240, 166, 166),
             imagePath: 'assets/images/emoTrack.png',
             text: 'Track Emotions',
-            textColor: const Color.fromARGB(255, 209, 130, 130),
+            textColor: isDarkMode ? const Color(0xFFD1E7E8) : const Color.fromARGB(255, 209, 130, 130),
             onTap: () {
               Navigator.push(
                 context,
@@ -37,15 +39,15 @@ class CustomLayout extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 16), // Reduced spacing between boxes
+          const SizedBox(height: 16),
           _buildRectangle(
             context: context,
-            width: maxWidth * 0.85, // Slightly reduced width for better fit
-            color: const Color(0xFFFFEBD8),
-            borderColor: const Color.fromARGB(255, 216, 176, 139),
+            width: maxWidth * 0.85,
+            color: isDarkMode ? const Color(0xFF4E6F6B) : const Color(0xFFFFEBD8),
+            borderColor: isDarkMode ? const Color(0xFF1D4D4F) : const Color.fromARGB(255, 216, 176, 139),
             imagePath: 'assets/images/emoDict.png',
             text: 'Emotion Dictionary',
-            textColor: const Color.fromARGB(255, 184, 146, 111),
+            textColor: isDarkMode ? const Color(0xFFE0F2F1) : const Color.fromARGB(255, 184, 146, 111),
             onTap: () {
               Navigator.push(
                 context,
@@ -72,7 +74,7 @@ class CustomLayout extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: width,
-        height: 90, // Slightly reduced height for better fit
+        height: 90,
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(12),
@@ -91,19 +93,19 @@ class CustomLayout extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const SizedBox(width: 16), // Reduced padding
+            const SizedBox(width: 16),
             Image.asset(
               imagePath,
-              width: 44, // Adjusted image size for better fit
+              width: 44,
               height: 44,
             ),
-            const SizedBox(width: 16), // Reduced padding
+            const SizedBox(width: 16),
             Expanded(
               child: Text(
                 text,
                 style: TextStyle(
                   color: textColor,
-                  fontSize: 20, // Slightly reduced text size
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = MediaQuery.of(context).platformBrightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : Colors.white,
@@ -102,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                           });
                         },
                         onLogin: _loginUser,
-                        onForgotPassword: _navigateToForgotPassword, 
+                        onForgotPassword: _navigateToForgotPassword,
                       ),
                       SocialLoginButtons(
                         onGoogleSignIn: _googleSignIn,

@@ -57,7 +57,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           .from('users')
           .select()
           .eq('reset_token', widget.accessToken)
-          .maybeSingle(); // Use maybeSingle or single depending on your needs
+          .maybeSingle();
 
       if (response == null) {
         throw Exception('Invalid or expired reset token.');
@@ -69,7 +69,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       final updateResponse = await Supabase.instance.client
           .from('users')
           .update({'password': password})
-          .eq('id', userId); // Use execute to perform the update
+          .eq('id', userId);
 
       if (updateResponse == null) {
         throw Exception('Failed to update password.');
@@ -94,35 +94,47 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reset Password'),
+        backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
+        iconTheme: IconThemeData(color: isDarkMode ? Colors.white : Colors.black),
       ),
+      backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Enter your new password.',
-              style: TextStyle(fontSize: 16.0),
+              style: TextStyle(
+                fontSize: 16.0,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
             ),
             const SizedBox(height: 16.0),
             TextField(
               controller: _passwordController,
               obscureText: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'New Password',
                 border: OutlineInputBorder(),
+                filled: true,
+                fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
               ),
             ),
             const SizedBox(height: 16.0),
             TextField(
               controller: _confirmPasswordController,
               obscureText: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Confirm Password',
                 border: OutlineInputBorder(),
+                filled: true,
+                fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
               ),
             ),
             const SizedBox(height: 16.0),
@@ -131,6 +143,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 : ElevatedButton(
                     onPressed: _resetPassword,
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: isDarkMode ? const Color(0xFF1A3C40) : Colors.blue,
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                       minimumSize: const Size(double.infinity, 50),
                     ),

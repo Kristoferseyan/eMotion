@@ -12,13 +12,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final isDarkMode = brightness == Brightness.dark;
+    // Use Theme.of(context).brightness instead of MediaQuery
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
       appBar: AppBar(
-        title: Text('Notification Settings'),
+        title: const Text('Notification Settings'),
         backgroundColor: isDarkMode ? const Color(0xFF0D2C2D) : const Color(0xFFB6DDF2),
       ),
       body: Padding(
@@ -70,7 +70,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     return Card(
       color: isDarkMode ? const Color.fromARGB(255, 23, 57, 61) : Colors.white,
       elevation: 3,
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: SwitchListTile(
         title: Text(

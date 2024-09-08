@@ -53,9 +53,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDarkMode ? const Color(0xFF122E31) : Colors.white,
       appBar: AppBar(
         title: const Text('Forgot Password'),
+        backgroundColor: isDarkMode ? const Color(0xFF0D2C2D) : const Color(0xFFB6DDF2),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -70,10 +74,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Email',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
+                filled: true,
+                fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
               ),
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
             const SizedBox(height: 16.0),
             _isLoading
@@ -82,9 +89,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     onPressed: _sendResetLink,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      backgroundColor: isDarkMode ? const Color(0xFF1A3C40) : const Color(0xFFB6DDF2),
                       minimumSize: const Size(double.infinity, 50),
                     ),
-                    child: const Text('Send Reset Link'),
+                    child: Text(
+                      'Send Reset Link',
+                      style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.white),
+                    ),
                   ),
             const SizedBox(height: 16.0),
             ElevatedButton(
@@ -95,9 +106,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   : null, // Disable the button if _isNextButtonEnabled is false
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
+                backgroundColor: isDarkMode ? Colors.grey[800] : const Color(0xFFB6DDF2),
                 minimumSize: const Size(double.infinity, 50),
               ),
-              child: const Text('Next'),
+              child: Text(
+                'Next',
+                style: TextStyle(color: isDarkMode ? Colors.white : Colors.white),
+              ),
             ),
           ],
         ),

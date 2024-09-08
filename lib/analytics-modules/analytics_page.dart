@@ -14,14 +14,13 @@ class AnalyticsPage extends StatefulWidget {
 
 class _AnalyticsPageState extends State<AnalyticsPage> {
   final supabase = Supabase.instance.client;
-  String _selectedEmotion = 'All'; // Default filter
+  String _selectedEmotion = 'All';
 
   Future<Map<String, dynamic>> _fetchData() async {
     Map<String, double> emotionData = {};
     List<Map<String, dynamic>> recentTrackings = [];
 
     try {
-      // Fetch emotion data
       final emotionResponse = await supabase
           .from('emotion_tracking')
           .select('emotion, emotion_distribution, timestamp, user_feedback')
@@ -44,7 +43,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           entry.key: (entry.value / total) * 100,
       };
 
-      // Fetch recent trackings
       recentTrackings = List<Map<String, dynamic>>.from(emotionResponse).map((tracking) {
         final DateTime timestamp = DateTime.parse(tracking['timestamp']);
         final String date = '${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}';
@@ -71,8 +69,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final isDarkMode = brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
@@ -80,14 +77,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         future: _fetchData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             final emotionData = snapshot.data!['emotionData'] as Map<String, double>;
             final recentTrackings = snapshot.data!['recentTrackings'] as List<Map<String, dynamic>>;
 
-            // Apply filter to recentTrackings
             final filteredTrackings = _selectedEmotion == 'All'
                 ? recentTrackings
                 : recentTrackings.where((tracking) => tracking['emotion'] == _selectedEmotion).toList();
@@ -124,7 +120,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               ),
             );
           } else {
-            return Center(child: Text('No data available.'));
+            return const Center(child: Text('No data available.'));
           }
         },
       ),
@@ -191,9 +187,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
   Widget _buildRecentTrackingList(List<Map<String, dynamic>> recentTrackings, bool isDarkMode) {
     return Container(
-      height: 300, // Fixed height for the recent tracking list
+      height: 300,
       decoration: BoxDecoration(
-        color: isDarkMode ? Color.fromARGB(255, 23, 57, 61) : Colors.white,
+        color: isDarkMode ? const Color.fromARGB(255, 23, 57, 61) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -217,7 +213,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       emotion: tracking['emotion'],
                       date: tracking['date'],
                       time: tracking['time'],
-                      emotionDistributionJson: tracking['emotion_distribution'], // Pass the JSON string directly
+                      emotionDistributionJson: tracking['emotion_distribution'],
                     ),
                   ),
                 );
@@ -227,7 +223,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: isDarkMode ? Color.fromARGB(255, 28, 66, 71) : Colors.white,
+                color: isDarkMode ? const Color.fromARGB(255, 28, 66, 71) : Colors.white,
                 boxShadow: [
                   BoxShadow(
                     color: isDarkMode ? Colors.black.withOpacity(0.15) : Colors.grey.withOpacity(0.15),
@@ -258,7 +254,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: isDarkMode ? Color.fromARGB(255, 23, 57, 61) : Colors.white,
+        color: isDarkMode ? const Color.fromARGB(255, 23, 57, 61) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(

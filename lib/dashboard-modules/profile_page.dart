@@ -50,8 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final isDarkMode = brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
@@ -69,57 +68,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: isDarkMode
-                              ? const [Color(0xFF1D4D4F), Color(0xFF122E31)]
-                              : const [Color(0xFFA2E3F6), Color(0xFFF3FCFF)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: isDarkMode ? Colors.black26 : Colors.grey.withOpacity(0.3),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: isDarkMode ? Colors.white : Colors.grey[300],
-                            child: Text(
-                              (userData!['fName'][0] as String).toUpperCase(),
-                              style: TextStyle(
-                                fontSize: 40,
-                                color: isDarkMode ? Colors.black : Colors.white,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            '${_capitalize(userData!['fName'])} ${_capitalize(userData!['lName'])}',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: isDarkMode ? Colors.white : Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    _buildProfileHeader(isDarkMode),
                     const SizedBox(height: 20),
                     _buildProfileDetailCard(
                       context,
                       icon: Icons.email,
                       title: 'Email',
                       value: userData!['email'] ?? '',
-                      isDarkMode: isDarkMode,
                     ),
                     const SizedBox(height: 10),
                     _buildProfileDetailCard(
@@ -127,7 +82,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       icon: Icons.person,
                       title: 'Username',
                       value: userData!['username'] ?? '',
-                      isDarkMode: isDarkMode,
                     ),
                     const SizedBox(height: 10),
                     _buildProfileDetailCard(
@@ -135,7 +89,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       icon: Icons.calendar_today,
                       title: 'Birthdate',
                       value: userData!['bDate'] ?? '',
-                      isDarkMode: isDarkMode,
                     ),
                     const SizedBox(height: 10),
                     _buildProfileDetailCard(
@@ -143,7 +96,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       icon: Icons.cake,
                       title: 'Age',
                       value: userData!['age'].toString(),
-                      isDarkMode: isDarkMode,
                     ),
                     const SizedBox(height: 30),
                     ElevatedButton(
@@ -170,12 +122,61 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Widget _buildProfileHeader(bool isDarkMode) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDarkMode
+              ? const [Color(0xFF1D4D4F), Color(0xFF122E31)]
+              : const [Color(0xFFA2E3F6), Color(0xFFF3FCFF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: isDarkMode ? Colors.black26 : Colors.grey.withOpacity(0.3),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: isDarkMode ? Colors.white : Colors.grey[300],
+            child: Text(
+              (userData!['fName'][0] as String).toUpperCase(),
+              style: TextStyle(
+                fontSize: 40,
+                color: isDarkMode ? Colors.black : Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '${_capitalize(userData!['fName'])} ${_capitalize(userData!['lName'])}',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   String _capitalize(String text) {
     if (text.isEmpty) return text;
     return text[0].toUpperCase() + text.substring(1).toLowerCase();
   }
 
-  Widget _buildProfileDetailCard(BuildContext context, {required IconData icon, required String title, required String value, required bool isDarkMode}) {
+  Widget _buildProfileDetailCard(BuildContext context, {required IconData icon, required String title, required String value}) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       color: isDarkMode ? const Color(0xFF1A3C40) : Colors.white,
       shape: RoundedRectangleBorder(

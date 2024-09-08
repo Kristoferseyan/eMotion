@@ -29,9 +29,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     _currentPasswordController = TextEditingController();
     _newPasswordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
-
-    // Print the userId whenever the page is opened
-    print("UserID: ${widget.userId}");
   }
 
   @override
@@ -49,7 +46,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       });
 
       try {
-        // Fetch the user data to verify the current password
         final response = await supabase
             .from('users')
             .select('password')
@@ -57,23 +53,14 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             .single();
 
         final user = response as Map<String, dynamic>?;
-
         if (user == null || user['password'] == null) {
           throw Exception('User data is invalid');
         }
 
         final currentPasswordHash = user['password'];
-
-        // Print the current password hash for debugging purposes
-        print("Current Password Hash: $currentPasswordHash");
-
-        // Verify the current password
         if (BCrypt.checkpw(_currentPasswordController.text, currentPasswordHash)) {
-          // Hash the new password
           final hashedNewPassword = BCrypt.hashpw(_newPasswordController.text, BCrypt.gensalt());
-
-          // Update the password in the database
-          final updateResponse = await supabase
+          await supabase
               .from('users')
               .update({'password': hashedNewPassword})
               .eq('id', widget.userId);
@@ -99,8 +86,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final isDarkMode = brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
@@ -125,38 +111,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 ),
               ),
               const SizedBox(height: 30),
-              TextFormField(
+              _buildPasswordField(
+                label: 'Current Password',
                 controller: _currentPasswordController,
-                decoration: InputDecoration(
-                  labelText: 'Current Password',
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  filled: true,
-                  fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                ),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your current password';
-                  }
-                  return null;
-                },
+                isDarkMode: isDarkMode,
               ),
               const SizedBox(height: 20),
-              TextFormField(
+              _buildPasswordField(
+                label: 'New Password',
                 controller: _newPasswordController,
-                decoration: InputDecoration(
-                  labelText: 'New Password',
-                  prefixIcon: const Icon(Icons.lock_open),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  filled: true,
-                  fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                ),
-                obscureText: true,
+                isDarkMode: isDarkMode,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a new password';
@@ -169,18 +133,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 },
               ),
               const SizedBox(height: 20),
-              TextFormField(
+              _buildPasswordField(
+                label: 'Confirm New Password',
                 controller: _confirmPasswordController,
-                decoration: InputDecoration(
-                  labelText: 'Confirm New Password',
-                  prefixIcon: const Icon(Icons.lock),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  filled: true,
-                  fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                ),
-                obscureText: true,
+                isDarkMode: isDarkMode,
                 validator: (value) {
                   if (value != _newPasswordController.text) {
                     return 'Passwords do not match';
@@ -215,6 +171,34 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPasswordField({
+    required String label,
+    required TextEditingController controller,
+    required bool isDarkMode,
+    FormFieldValidator<String>? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: true,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: const Icon(Icons.lock),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        filled: true,
+        fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+      ),
+      validator: validator ??
+          (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your $label';
+            }
+            return null;
+          },
     );
   }
 }
