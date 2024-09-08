@@ -1,5 +1,6 @@
 import 'package:fix_emotion/settings-modules/change_password_page.dart';
 import 'package:fix_emotion/settings-modules/delete_data_page.dart';
+import 'package:fix_emotion/settings-modules/login_activity_page.dart';
 import 'package:fix_emotion/settings-modules/privacy_settings_page.dart';
 import 'package:fix_emotion/settings-modules/theme_settings_page.dart';
 import 'package:flutter/material.dart';
@@ -88,7 +89,12 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: 20),
                       _buildSectionHeader('Security', isDarkMode),
                       _buildSettingsTile(Icons.security, 'Two-Factor Authentication', isDarkMode, () {}),
-                      _buildSettingsTile(Icons.history, 'Login Activity', isDarkMode, () {}),
+                      _buildSettingsTile(Icons.history, 'Login Activity', isDarkMode, () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginActivityPage(userId: widget.userId)),
+                        );
+                      }),
                       const SizedBox(height: 20),
                       _buildSectionHeader('About', isDarkMode),
                       _buildSettingsTile(Icons.info, 'App Version', isDarkMode, () {}),
