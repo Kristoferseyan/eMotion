@@ -1,6 +1,7 @@
 import 'package:fix_emotion/settings-modules/app_version_page.dart';
 import 'package:fix_emotion/settings-modules/change_password_page.dart';
 import 'package:fix_emotion/settings-modules/delete_data_page.dart';
+import 'package:fix_emotion/settings-modules/developer_info_page.dart';
 import 'package:fix_emotion/settings-modules/login_activity_page.dart';
 import 'package:fix_emotion/settings-modules/privacy_settings_page.dart';
 import 'package:fix_emotion/settings-modules/theme_settings_page.dart';
@@ -104,8 +105,12 @@ class _SettingsPageState extends State<SettingsPage> {
                           MaterialPageRoute(builder: (context) => AppVersionPage()),
                         );
                       }),
-                      _buildSettingsTile(Icons.developer_mode, 'Developer Info', isDarkMode, () {}),
-                      _buildSettingsTile(Icons.description, 'Open Source Licenses', isDarkMode, () {}),
+                      _buildSettingsTile(Icons.developer_mode, 'Developer Info', isDarkMode, () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => DeveloperInfoPage()),
+                        );
+                      }),
                       const SizedBox(height: 20),
                       _buildLogOutButton(context, isDarkMode),
                     ],
