@@ -25,11 +25,11 @@ class CustomLayout extends StatelessWidget {
           _buildRectangle(
             context: context,
             width: maxWidth * 0.85,
-            color: isDarkMode ? const Color(0xFF1D4D4F) : const Color(0xFFFFC5C5),
-            borderColor: isDarkMode ? const Color(0xFF122E31) : const Color.fromARGB(255, 240, 166, 166),
+            color: isDarkMode ? const Color(0xFF2A5B5E) : const Color(0xFFFFD9D9),
+            borderColor: isDarkMode ? const Color(0xFF1D4D4F) : const Color.fromARGB(255, 240, 130, 130),
+            textColor: isDarkMode ? const Color(0xFFB3E3E2) : const Color.fromARGB(255, 150, 70, 70),
             imagePath: 'assets/images/emoTrack.png',
             text: 'Track Emotions',
-            textColor: isDarkMode ? const Color(0xFFD1E7E8) : const Color.fromARGB(255, 209, 130, 130),
             onTap: () {
               Navigator.push(
                 context,
@@ -43,11 +43,11 @@ class CustomLayout extends StatelessWidget {
           _buildRectangle(
             context: context,
             width: maxWidth * 0.85,
-            color: isDarkMode ? const Color(0xFF4E6F6B) : const Color(0xFFFFEBD8),
-            borderColor: isDarkMode ? const Color(0xFF1D4D4F) : const Color.fromARGB(255, 216, 176, 139),
+            color: isDarkMode ? const Color(0xFF2A5B5E) : const Color(0xFFFFD9D9),
+            borderColor: isDarkMode ? const Color(0xFF1D4D4F) : const Color.fromARGB(255, 240, 130, 130),
+            textColor: isDarkMode ? const Color(0xFFB3E3E2) : const Color.fromARGB(255, 150, 70, 70),
             imagePath: 'assets/images/emoDict.png',
             text: 'Emotion Dictionary',
-            textColor: isDarkMode ? const Color(0xFFE0F2F1) : const Color.fromARGB(255, 184, 146, 111),
             onTap: () {
               Navigator.push(
                 context,
