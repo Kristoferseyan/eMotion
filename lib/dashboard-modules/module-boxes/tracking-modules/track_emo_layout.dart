@@ -89,20 +89,31 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Track Emotion')),
-      body: SafeArea(
-        child: FutureBuilder<void>(
-          future: _initializationFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else {
-              return _buildMainContent();
-            }
-          },
+    return WillPopScope(
+      onWillPop: () async {
+        if (_isCameraPlaying) {
+          // If the camera is still playing, show a dialog to stop it first
+          return await _showStopTrackingDialog(context);
+        } else {
+          // If the camera is not playing, allow normal back navigation
+          return true;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Track Emotion')),
+        body: SafeArea(
+          child: FutureBuilder<void>(
+            future: _initializationFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+                return _buildMainContent();
+              }
+            },
+          ),
         ),
       ),
     );
@@ -227,5 +238,30 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
     );
 
     print('Session ended, data saved.');
+  }
+
+  Future<bool> _showStopTrackingDialog(BuildContext context) async {
+    return await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Stop Tracking'),
+        content: const Text('The camera is still tracking emotions. Do you want to stop tracking and exit?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              _toggleCamera();
+              Navigator.of(context).pop(true);
+            },
+            child: const Text('Yes'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: const Text('No'),
+          ),
+        ],
+      ),
+    ) ?? false;
   }
 }
