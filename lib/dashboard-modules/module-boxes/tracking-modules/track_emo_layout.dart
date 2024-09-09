@@ -92,10 +92,8 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
     return WillPopScope(
       onWillPop: () async {
         if (_isCameraPlaying) {
-          // If the camera is still playing, show a dialog to stop it first
           return await _showStopTrackingDialog(context);
         } else {
-          // If the camera is not playing, allow normal back navigation
           return true;
         }
       },
