@@ -11,21 +11,21 @@ class DeveloperInfoPage extends StatelessWidget {
     },
     {
       'name': 'Cerita, John Christopher',
-      'role': 'Backend Developer',
+      'role': 'Lead Developer',
       'status': 'College Student',
       'institution': 'STI College General Santos Inc.',
       'photoUrl': 'https://via.placeholder.com/150', // Placeholder for photo URL
     },
     {
       'name': 'Cornillez, Gemuel',
-      'role': 'Frontend Developer',
+      'role': 'Project Manager',
       'status': 'College Student',
       'institution': 'STI College General Santos Inc.',
       'photoUrl': 'https://via.placeholder.com/150', // Placeholder for photo URL
     },
     {
       'name': 'Nuevo, Sean Christopher',
-      'role': 'UI/UX Designer',
+      'role': 'Lead Developer',
       'status': 'College Student',
       'institution': 'STI College General Santos Inc.',
       'photoUrl': 'https://via.placeholder.com/150', // Placeholder for photo URL
