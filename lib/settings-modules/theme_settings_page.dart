@@ -33,7 +33,6 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
       _selectedTheme = theme;
     });
 
-    // Apply the selected theme immediately using setTheme from MyApp
     switch (theme) {
       case 'Light Mode':
         MyApp.of(context)?.setTheme(ThemeMode.light);
@@ -48,43 +47,75 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
       appBar: AppBar(
-        title: Text('Theme Settings'),
+        title: const Text('Theme Settings'),
+        backgroundColor: isDarkMode ? const Color(0xFF0D2C2D) : const Color(0xFFB6DDF2),
       ),
-      body: Column(
-        children: [
-          ListTile(
-            title: Text('Light Mode'),
-            trailing: Radio(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: <Widget>[
+            _buildThemeOption(
+              title: 'Light Mode',
               value: 'Light Mode',
               groupValue: _selectedTheme,
               onChanged: (value) {
                 _saveThemePreference('Light Mode');
               },
+              isDarkMode: isDarkMode,
             ),
-          ),
-          ListTile(
-            title: Text('Dark Mode'),
-            trailing: Radio(
+            _buildThemeOption(
+              title: 'Dark Mode',
               value: 'Dark Mode',
               groupValue: _selectedTheme,
               onChanged: (value) {
                 _saveThemePreference('Dark Mode');
               },
+              isDarkMode: isDarkMode,
             ),
-          ),
-          ListTile(
-            title: Text('System Default'),
-            trailing: Radio(
+            _buildThemeOption(
+              title: 'System Default',
               value: 'System Default',
               groupValue: _selectedTheme,
               onChanged: (value) {
                 _saveThemePreference('System Default');
               },
+              isDarkMode: isDarkMode,
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeOption({
+    required String title,
+    required String value,
+    required String? groupValue,
+    required ValueChanged<String?> onChanged,
+    required bool isDarkMode,
+  }) {
+    return Card(
+      color: isDarkMode ? const Color.fromARGB(255, 23, 57, 61) : Colors.white,
+      elevation: 3,
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: RadioListTile<String>(
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black,
           ),
-        ],
+        ),
+        value: value,
+        groupValue: groupValue,
+        onChanged: onChanged,
+        activeColor: isDarkMode ? Colors.white70 : const Color(0xFF317B85),
       ),
     );
   }
