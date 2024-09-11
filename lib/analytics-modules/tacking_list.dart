@@ -7,6 +7,7 @@ class TrackingList extends StatefulWidget {
   final String selectedEmotion;
   final ValueChanged<String?> onEmotionChanged;
   final bool isDarkMode;
+  final String userId;
 
   const TrackingList({
     Key? key,
@@ -14,6 +15,7 @@ class TrackingList extends StatefulWidget {
     required this.selectedEmotion,
     required this.onEmotionChanged,
     required this.isDarkMode,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -31,28 +33,38 @@ class _TrackingListState extends State<TrackingList> {
     _trackingData = widget.recentTrackings;
   }
 
-  Future<void> _deleteTrackingItem(String trackingId) async {
-    try {
-      // Delete the item from Supabase
-      await supabase
-          .from('emotion_tracking')
-          .delete()
-          .eq('id', trackingId);
+  Future<void> _deleteTrackingItem(String sessionId, int index) async {
+    // Print userId and sessionId for debugging
+    print('UserId: ${widget.userId}');
+    print('SessionId: $sessionId');
 
-      // Remove the item from the local list
-      setState(() {
-        _trackingData.removeWhere((item) => item['id'] == trackingId);
-      });
-    } catch (e) {
-      print('Error deleting tracking: $e');
-    }
+    // Attempt to delete the item from Supabase
+    await supabase
+        .from('emotion_tracking')
+        .delete()
+        .eq('session_id', sessionId); // Use session_id instead of id
+
+    // If deletion is successful, remove the item from the list
+    setState(() {
+      _trackingData.removeAt(index);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Tracking session deleted successfully')),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final filteredTrackings = widget.selectedEmotion == 'All'
+    // Combine date and time into DateTime and sort by latest first
+    final filteredTrackings = (widget.selectedEmotion == 'All'
         ? _trackingData
-        : _trackingData.where((tracking) => tracking['emotion'] == widget.selectedEmotion).toList();
+        : _trackingData.where((tracking) => tracking['emotion'] == widget.selectedEmotion).toList())
+      ..sort((a, b) {
+        final aDateTime = DateTime.parse('${a['date']} ${a['time']}');
+        final bDateTime = DateTime.parse('${b['date']} ${b['time']}');
+        return bDateTime.compareTo(aDateTime); // Sort so latest is on top
+      });
 
     return Column(
       children: [
@@ -126,63 +138,54 @@ class _TrackingListState extends State<TrackingList> {
           final tracking = filteredTrackings[index];
 
           return Dismissible(
-            key: Key(tracking['id'].toString()), // Ensure a unique key for each item
+            key: Key(tracking['session_id'].toString()),
             background: Container(
               color: Colors.red,
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: const Icon(Icons.delete, color: Colors.white),
             ),
-            direction: DismissDirection.endToStart, // Swipe from right to left
+            direction: DismissDirection.endToStart,
             onDismissed: (direction) async {
-              final trackingId = tracking['id'];
+              final sessionId = tracking['session_id']?.toString(); // Ensure it's a string
 
-              // Remove the item from the UI
-              setState(() {
-                filteredTrackings.removeAt(index);
-              });
+              if (sessionId != null) {
+                // Print userId and sessionId
+                print('UserId: ${widget.userId}');
+                print('SessionId: $sessionId');
 
-              // Delete the item from the database
-              await _deleteTrackingItem(trackingId);
-            },
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TrackingDetailPage(
-                      emotion: tracking['emotion'],
-                      date: tracking['date'],
-                      time: tracking['time'],
-                      emotionDistributionJson: tracking['emotion_distribution'],
-                    ),
-                  ),
+                // Call the delete method with sessionId and index
+                await _deleteTrackingItem(sessionId, index);
+              } else {
+                // Handle case where sessionId is null
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to delete: Invalid session ID')),
                 );
-              },
-              child: Container(
-                margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: isDarkMode ? const Color.fromARGB(255, 28, 66, 71) : Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: isDarkMode ? Colors.black.withOpacity(0.15) : Colors.grey.withOpacity(0.15),
-                      spreadRadius: 2,
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+              }
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: isDarkMode ? const Color.fromARGB(255, 28, 66, 71) : Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: isDarkMode ? Colors.black.withOpacity(0.15) : Colors.grey.withOpacity(0.15),
+                    spreadRadius: 2,
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ListTile(
+                title: Text(
+                  tracking['emotion'],
+                  style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                 ),
-                child: ListTile(
-                  title: Text(
-                    tracking['emotion'],
-                    style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-                  ),
-                  subtitle: Text(
-                    '${tracking['date']} ${tracking['time']}',
-                    style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
-                  ),
+                subtitle: Text(
+                  '${tracking['date']} ${tracking['time']}',
+                  style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
                 ),
               ),
             ),

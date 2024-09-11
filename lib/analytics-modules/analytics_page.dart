@@ -54,6 +54,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           'date': date,
           'time': time,
           'user_feedback': tracking['user_feedback'],
+          'id': tracking['id'], // Ensure id is available for deletion
         };
       }).toList();
 
@@ -110,6 +111,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                           });
                         },
                         isDarkMode: isDarkMode,
+                        userId: widget.userId, // Pass the userId here
                       ),
                     ],
                   ),
