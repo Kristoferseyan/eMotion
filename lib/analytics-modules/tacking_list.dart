@@ -8,6 +8,7 @@ class TrackingList extends StatefulWidget {
   final ValueChanged<String?> onEmotionChanged;
   final bool isDarkMode;
   final String userId;
+  final VoidCallback onItemDeleted; // Callback for refreshing the page
 
   const TrackingList({
     Key? key,
@@ -16,6 +17,7 @@ class TrackingList extends StatefulWidget {
     required this.onEmotionChanged,
     required this.isDarkMode,
     required this.userId,
+    required this.onItemDeleted, // Add this callback
   }) : super(key: key);
 
   @override
@@ -53,9 +55,9 @@ class _TrackingListState extends State<TrackingList> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Tracking session deleted successfully')),
         );
+        widget.onItemDeleted(); // Trigger the refresh function on AnalyticsPage
       }
     } catch (e) {
-      // Error handling
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to delete: $e')),
       );
@@ -158,10 +160,8 @@ class _TrackingListState extends State<TrackingList> {
               final sessionId = tracking['session_id']?.toString(); // Ensure it's a string
 
               if (sessionId != null && sessionId.isNotEmpty) {
-                // Call the delete method with sessionId and index
                 await _deleteTrackingItem(sessionId, index);
               } else {
-                // Handle case where sessionId is null or invalid
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Failed to delete: Invalid session ID')),
                 );

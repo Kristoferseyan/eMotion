@@ -23,7 +23,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     try {
       final emotionResponse = await supabase
           .from('emotion_tracking')
-          .select('session_id, emotion, emotion_distribution, timestamp, user_feedback')
+          .select('session_id, emotion, emotion_distribution, timestamp, user_feedback, duration')
           .eq('user_id', widget.userId);
 
       if (emotionResponse.isEmpty) {
@@ -60,6 +60,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           'date': date,
           'time': time,
           'user_feedback': tracking['user_feedback'],
+          'duration': tracking['duration']?.toString() ?? 'Unknown duration', // Add duration field here
         };
       }).toList();
 
@@ -71,6 +72,12 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       'emotionData': emotionData,
       'recentTrackings': recentTrackings,
     };
+  }
+
+  void _refreshData() {
+    setState(() {
+      _fetchData();
+    });
   }
 
   @override
@@ -117,6 +124,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                         },
                         isDarkMode: isDarkMode,
                         userId: widget.userId,
+                        onItemDeleted: _refreshData, // Pass the refresh function
                       ),
                     ],
                   ),

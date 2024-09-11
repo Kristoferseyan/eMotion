@@ -20,6 +20,7 @@ class TrackingDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('Duration: $duration');
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     final Map<String, double> emotionDistribution = Map<String, double>.from(
