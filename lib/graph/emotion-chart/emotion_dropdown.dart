@@ -16,8 +16,11 @@ class EmotionDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
+    // Check if all emotions are selected
+    final bool isAllSelected = selectedEmotions.length == emotions.length;
+
     return DropdownButton<String>(
-      value: selectedEmotions.isNotEmpty ? selectedEmotions.first : null,
+      value: isAllSelected ? 'All Emotions' : selectedEmotions.isNotEmpty ? selectedEmotions.first : null,
       icon: Icon(Icons.arrow_drop_down, color: isDarkMode ? Colors.white : Colors.black),
       iconSize: 24,
       elevation: 16,
@@ -28,15 +31,27 @@ class EmotionDropdown extends StatelessWidget {
       ),
       onChanged: (String? newValue) {
         if (newValue != null) {
-          onEmotionChanged([newValue]);
+          if (newValue == 'All Emotions') {
+            // Select all emotions when "All Emotions" is selected
+            onEmotionChanged(emotions);
+          } else {
+            // Select only the chosen emotion
+            onEmotionChanged([newValue]);
+          }
         }
       },
-      items: emotions.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
+      items: [
+        const DropdownMenuItem<String>(
+          value: 'All Emotions',
+          child: Text('All Emotions'),
+        ),
+        ...emotions.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+      ],
     );
   }
 }

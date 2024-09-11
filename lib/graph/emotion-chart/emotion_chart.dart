@@ -4,14 +4,14 @@ import 'emotion_chart_data.dart';
 import 'emotion_dropdown.dart';
 
 class EmotionChart extends StatefulWidget {
-  final String userId;  // Add userId parameter
+  final String userId;
   final List<String> selectedEmotions;
   final List<String> emotions;
   final ValueChanged<List<String>> onEmotionChanged;
 
   const EmotionChart({
     Key? key,
-    required this.userId,  // Add userId to constructor
+    required this.userId,
     required this.selectedEmotions,
     required this.emotions,
     required this.onEmotionChanged,
@@ -27,7 +27,7 @@ class _EmotionChartState extends State<EmotionChart> {
   @override
   void initState() {
     super.initState();
-    // Pass both userId and selectedEmotions to fetchEmotionData
+    // Fetch the emotion data with userId and selectedEmotions
     _emotionDataFuture = EmotionChartData.fetchEmotionData(widget.userId, widget.selectedEmotions);
   }
 
@@ -36,7 +36,7 @@ class _EmotionChartState extends State<EmotionChart> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectedEmotions != widget.selectedEmotions) {
       setState(() {
-        // Pass both userId and selectedEmotions to fetchEmotionData
+        // Re-fetch the emotion data if the selected emotions change
         _emotionDataFuture = EmotionChartData.fetchEmotionData(widget.userId, widget.selectedEmotions);
       });
     }
@@ -101,7 +101,7 @@ class _EmotionChartState extends State<EmotionChart> {
                           gridData: FlGridData(
                             show: true,
                             drawVerticalLine: true,
-                            horizontalInterval: 1,
+                            horizontalInterval: 5,
                             verticalInterval: 1,
                             getDrawingHorizontalLine: (value) {
                               return FlLine(
@@ -157,32 +157,18 @@ class _EmotionChartState extends State<EmotionChart> {
                           minX: 0,
                           maxX: 6,
                           minY: 0,
-                          maxY: 5,
+                          maxY: 20,
                           lineBarsData: snapshot.data!.entries.map((entry) {
                             return LineChartBarData(
                               spots: entry.value,
                               isCurved: true,
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.blue.withOpacity(0.6),
-                                  Colors.blue.withOpacity(0.1),
-                                ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
+                              color: _getColor(entry.key), // Use the same _getColor method from PieChart
                               barWidth: 3,
                               isStrokeCapRound: true,
-                              dotData: FlDotData(show: true), // Show data points
+                              dotData: FlDotData(show: true),
                               belowBarData: BarAreaData(
                                 show: true,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.blue.withOpacity(0.3),
-                                    Colors.blue.withOpacity(0.1),
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
+                                color: _getColor(entry.key).withOpacity(0.3),
                               ),
                             );
                           }).toList(),
@@ -237,5 +223,25 @@ class _EmotionChartState extends State<EmotionChart> {
       space: 4.0,
       child: text,
     );
+  }
+
+
+  Color _getColor(String emotion) {
+    switch (emotion.trim()) {
+      case 'Happiness':
+        return Colors.amber;
+      case 'Sadness':
+        return Colors.blueAccent;
+      case 'Anger':
+        return Colors.redAccent;
+      case 'Surprise':
+        return Colors.orangeAccent;
+      case 'Disgust':
+        return Colors.green;
+      case 'Fear':
+        return Colors.deepPurpleAccent;
+      default:
+        return Colors.grey;
+    }
   }
 }

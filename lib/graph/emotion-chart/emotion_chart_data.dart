@@ -1,87 +1,66 @@
-import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EmotionChartData {
   static final supabase = Supabase.instance.client;
 
-static Future<Map<String, List<FlSpot>>> fetchEmotionData(String userId, List<String> emotions) async {
-  try {
-    // Fetch only data related to the logged-in user for the past 7 days
-    final response = await supabase
-        .from('emotion_tracking')
-        .select('emotion_distribution, timestamp')
-        .eq('user_id', userId)
-        .gte('timestamp', DateTime.now().subtract(const Duration(days: 7)).toIso8601String())
-        .order('timestamp', ascending: true);
+  static Future<Map<String, List<FlSpot>>> fetchEmotionData(String userId, List<String> emotions) async {
+    try {
+      // Fetch records related to the logged-in user for the past 7 days
+      final response = await supabase
+          .from('emotion_tracking')
+          .select('emotion, timestamp')
+          .eq('user_id', userId)
+          .gte('timestamp', DateTime.now().subtract(const Duration(days: 7)).toIso8601String())
+          .order('timestamp', ascending: true);
 
-    if (response.isEmpty) {
-      print("No data found for user: $userId");
+      if (response.isEmpty) {
+        print("No data found for user: $userId");
+        return {};
+      }
+
+      // Initialize maps for each emotion with zero values for the week (Mon-Sun)
+      Map<String, Map<int, int>> dailyEmotionCounts = {};
+      for (var emotion in emotions) {
+        dailyEmotionCounts[emotion] = {};
+        for (var i = 0; i < 7; i++) {
+          dailyEmotionCounts[emotion]![i] = 0; // Initialize with zero counts
+        }
+      }
+
+      // Iterate through the fetched records and count the occurrences of each emotion per day
+      for (var entry in response) {
+        DateTime timestamp = DateTime.parse(entry['timestamp']);
+        int dayOfWeek = timestamp.weekday - 1; // Map Monday = 0, Tuesday = 1, etc.
+
+        String dominantEmotion = _sanitizeEmotion(entry['emotion']); // Sanitize emotion by trimming spaces
+
+        // Increment the count for the dominant emotion
+        if (emotions.contains(dominantEmotion)) {
+          dailyEmotionCounts[dominantEmotion]![dayOfWeek] = dailyEmotionCounts[dominantEmotion]![dayOfWeek]! + 1;
+        }
+      }
+
+      // Prepare the chart data with raw counts
+      Map<String, List<FlSpot>> spotsMap = {};
+      for (var emotion in emotions) {
+        List<FlSpot> spots = [];
+        for (var i = 0; i < 7; i++) {
+          int count = dailyEmotionCounts[emotion]![i] ?? 0;
+          spots.add(FlSpot(i.toDouble(), count.toDouble()));
+        }
+        spotsMap[emotion] = spots;
+      }
+
+      return spotsMap;
+    } catch (e) {
+      print('Error fetching emotion data: $e');
       return {};
     }
-
-    // Initialize maps to accumulate sums and counts for each emotion
-    Map<String, Map<int, double>> dailyEmotionSum = {};
-    Map<String, Map<int, int>> dailyEmotionCounts = {};
-
-    // Initialize maps for each emotion with zero values for the week (Mon-Sun)
-    for (var emotion in emotions) {
-      dailyEmotionSum[emotion] = {};
-      dailyEmotionCounts[emotion] = {};
-      for (var i = 0; i < 7; i++) {
-        dailyEmotionSum[emotion]![i] = 0.0;
-        dailyEmotionCounts[emotion]![i] = 0;
-      }
-    }
-
-    // Iterate through the fetched records and accumulate emotion intensities per day
-    for (var entry in response) {
-      DateTime timestamp = DateTime.parse(entry['timestamp']);
-      
-      // Get the weekday index (Monday = 1, ..., Sunday = 7)
-      int dayOfWeek = timestamp.weekday;
-
-      // Map Monday to 0, Tuesday to 1, ..., Sunday to 6 for the chart
-      int chartIndex = dayOfWeek - 1;
-
-      final emotionDistributionJson = entry['emotion_distribution'];
-      final Map<String, dynamic> emotionDistributionMap = _sanitizeJsonKeys(jsonDecode(emotionDistributionJson));
-
-      for (var emotion in emotions) {
-        // Accumulate the intensity of each emotion for each day
-        double emotionValue = (emotionDistributionMap[emotion] ?? 0.0).toDouble();
-        dailyEmotionSum[emotion]![chartIndex] = dailyEmotionSum[emotion]![chartIndex]! + emotionValue;
-        dailyEmotionCounts[emotion]![chartIndex] = dailyEmotionCounts[emotion]![chartIndex]! + 1;
-      }
-    }
-
-    // Prepare the data for the chart
-    Map<String, List<FlSpot>> spotsMap = {};
-    for (var emotion in emotions) {
-      List<FlSpot> spots = [];
-      for (var i = 0; i < 7; i++) {
-        // Calculate the average intensity of the emotion for each day
-        double averageEmotionValue = dailyEmotionCounts[emotion]![i] != 0
-            ? dailyEmotionSum[emotion]![i]! / dailyEmotionCounts[emotion]![i]!
-            : 0.0;
-        spots.add(FlSpot(i.toDouble(), averageEmotionValue));
-      }
-      spotsMap[emotion] = spots;
-    }
-
-    return spotsMap;
-  } catch (e) {
-    print('Error fetching emotion data: $e');
-    return {};
   }
-}
-// Utility function to remove leading/trailing spaces from JSON keys
-static Map<String, dynamic> _sanitizeJsonKeys(Map<String, dynamic> json) {
-  return json.map((key, value) {
-    // Trim spaces from the key
-    final sanitizedKey = key.trim();
-    return MapEntry(sanitizedKey, value);
-  });
-}
 
+  // Helper method to trim spaces around emotion names
+  static String _sanitizeEmotion(String emotion) {
+    return emotion.trim(); // Remove leading/trailing spaces from the emotion name
+  }
 }
