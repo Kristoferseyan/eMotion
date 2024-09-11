@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../graph/emotion_chart.dart';
+import '../graph/emotion-chart/emotion_chart.dart';
 import 'custom_layout.dart';
 import 'profile_page.dart';
 import '../auth-modules/login-modules/login.dart';
-import '../auth-modules/authentication_service.dart'; // Import your AuthenticationService
+import '../auth-modules/authentication_service.dart';
 
 class DashboardLayout extends StatefulWidget {
   final String userId;
@@ -155,15 +154,20 @@ class DashboardBody extends StatelessWidget {
             const SizedBox(height: 10),
             _buildHeader(isDarkMode),
             const SizedBox(height: 10),
-            // Increase the height of the EmotionChart
-            SizedBox(
-              height: 350, // Increased height for the emotion chart
-              child: EmotionChart(
-                selectedEmotion: selectedEmotion,
-                emotions: emotions,
-                onEmotionChanged: onEmotionChanged,
-              ),
+          SizedBox(
+            height: 350,
+            child: EmotionChart(
+              userId: userId,  // Pass userId to EmotionChart
+              selectedEmotions: [selectedEmotion],  // Pass selected emotion
+              emotions: emotions,
+              onEmotionChanged: (newEmotions) {
+                if (newEmotions.isNotEmpty) {
+                  onEmotionChanged(newEmotions.first);
+                }
+              },
             ),
+          ),
+
             const SizedBox(height: 20),
             Expanded(
               child: Container(

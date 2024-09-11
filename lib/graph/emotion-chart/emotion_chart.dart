@@ -1,17 +1,18 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'emotion_chart_data.dart';
+import 'emotion_dropdown.dart';
 
 class EmotionChart extends StatefulWidget {
-  final String selectedEmotion;
+  final String userId;  // Add userId parameter
+  final List<String> selectedEmotions;
   final List<String> emotions;
-  final ValueChanged<String> onEmotionChanged;
+  final ValueChanged<List<String>> onEmotionChanged;
 
   const EmotionChart({
     Key? key,
-    required this.selectedEmotion,
+    required this.userId,  // Add userId to constructor
+    required this.selectedEmotions,
     required this.emotions,
     required this.onEmotionChanged,
   }) : super(key: key);
@@ -21,74 +22,23 @@ class EmotionChart extends StatefulWidget {
 }
 
 class _EmotionChartState extends State<EmotionChart> {
-  final supabase = Supabase.instance.client;
-  late Future<List<FlSpot>> _emotionDataFuture;
+  late Future<Map<String, List<FlSpot>>> _emotionDataFuture;
 
   @override
   void initState() {
     super.initState();
-    _emotionDataFuture = _fetchEmotionData(widget.selectedEmotion);
+    // Pass both userId and selectedEmotions to fetchEmotionData
+    _emotionDataFuture = EmotionChartData.fetchEmotionData(widget.userId, widget.selectedEmotions);
   }
 
   @override
   void didUpdateWidget(EmotionChart oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectedEmotion != widget.selectedEmotion) {
+    if (oldWidget.selectedEmotions != widget.selectedEmotions) {
       setState(() {
-        _emotionDataFuture = _fetchEmotionData(widget.selectedEmotion);
+        // Pass both userId and selectedEmotions to fetchEmotionData
+        _emotionDataFuture = EmotionChartData.fetchEmotionData(widget.userId, widget.selectedEmotions);
       });
-    }
-  }
-
-  Future<List<FlSpot>> _fetchEmotionData(String emotion) async {
-    try {
-      final response = await supabase
-          .from('emotion_tracking')
-          .select('emotion_distribution, timestamp')
-          .gte('timestamp', DateTime.now().subtract(const Duration(days: 7)).toIso8601String())
-          .order('timestamp', ascending: true);
-
-      if (response.isEmpty) {
-        return [];
-      }
-
-      Map<int, double> dailyEmotionSum = {};
-      Map<int, int> dailyEmotionCounts = {};
-
-      for (var i = 0; i < 7; i++) {
-        dailyEmotionSum[i] = 0.0;
-        dailyEmotionCounts[i] = 0;
-      }
-
-      for (var entry in response) {
-        DateTime timestamp = DateTime.parse(entry['timestamp']);
-        int dayIndex = DateTime.now().difference(timestamp).inDays;
-
-        if (dayIndex < 7) {
-          int chartIndex = 6 - dayIndex;
-
-          final emotionDistributionJson = entry['emotion_distribution'];
-          final Map<String, dynamic> emotionDistributionMap = jsonDecode(emotionDistributionJson);
-
-          double emotionValue = (emotionDistributionMap[emotion] ?? 0.0).toDouble();
-
-          dailyEmotionSum[chartIndex] = dailyEmotionSum[chartIndex]! + emotionValue;
-          dailyEmotionCounts[chartIndex] = dailyEmotionCounts[chartIndex]! + 1;
-        }
-      }
-
-      List<FlSpot> spots = [];
-      for (var i = 0; i < 7; i++) {
-        double averageEmotionValue = dailyEmotionCounts[i] != 0
-            ? dailyEmotionSum[i]! / dailyEmotionCounts[i]!
-            : 0.0;
-        spots.add(FlSpot(i.toDouble(), averageEmotionValue));
-      }
-
-      return spots;
-    } catch (e) {
-      print('Error fetching emotion data: $e');
-      return [];
     }
   }
 
@@ -99,7 +49,7 @@ class _EmotionChartState extends State<EmotionChart> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Container(
-        height: 300,
+        height: 400,
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
           borderRadius: BorderRadius.circular(16),
@@ -127,27 +77,10 @@ class _EmotionChartState extends State<EmotionChart> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  DropdownButton<String>(
-                    value: widget.selectedEmotion,
-                    icon: Icon(Icons.arrow_drop_down, color: isDarkMode ? Colors.white : Colors.black),
-                    iconSize: 24,
-                    elevation: 16,
-                    style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-                    underline: Container(
-                      height: 1,
-                      color: Colors.transparent,
-                    ),
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        widget.onEmotionChanged(newValue);
-                      }
-                    },
-                    items: widget.emotions.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                  EmotionDropdown(
+                    selectedEmotions: widget.selectedEmotions,
+                    emotions: widget.emotions,
+                    onEmotionChanged: widget.onEmotionChanged,
                   ),
                 ],
               ),
@@ -155,7 +88,7 @@ class _EmotionChartState extends State<EmotionChart> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                child: FutureBuilder<List<FlSpot>>(
+                child: FutureBuilder<Map<String, List<FlSpot>>>(
                   future: _emotionDataFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -188,7 +121,7 @@ class _EmotionChartState extends State<EmotionChart> {
                               sideTitles: SideTitles(
                                 showTitles: true,
                                 reservedSize: 32,
-                                getTitlesWidget: bottomTitleWidgets,
+                                getTitlesWidget: _bottomTitleWidgets,
                               ),
                             ),
                             leftTitles: AxisTitles(
@@ -225,9 +158,9 @@ class _EmotionChartState extends State<EmotionChart> {
                           maxX: 6,
                           minY: 0,
                           maxY: 5,
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: snapshot.data!,
+                          lineBarsData: snapshot.data!.entries.map((entry) {
+                            return LineChartBarData(
+                              spots: entry.value,
                               isCurved: true,
                               gradient: LinearGradient(
                                 colors: [
@@ -239,7 +172,7 @@ class _EmotionChartState extends State<EmotionChart> {
                               ),
                               barWidth: 3,
                               isStrokeCapRound: true,
-                              dotData: FlDotData(show: false),
+                              dotData: FlDotData(show: true), // Show data points
                               belowBarData: BarAreaData(
                                 show: true,
                                 gradient: LinearGradient(
@@ -251,8 +184,8 @@ class _EmotionChartState extends State<EmotionChart> {
                                   end: Alignment.bottomCenter,
                                 ),
                               ),
-                            ),
-                          ],
+                            );
+                          }).toList(),
                         ),
                       );
                     }
@@ -266,7 +199,7 @@ class _EmotionChartState extends State<EmotionChart> {
     );
   }
 
-  Widget bottomTitleWidgets(double value, TitleMeta meta) {
+  Widget _bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       color: Color(0xff68737d),
       fontWeight: FontWeight.bold,

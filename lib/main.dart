@@ -111,10 +111,7 @@ class _MyAppState extends State<MyApp> {
         );
       case '/privacy-settings':
         return MaterialPageRoute(
-          builder: (_) => PrivacySettingsPage(
-            userId: args['userId'] ?? '',
-            onSettingsChanged: (String setting, bool value) {},
-          ),
+          builder: (_) => PrivacySettingsPage(),
         );
       default:
         _logger.warning('Unknown route: ${settings.name}');

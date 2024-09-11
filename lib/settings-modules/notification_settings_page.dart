@@ -12,7 +12,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Use Theme.of(context).brightness instead of MediaQuery
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(

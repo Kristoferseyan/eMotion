@@ -63,13 +63,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       }),
                       const SizedBox(height: 20),
                       _buildSectionHeader('Privacy', isDarkMode),
-                      _buildSettingsTile(Icons.lock, 'Privacy Settings', isDarkMode, () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacySettingsPage(
-                          onSettingsChanged: (String setting, bool value) {
-                            _updatePrivacySettings(setting, value);
-                          },
-                          userId: widget.userId,
-                        )));
+                      _buildSettingsTile(Icons.lock, 'Privacy', isDarkMode, () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacySettingsPage()));
                       }),
                       _buildSettingsTile(Icons.delete, 'Delete Data', isDarkMode, () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => DeletePage(
@@ -87,10 +82,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           MaterialPageRoute(builder: (context) => ThemeSettingsPage()),
                         );
                       }),
-                      _buildSettingsTile(Icons.language, 'Language', isDarkMode, () {}),
-                      const SizedBox(height: 20),
                       _buildSectionHeader('Security', isDarkMode),
-                      _buildSettingsTile(Icons.security, 'Two-Factor Authentication', isDarkMode, () {}),
                       _buildSettingsTile(Icons.history, 'Login Activity', isDarkMode, () {
                         Navigator.push(
                           context,
