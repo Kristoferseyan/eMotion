@@ -19,11 +19,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
 
   bool _isLoading = false;
   bool _agreedToTerms = false;
   bool _termsRead = false;
+  bool _isPasswordVisible = false;
 
   final supabase = Supabase.instance.client;
 
@@ -31,6 +33,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     _usernameController.dispose();
     super.dispose();
   }
@@ -85,6 +88,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isPasswordVisible = !_isPasswordVisible;
+    });
+  }
+
+  bool _validatePasswords() {
+    return _passwordController.text == _confirmPasswordController.text;
+  }
+
   @override
   Widget build(BuildContext context) {
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
@@ -131,11 +144,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             controller: _usernameController,
                             isDarkMode: isDarkMode,
                           ),
-                          _buildTextField(
+                          _buildPasswordField(
                             labelText: 'Password',
-                            keyboardType: TextInputType.text,
-                            obscureText: true,
                             controller: _passwordController,
+                            isDarkMode: isDarkMode,
+                          ),
+                          _buildPasswordField(
+                            labelText: 'Confirm Password',
+                            controller: _confirmPasswordController,
                             isDarkMode: isDarkMode,
                           ),
                           _buildTermsButton(),
@@ -198,7 +214,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget _buildTextField({
     required String labelText,
     required TextInputType keyboardType,
-    bool obscureText = false,
     required TextEditingController controller,
     required bool isDarkMode,
   }) {
@@ -233,7 +248,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
           fillColor: isDarkMode ? Colors.white : Colors.white70,
         ),
         keyboardType: keyboardType,
-        obscureText: obscureText,
         style: TextStyle(
           color: isDarkMode ? Colors.black : Colors.black87,
           fontSize: 16,
@@ -244,6 +258,63 @@ class _RegistrationPageState extends State<RegistrationPage> {
           }
           if (labelText == 'Email' && !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
             return 'Enter a valid email address';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _buildPasswordField({
+    required String labelText,
+    required TextEditingController controller,
+    required bool isDarkMode,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[800] : Colors.white70,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: !_isPasswordVisible,
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: TextStyle(
+            color: isDarkMode ? Colors.black87 : Colors.black87,
+            fontSize: 16,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          filled: true,
+          fillColor: isDarkMode ? Colors.white : Colors.white70,
+          suffixIcon: IconButton(
+            icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+            onPressed: _togglePasswordVisibility,
+          ),
+        ),
+        style: TextStyle(
+          color: isDarkMode ? Colors.black : Colors.black87,
+          fontSize: 16,
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'This field is required';
+          }
+          if (labelText == 'Confirm Password' && !_validatePasswords()) {
+            return 'Passwords do not match';
           }
           return null;
         },
