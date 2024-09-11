@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'tracking_detail_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class TrackingList extends StatelessWidget {
+class TrackingList extends StatefulWidget {
   final List<Map<String, dynamic>> recentTrackings;
   final String selectedEmotion;
   final ValueChanged<String?> onEmotionChanged;
@@ -16,22 +17,54 @@ class TrackingList extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _TrackingListState createState() => _TrackingListState();
+}
+
+class _TrackingListState extends State<TrackingList> {
+  List<Map<String, dynamic>> _trackingData = [];
+
+  final supabase = Supabase.instance.client;
+
+  @override
+  void initState() {
+    super.initState();
+    _trackingData = widget.recentTrackings;
+  }
+
+  Future<void> _deleteTrackingItem(String trackingId) async {
+    try {
+      // Delete the item from Supabase
+      await supabase
+          .from('emotion_tracking')
+          .delete()
+          .eq('id', trackingId);
+
+      // Remove the item from the local list
+      setState(() {
+        _trackingData.removeWhere((item) => item['id'] == trackingId);
+      });
+    } catch (e) {
+      print('Error deleting tracking: $e');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final filteredTrackings = selectedEmotion == 'All'
-        ? recentTrackings
-        : recentTrackings.where((tracking) => tracking['emotion'] == selectedEmotion).toList();
+    final filteredTrackings = widget.selectedEmotion == 'All'
+        ? _trackingData
+        : _trackingData.where((tracking) => tracking['emotion'] == widget.selectedEmotion).toList();
 
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildSectionTitle('Recent Tracking History', isDarkMode),
-            _buildEmotionFilterDropdown(isDarkMode),
+            _buildSectionTitle('Recent Tracking History', widget.isDarkMode),
+            _buildEmotionFilterDropdown(widget.isDarkMode),
           ],
         ),
         const SizedBox(height: 10),
-        _buildRecentTrackingList(filteredTrackings, isDarkMode),
+        _buildRecentTrackingList(filteredTrackings, widget.isDarkMode),
       ],
     );
   }
@@ -51,7 +84,7 @@ class TrackingList extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: DropdownButton<String>(
-        value: selectedEmotion,
+        value: widget.selectedEmotion,
         icon: Icon(Icons.filter_list, color: isDarkMode ? Colors.white : Colors.black),
         iconSize: 24,
         elevation: 16,
@@ -60,7 +93,7 @@ class TrackingList extends StatelessWidget {
           height: 2,
           color: isDarkMode ? Colors.white : Colors.black,
         ),
-        onChanged: onEmotionChanged,
+        onChanged: widget.onEmotionChanged,
         items: ['All', 'Happiness', 'Sadness', 'Anger', 'Surprise', 'Disgust', 'Fear']
             .map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
@@ -91,43 +124,65 @@ class TrackingList extends StatelessWidget {
         itemCount: filteredTrackings.length,
         itemBuilder: (context, index) {
           final tracking = filteredTrackings[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TrackingDetailPage(
-                    emotion: tracking['emotion'],
-                    date: tracking['date'],
-                    time: tracking['time'],
-                    emotionDistributionJson: tracking['emotion_distribution'],
-                  ),
-                ),
-              );
+
+          return Dismissible(
+            key: Key(tracking['id'].toString()), // Ensure a unique key for each item
+            background: Container(
+              color: Colors.red,
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: const Icon(Icons.delete, color: Colors.white),
+            ),
+            direction: DismissDirection.endToStart, // Swipe from right to left
+            onDismissed: (direction) async {
+              final trackingId = tracking['id'];
+
+              // Remove the item from the UI
+              setState(() {
+                filteredTrackings.removeAt(index);
+              });
+
+              // Delete the item from the database
+              await _deleteTrackingItem(trackingId);
             },
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: isDarkMode ? const Color.fromARGB(255, 28, 66, 71) : Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: isDarkMode ? Colors.black.withOpacity(0.15) : Colors.grey.withOpacity(0.15),
-                    spreadRadius: 2,
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TrackingDetailPage(
+                      emotion: tracking['emotion'],
+                      date: tracking['date'],
+                      time: tracking['time'],
+                      emotionDistributionJson: tracking['emotion_distribution'],
+                    ),
                   ),
-                ],
-              ),
-              child: ListTile(
-                title: Text(
-                  tracking['emotion'],
-                  style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: isDarkMode ? const Color.fromARGB(255, 28, 66, 71) : Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDarkMode ? Colors.black.withOpacity(0.15) : Colors.grey.withOpacity(0.15),
+                      spreadRadius: 2,
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                subtitle: Text(
-                  '${tracking['date']} ${tracking['time']}',
-                  style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
+                child: ListTile(
+                  title: Text(
+                    tracking['emotion'],
+                    style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                  ),
+                  subtitle: Text(
+                    '${tracking['date']} ${tracking['time']}',
+                    style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
+                  ),
                 ),
               ),
             ),
