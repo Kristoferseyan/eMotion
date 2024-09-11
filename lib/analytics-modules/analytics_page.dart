@@ -23,8 +23,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     try {
       final emotionResponse = await supabase
           .from('emotion_tracking')
-          .select('emotion, emotion_distribution, timestamp, user_feedback')
+          .select('session_id, emotion, emotion_distribution, timestamp, user_feedback')
           .eq('user_id', widget.userId);
+
+      if (emotionResponse.isEmpty) {
+        print("No data found for user: ${widget.userId}");
+        return {};
+      }
 
       Map<String, int> emotionCount = {};
 
@@ -49,12 +54,12 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         final String time = '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
 
         return {
+          'session_id': tracking['session_id'], // Ensure session_id is available
           'emotion': tracking['emotion'],
           'emotion_distribution': tracking['emotion_distribution'],
           'date': date,
           'time': time,
           'user_feedback': tracking['user_feedback'],
-          'id': tracking['id'], // Ensure id is available for deletion
         };
       }).toList();
 
@@ -81,7 +86,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             final emotionData = snapshot.data!['emotionData'] as Map<String, double>;
             final recentTrackings = snapshot.data!['recentTrackings'] as List<Map<String, dynamic>>;
 
@@ -111,7 +116,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                           });
                         },
                         isDarkMode: isDarkMode,
-                        userId: widget.userId, // Pass the userId here
+                        userId: widget.userId,
                       ),
                     ],
                   ),

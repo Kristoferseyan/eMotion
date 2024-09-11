@@ -7,7 +7,7 @@ class EmotionChartData {
 
 static Future<Map<String, List<FlSpot>>> fetchEmotionData(String userId, List<String> emotions) async {
   try {
-    // Fetch only data related to the logged-in user
+    // Fetch only data related to the logged-in user for the past 7 days
     final response = await supabase
         .from('emotion_tracking')
         .select('emotion_distribution, timestamp')
@@ -20,9 +20,11 @@ static Future<Map<String, List<FlSpot>>> fetchEmotionData(String userId, List<St
       return {};
     }
 
+    // Initialize maps to accumulate sums and counts for each emotion
     Map<String, Map<int, double>> dailyEmotionSum = {};
     Map<String, Map<int, int>> dailyEmotionCounts = {};
 
+    // Initialize maps for each emotion with zero values for the week (Mon-Sun)
     for (var emotion in emotions) {
       dailyEmotionSum[emotion] = {};
       dailyEmotionCounts[emotion] = {};
@@ -32,6 +34,7 @@ static Future<Map<String, List<FlSpot>>> fetchEmotionData(String userId, List<St
       }
     }
 
+    // Iterate through the fetched records and accumulate emotion intensities per day
     for (var entry in response) {
       DateTime timestamp = DateTime.parse(entry['timestamp']);
       
@@ -45,17 +48,19 @@ static Future<Map<String, List<FlSpot>>> fetchEmotionData(String userId, List<St
       final Map<String, dynamic> emotionDistributionMap = _sanitizeJsonKeys(jsonDecode(emotionDistributionJson));
 
       for (var emotion in emotions) {
+        // Accumulate the intensity of each emotion for each day
         double emotionValue = (emotionDistributionMap[emotion] ?? 0.0).toDouble();
         dailyEmotionSum[emotion]![chartIndex] = dailyEmotionSum[emotion]![chartIndex]! + emotionValue;
         dailyEmotionCounts[emotion]![chartIndex] = dailyEmotionCounts[emotion]![chartIndex]! + 1;
       }
     }
 
-
+    // Prepare the data for the chart
     Map<String, List<FlSpot>> spotsMap = {};
     for (var emotion in emotions) {
       List<FlSpot> spots = [];
       for (var i = 0; i < 7; i++) {
+        // Calculate the average intensity of the emotion for each day
         double averageEmotionValue = dailyEmotionCounts[emotion]![i] != 0
             ? dailyEmotionSum[emotion]![i]! / dailyEmotionCounts[emotion]![i]!
             : 0.0;
@@ -70,7 +75,6 @@ static Future<Map<String, List<FlSpot>>> fetchEmotionData(String userId, List<St
     return {};
   }
 }
-
 // Utility function to remove leading/trailing spaces from JSON keys
 static Map<String, dynamic> _sanitizeJsonKeys(Map<String, dynamic> json) {
   return json.map((key, value) {

@@ -38,20 +38,28 @@ class _TrackingListState extends State<TrackingList> {
     print('UserId: ${widget.userId}');
     print('SessionId: $sessionId');
 
-    // Attempt to delete the item from Supabase
-    await supabase
-        .from('emotion_tracking')
-        .delete()
-        .eq('session_id', sessionId); // Use session_id instead of id
+    try {
+      // Attempt to delete the item from Supabase
+      final response = await supabase
+          .from('emotion_tracking')
+          .delete()
+          .eq('session_id', sessionId);
 
-    // If deletion is successful, remove the item from the list
-    setState(() {
-      _trackingData.removeAt(index);
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Tracking session deleted successfully')),
-    );
+      // If deletion is successful, remove the item from the list
+      if (response != null) {
+        setState(() {
+          _trackingData.removeAt(index);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tracking session deleted successfully')),
+        );
+      }
+    } catch (e) {
+      // Error handling
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete: $e')),
+      );
+    }
   }
 
   @override
@@ -149,43 +157,55 @@ class _TrackingListState extends State<TrackingList> {
             onDismissed: (direction) async {
               final sessionId = tracking['session_id']?.toString(); // Ensure it's a string
 
-              if (sessionId != null) {
-                // Print userId and sessionId
-                print('UserId: ${widget.userId}');
-                print('SessionId: $sessionId');
-
+              if (sessionId != null && sessionId.isNotEmpty) {
                 // Call the delete method with sessionId and index
                 await _deleteTrackingItem(sessionId, index);
               } else {
-                // Handle case where sessionId is null
+                // Handle case where sessionId is null or invalid
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Failed to delete: Invalid session ID')),
                 );
               }
             },
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: isDarkMode ? const Color.fromARGB(255, 28, 66, 71) : Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: isDarkMode ? Colors.black.withOpacity(0.15) : Colors.grey.withOpacity(0.15),
-                    spreadRadius: 2,
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TrackingDetailPage(
+                      emotion: tracking['emotion'],
+                      date: tracking['date'],
+                      time: tracking['time'],
+                      duration: tracking['duration']?.toString() ?? 'Unknown duration',
+                      emotionDistributionJson: tracking['emotion_distribution'],
+                    ),
                   ),
-                ],
-              ),
-              child: ListTile(
-                title: Text(
-                  tracking['emotion'],
-                  style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: isDarkMode ? const Color.fromARGB(255, 28, 66, 71) : Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDarkMode ? Colors.black.withOpacity(0.15) : Colors.grey.withOpacity(0.15),
+                      spreadRadius: 2,
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                subtitle: Text(
-                  '${tracking['date']} ${tracking['time']}',
-                  style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
+                child: ListTile(
+                  title: Text(
+                    tracking['emotion'],
+                    style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                  ),
+                  subtitle: Text(
+                    '${tracking['date']} ${tracking['time']}',
+                    style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
+                  ),
                 ),
               ),
             ),
