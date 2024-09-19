@@ -1,4 +1,5 @@
 import 'package:fix_emotion/auth-modules/login-modules/reset_password.dart';
+import 'package:fix_emotion/auth-modules/reg-modules/admin-registration/admin_registration.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -31,7 +32,7 @@ Future<void> main() async {
   final supabase = Supabase.instance.client;
   final bool isAuthenticated = supabase.auth.currentSession != null;
 
-  runApp(SplashScreen(isAuthenticated: isAuthenticated));
+  runApp(MyApp(isAuthenticated: isAuthenticated));
 }
 
 class MyApp extends StatefulWidget {
@@ -289,3 +290,4 @@ class _LoginRegState extends State<LoginReg> {
     );
   }
 }
+
