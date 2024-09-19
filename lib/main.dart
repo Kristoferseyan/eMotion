@@ -1,4 +1,5 @@
 import 'package:fix_emotion/auth-modules/login-modules/reset_password.dart';
+import 'package:fix_emotion/auth-modules/reg-modules/admin-registration/admin_registration.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -61,7 +62,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: _buildLightTheme(),
       darkTheme: _buildDarkTheme(),
-      themeMode: _themeMode, // Apply the dynamically updated theme
+      themeMode: _themeMode,
     );
   }
 
@@ -90,6 +91,8 @@ class _MyAppState extends State<MyApp> {
         return MaterialPageRoute(builder: (_) => const LoginPage());
       case '/register':
         return MaterialPageRoute(builder: (_) => const RegistrationPage());
+      case '/admin-register':
+        return MaterialPageRoute(builder: (_) => const AdminRegistrationPage());
       case '/dashboard':
         return MaterialPageRoute(
           builder: (_) => Dashboard(
@@ -109,6 +112,7 @@ class _MyAppState extends State<MyApp> {
         return MaterialPageRoute(
           builder: (_) => ResetPasswordPage(accessToken: token),
         );
+        
       case '/privacy-settings':
         return MaterialPageRoute(
           builder: (_) => PrivacySettingsPage(),
@@ -149,7 +153,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  // Reusable button styles
   ButtonStyle _buttonStyle(Color backgroundColor, Color foregroundColor) {
     return ElevatedButton.styleFrom(
       foregroundColor: foregroundColor,
@@ -165,8 +168,16 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class LoginReg extends StatelessWidget {
+class LoginReg extends StatefulWidget {
   const LoginReg({Key? key}) : super(key: key);
+
+  @override
+  _LoginRegState createState() => _LoginRegState();
+}
+
+class _LoginRegState extends State<LoginReg> {
+  bool _isUserRegistration = true;
+  bool _showSnackbar = false;
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +220,10 @@ class LoginReg extends StatelessWidget {
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/register');
+                    Navigator.pushNamed(
+                      context,
+                      _isUserRegistration ? '/register' : '/admin-register',
+                    );
                   },
                   child: const Text(
                     'Register',
@@ -220,6 +234,9 @@ class LoginReg extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
+              _buildToggleButton(context),
+              if (_showSnackbar) _buildSnackbarText(),
             ],
           ),
         ),
@@ -233,5 +250,43 @@ class LoginReg extends StatelessWidget {
     } else {
       Navigator.pushNamed(context, '/login');
     }
+  }
+
+  Widget _buildToggleButton(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.person, color: _isUserRegistration ? Colors.blue : Colors.grey),
+        Switch(
+          value: _isUserRegistration,
+          onChanged: (bool newValue) {
+            setState(() {
+              _isUserRegistration = newValue;
+              _showSnackbar = true;
+
+              Future.delayed(const Duration(seconds: 2), () {
+                setState(() {
+                  _showSnackbar = false;
+                });
+              });
+            });
+          },
+          activeColor: Colors.blue,
+          inactiveThumbColor: Colors.grey,
+          inactiveTrackColor: Colors.grey[300],
+        ),
+        Icon(Icons.shield, color: !_isUserRegistration ? Colors.blue : Colors.grey),
+      ],
+    );
+  }
+
+  Widget _buildSnackbarText() {
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      child: Text(
+        _isUserRegistration ? 'User registration selected' : 'Admin registration selected',
+        style: const TextStyle(color: Colors.white, fontSize: 16),
+      ),
+    );
   }
 }
