@@ -1,8 +1,14 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
+import 'package:fix_emotion/analytics-modules/pdf_generator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import '../graph/pie_chart_widget.dart';
 
-class TrackingDetailPage extends StatelessWidget {
+
+class TrackingDetailPage extends StatefulWidget {
   final String emotion;
   final String date;
   final String time;
@@ -19,20 +25,41 @@ class TrackingDetailPage extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    print('Duration: $duration');
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  _TrackingDetailPageState createState() => _TrackingDetailPageState();
+}
 
-    final Map<String, double> emotionDistribution = Map<String, double>.from(
-      jsonDecode(emotionDistributionJson).map(
-        (key, value) => MapEntry(key, value.toDouble() * 100),
+class _TrackingDetailPageState extends State<TrackingDetailPage> {
+  final GlobalKey _chartKey = GlobalKey();
+  late Map<String, double> emotionDistribution;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize emotionDistribution here so it's accessible throughout the class
+    emotionDistribution = Map<String, double>.from(
+      jsonDecode(widget.emotionDistributionJson).map(
+            (key, value) => MapEntry(key, (value as num).toDouble() * 100),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print('Duration: ${widget.duration}');
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tracking Details'),
-        backgroundColor: isDarkMode ? const Color(0xFF0D2C2D) : const Color(0xFFB6DDF2),
+        backgroundColor:
+        isDarkMode ? const Color(0xFF0D2C2D) : const Color(0xFFB6DDF2),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            onPressed: _onSavePdfPressed,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -40,7 +67,7 @@ class TrackingDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Dominant Emotion: $emotion',
+              'Dominant Emotion: ${widget.emotion}',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -48,9 +75,9 @@ class TrackingDetailPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            _buildInfoRow('Date', date, isDarkMode),
-            _buildInfoRow('Time', time, isDarkMode),
-            _buildInfoRow('Duration', duration, isDarkMode),
+            _buildInfoRow('Date', widget.date, isDarkMode),
+            _buildInfoRow('Time', widget.time, isDarkMode),
+            _buildInfoRow('Duration', widget.duration, isDarkMode),
             const SizedBox(height: 20),
             Text(
               'Emotion Distribution:',
@@ -62,14 +89,18 @@ class TrackingDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: PieChartWidget(emotionData: emotionDistribution),
+              child: RepaintBoundary(
+                key: _chartKey,
+                child: PieChartWidget(emotionData: emotionDistribution),
+              ),
             ),
             const SizedBox(height: 20),
             _buildEmotionPercentages(emotionDistribution, isDarkMode),
           ],
         ),
       ),
-      backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
+      backgroundColor:
+      isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
     );
   }
 
@@ -99,7 +130,8 @@ class TrackingDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEmotionPercentages(Map<String, double> emotionDistribution, bool isDarkMode) {
+  Widget _buildEmotionPercentages(
+      Map<String, double> emotionDistribution, bool isDarkMode) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: emotionDistribution.entries.map((entry) {
@@ -127,5 +159,33 @@ class TrackingDetailPage extends StatelessWidget {
         );
       }).toList(),
     );
+  }
+
+  void _onSavePdfPressed() async {
+    try {
+      // Capture chart image
+      RenderRepaintBoundary boundary = _chartKey.currentContext!
+          .findRenderObject() as RenderRepaintBoundary;
+      final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+      ui.Image chartImage = await boundary.toImage(pixelRatio: pixelRatio);
+      ByteData? byteData =
+      await chartImage.toByteData(format: ui.ImageByteFormat.png);
+      Uint8List chartBytes = byteData!.buffer.asUint8List();
+
+      await PDFGenerator.saveTrackingDetailsAsPDF(
+        context: context,
+        emotion: widget.emotion,
+        date: widget.date,
+        time: widget.time,
+        duration: widget.duration,
+        emotionDistribution: emotionDistribution,
+        chartImageBytes: chartBytes, // Pass the chart image bytes
+      );
+    } catch (e) {
+      // Handle errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save PDF: $e')),
+      );
+    }
   }
 }
