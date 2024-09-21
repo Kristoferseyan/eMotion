@@ -40,17 +40,19 @@ class _UserInfoPageState extends State<UserInfoPage> {
         DateTime birthDate = DateFormat('yyyy-MM-dd').parse(_bDateController.text.trim());
         int age = _calculateAge(birthDate);
 
-        final response = await supabase.from('users').update({
-          'fName': _fNameController.text.trim(),
-          'lName': _lNameController.text.trim(),
+        // Update to use the new 'user_admin' table
+        final response = await supabase.from('user_admin').update({
+          'fname': _fNameController.text.trim(),
+          'lname': _lNameController.text.trim(),
           'age': age,
-          'bDate': _bDateController.text.trim(),
+          'bdate': _bDateController.text.trim(),
         }).eq('id', widget.userId).select();
 
         if (response.isEmpty) {
           throw Exception('Failed to save user information.');
         }
 
+        // Insert default permissions for the user
         final permissionResponse = await supabase.from('user_permissions').insert({
           'user_id': widget.userId,
           'camera_access': false,

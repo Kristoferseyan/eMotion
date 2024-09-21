@@ -66,6 +66,7 @@ class AdminTextField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
+        style: const TextStyle(color: Colors.black), // Set text color to black
         decoration: InputDecoration(
           labelText: labelText,
           labelStyle: TextStyle(
@@ -132,6 +133,7 @@ class AdminPasswordField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         obscureText: !isPasswordVisible,
+        style: const TextStyle(color: Colors.black), // Set text color to black
         decoration: InputDecoration(
           labelText: labelText,
           labelStyle: TextStyle(
@@ -165,9 +167,10 @@ class AdminPasswordField extends StatelessWidget {
 }
 
 // Organization Group Toggle Widget
+// Organization Group Toggle Widget
 class AdminToggle extends StatelessWidget {
-  final bool isOrganizationSelected;
-  final ValueChanged<bool> onToggle;
+  final bool isOrganizationSelected; // This is true if the toggle is ON (organization)
+  final ValueChanged<bool> onToggle; // Function to call when the toggle changes
 
   const AdminToggle({
     Key? key,
@@ -181,23 +184,24 @@ class AdminToggle extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         IconButton(
-          icon: Icon(Icons.apartment, color: isOrganizationSelected ? Colors.blue : Colors.grey),
-          onPressed: () => onToggle(true),
+          icon: Icon(Icons.group, color: !isOrganizationSelected ? Colors.blue : Colors.grey),
+          onPressed: () => onToggle(false), // Group option when toggle is OFF
         ),
         Switch(
-          value: isOrganizationSelected,
+          value: isOrganizationSelected, // Toggle ON means organization is selected
           onChanged: onToggle,
           activeColor: Colors.blue,
           inactiveThumbColor: Colors.grey,
         ),
         IconButton(
-          icon: Icon(Icons.group, color: !isOrganizationSelected ? Colors.blue : Colors.grey),
-          onPressed: () => onToggle(false),
+          icon: Icon(Icons.apartment, color: isOrganizationSelected ? Colors.blue : Colors.grey),
+          onPressed: () => onToggle(true), // Organization option when toggle is ON
         ),
       ],
     );
   }
 }
+
 
 // Register Button Widget
 class AdminRegisterButton extends StatelessWidget {

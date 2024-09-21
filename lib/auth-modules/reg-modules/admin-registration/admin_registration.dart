@@ -3,7 +3,7 @@ import 'package:fix_emotion/auth-modules/reg-modules/admin-registration/terms_an
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:bcrypt/bcrypt.dart';
-import 'admin_widgets.dart'; 
+import 'admin_widgets.dart';
 
 class AdminRegistrationPage extends StatefulWidget {
   const AdminRegistrationPage({Key? key}) : super(key: key);
@@ -27,7 +27,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
   bool _isLoading = false;
   bool _isPasswordVisible = false;
   bool _isOrganizationSelected = true;
-  bool _agreedToTerms = false; // Track if Terms are accepted
+  bool _agreedToTerms = false;
 
   final supabase = Supabase.instance.client;
 
@@ -44,54 +44,74 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
     super.dispose();
   }
 
-  Future<void> _registerAdmin() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        setState(() {
-          _isLoading = true;
-        });
-
-        String hashedPassword = BCrypt.hashpw(_passwordController.text.trim(), BCrypt.gensalt());
-
-        final response = await supabase.from('admin_users').insert({
-          'email': _emailController.text.trim(),
-          'password': hashedPassword,
-          'first_name': _firstNameController.text.trim(),
-          'last_name': _lastNameController.text.trim(),
-          'organization_name': _isOrganizationSelected ? _organizationNameController.text.trim() : null,
-          'organization_role': _isOrganizationSelected ? _roleController.text.trim() : null,
-          'group_name': !_isOrganizationSelected ? _groupNameController.text.trim() : null,
-        }).select().single();
-
-        if (response['error'] != null) {
-          throw Exception('Failed to register admin: ${response['error'].message}');
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Admin registration successful!')),
-        );
-      } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${error.toString()}'), backgroundColor: Colors.red),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
+  // Validate passwords
   bool _validatePasswords() {
     return _passwordController.text == _confirmPasswordController.text;
   }
 
+  // Register the admin based on selected toggle (Organization/Group)
+Future<void> _registerAdmin() async {
+  if (_formKey.currentState!.validate()) {
+    if (!_agreedToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You must accept the Terms and Conditions to register.')),
+      );
+      return;
+    }
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      String hashedPassword = BCrypt.hashpw(_passwordController.text.trim(), BCrypt.gensalt());
+
+      // Use the toggle value to determine if it's an organization or group
+      String userType = _isOrganizationSelected ? 'organization' : 'group'; // Logic based on the toggle state
+
+      final response = await supabase.from('user_admin').insert({
+        'email': _emailController.text.trim(),
+        'password': hashedPassword,
+        'fname': _firstNameController.text.trim(),
+        'lname': _lastNameController.text.trim(),
+        'organization_name': _isOrganizationSelected ? _organizationNameController.text.trim() : null,
+        'organization_role': _isOrganizationSelected ? _roleController.text.trim() : null,
+        'group_name': !_isOrganizationSelected ? _groupNameController.text.trim() : null,
+        'type': userType, // Set type based on the toggle logic
+        'role': 'admin', // Set the role as 'admin' by default
+      }).select().single();
+
+      if (response == null || response.isEmpty) {
+        throw Exception('Failed to register admin');
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Admin registration successful!')),
+      );
+
+      // Redirect to the login page after successful registration
+      Navigator.pushReplacementNamed(context, '/login');
+
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${error.toString()}'), backgroundColor: Colors.red),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+}
+
+
+  // Toggle password visibility
   void _togglePasswordVisibility() {
     setState(() {
       _isPasswordVisible = !_isPasswordVisible;
     });
   }
 
+  // Show terms and conditions
   void _showTermsAndConditions() {
     showDialog(
       context: context,
@@ -187,7 +207,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
                 isLoading: _isLoading,
                 onPressed: _showTermsAndConditions, // Show terms before registering
               ),
-            ],  
+            ],
           ),
         ),
       ),

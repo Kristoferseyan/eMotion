@@ -1,3 +1,4 @@
+import 'package:fix_emotion/admin-dashboard/admin_dashboard.dart';
 import 'package:fix_emotion/auth-modules/login-modules/forgot_password.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -20,6 +21,8 @@ class _LoginPageState extends State<LoginPage> {
   late TextEditingController passwordController;
   bool rememberMe = false;
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
+  String _errorMessage = '';
 
   final authService = AuthenticationService();
 
@@ -59,9 +62,21 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> _navigateToDashboard() async {
-    final userData = await authService.getUserData();
-    if (userData != null) {
+Future<void> _navigateToDashboard() async {
+  final userData = await authService.getUserData();
+  if (userData != null) {
+    final role = await _getUserRole(userData['userId']!);
+
+    if (role == 'admin') {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => AdminDashboard(
+            userId: userData['userId']!,
+            userEmail: userData['userEmail']!,
+          ),
+        ),
+      );
+    } else {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => Dashboard(
@@ -72,6 +87,28 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
+}
+
+
+
+Future<String?> _getUserRole(String userId) async {
+  try {
+
+    final response = await authService.client
+        .from('user_admin')
+        .select('role')
+        .eq('id', userId)
+        .single();
+
+    if (response != null && response['role'] != null) {
+      return response['role'] as String; 
+    }
+    return null;
+  } catch (error) {
+    print('Error fetching user role: $error');
+    return null;
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -101,6 +138,9 @@ class _LoginPageState extends State<LoginPage> {
                             rememberMe = value;
                           });
                         },
+                        isPasswordVisible: _isPasswordVisible,
+                        onTogglePasswordVisibility: _togglePasswordVisibility,
+                        errorMessage: _errorMessage,
                         onLogin: _loginUser,
                         onForgotPassword: _navigateToForgotPassword,
                       ),
@@ -119,19 +159,26 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isPasswordVisible = !_isPasswordVisible;
+    });
+  }
+
   Future<void> _loginUser() async {
-    final username = usernameController.text.trim();
+    final input = usernameController.text.trim();
     final password = passwordController.text.trim();
 
     setState(() {
       _isLoading = true;
+      _errorMessage = '';
     });
 
     try {
-      final user = await authService.signInWithUsernameAndPassword(username, password);
+      final user = await authService.signInWithUsernameOrEmailAndPassword(input, password);
       if (user != null) {
         if (rememberMe) {
-          await authService.saveCredentials(username, password);
+          await authService.saveCredentials(input, password);
         } else {
           await authService.removeCredentials();
         }
@@ -139,8 +186,11 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (error) {
       print('Unexpected error: $error');
+      setState(() {
+        _errorMessage = 'Incorrect username/email or password';
+      });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unexpected error occurred: $error')),
+        SnackBar(content: Text('Login failed: $_errorMessage')),
       );
     } finally {
       setState(() {

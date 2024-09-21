@@ -5,9 +5,12 @@ class LoginForm extends StatelessWidget {
   final TextEditingController passwordController;
   final bool rememberMe;
   final bool isLoading;
+  final bool isPasswordVisible;
   final ValueChanged<bool> onRememberMeChanged;
   final VoidCallback onLogin;
   final VoidCallback onForgotPassword;
+  final VoidCallback onTogglePasswordVisibility;
+  final String errorMessage;
 
   const LoginForm({
     Key? key,
@@ -15,39 +18,61 @@ class LoginForm extends StatelessWidget {
     required this.passwordController,
     required this.rememberMe,
     required this.isLoading,
+    required this.isPasswordVisible,
     required this.onRememberMeChanged,
     required this.onLogin,
-    required this.onForgotPassword, // Add this line
+    required this.onForgotPassword,
+    required this.onTogglePasswordVisibility,
+    required this.errorMessage,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 30.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTextField(
-            labelText: 'Username',
-            keyboardType: TextInputType.text,
+          if (errorMessage.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(
+                errorMessage,
+                style: const TextStyle(color: Colors.red),
+              ),
+            ),
+          TextFormField(
             controller: usernameController,
+            decoration: const InputDecoration(
+              labelText: 'Username or Email',
+            ),
           ),
-          const SizedBox(height: 16.0),
-          _buildTextField(
-            labelText: 'Password',
-            keyboardType: TextInputType.text,
-            obscureText: true,
+          const SizedBox(height: 16),
+          TextFormField(
             controller: passwordController,
+            obscureText: !isPasswordVisible,
+            decoration: InputDecoration(
+              labelText: 'Password',
+              suffixIcon: IconButton(
+                icon: Icon(
+                  isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: onTogglePasswordVisibility,
+              ),
+            ),
           ),
-          const SizedBox(height: 16.0),
+          const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligns items to the edges
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
                   Checkbox(
                     value: rememberMe,
-                    onChanged: (bool? newValue) {
-                      onRememberMeChanged(newValue ?? false);
+                    onChanged: (bool? value) {
+                      if (value != null) {
+                        onRememberMeChanged(value);
+                      }
                     },
                   ),
                   const Text('Remember Me'),
@@ -57,64 +82,23 @@ class LoginForm extends StatelessWidget {
                 onPressed: onForgotPassword,
                 child: const Text(
                   'Forgot Password?',
-                  style: TextStyle(color: Color(0xFF6EBBC5)), // Match the color to the theme
+                  style: TextStyle(color: Color(0xFF6EBBC5)),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16.0),
+          const SizedBox(height: 16),
           ElevatedButton(
             onPressed: isLoading ? null : onLogin,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF6EBBC5),
-              minimumSize: const Size(double.infinity, 60),
+              minimumSize: const Size(double.infinity, 50), 
             ),
-            child: Text(
-              isLoading ? 'Logging in...' : 'Login',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-              ),
-            ),
+            child: isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text('Login'),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required String labelText,
-    required TextInputType keyboardType,
-    bool obscureText = false,
-    required TextEditingController controller,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: TextFormField(
-        controller: controller,
-        style: const TextStyle(color: Colors.black87),
-        decoration: InputDecoration(
-          labelText: labelText,
-          labelStyle: const TextStyle(color: Colors.black87),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
-          ),
-        ),
-        keyboardType: keyboardType,
-        obscureText: obscureText,
       ),
     );
   }

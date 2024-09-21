@@ -57,10 +57,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
         String hashedPassword = BCrypt.hashpw(_passwordController.text.trim(), BCrypt.gensalt());
 
-        final response = await supabase.from('users').insert({
+        // Inserting into the new "user_admin" table, and defaulting 'role' to 'user'
+        final response = await supabase.from('user_admin').insert({
           'email': _emailController.text.trim(),
           'password': hashedPassword,
           'username': _usernameController.text.trim(),
+          'role': 'user', // Default role for user
         }).select().single();
 
         if (response['error'] != null) {
