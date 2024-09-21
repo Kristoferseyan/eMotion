@@ -33,6 +33,8 @@ dependencies:
   google_mlkit_pose_detection: ^0.12.0
   logging: ^1.2.0
   package_info_plus: ^8.0.2
+  pdf: ^3.8.1
+  printing: ^5.9.0
 
 dev_dependencies:
   flutter_test:
