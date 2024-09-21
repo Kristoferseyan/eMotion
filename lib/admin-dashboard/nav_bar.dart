@@ -25,14 +25,14 @@ class BottomNavBar extends StatelessWidget {
           vertical: screenHeight * 0.02,
         ),
         child: GNav(
-          gap: screenWidth * 0.02,
+          gap: screenWidth * 0.03, // Increased gap for better spacing
           padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.03,
-            vertical: screenHeight * 0.015,
+            horizontal: screenWidth * 0.04,
+            vertical: screenHeight * 0.02, // More vertical padding
           ),
           tabMargin: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.05,
-            vertical: screenHeight * 0.01,
+            horizontal: screenWidth * 0.06,
+            vertical: screenHeight * 0.012,
           ),
           tabBackgroundColor: isDarkMode
               ? const Color.fromARGB(255, 255, 245, 245)
@@ -50,7 +50,8 @@ class BottomNavBar extends StatelessWidget {
                   : Colors.white,
               iconColor: const Color.fromARGB(255, 49, 123, 136),
               text: 'Dashboard',
-              textSize: screenWidth * 0.035,
+              textColor: const Color.fromARGB(255, 60, 60, 60), // Darker text
+              textSize: screenWidth * 0.04, // Slightly larger text
             ),
             GButton(
               icon: Icons.settings,
@@ -59,7 +60,8 @@ class BottomNavBar extends StatelessWidget {
                   : Colors.white,
               iconColor: const Color.fromARGB(255, 49, 123, 136),
               text: 'Settings',
-              textSize: screenWidth * 0.035,
+              textColor: const Color.fromARGB(255, 60, 60, 60), // Darker text
+              textSize: screenWidth * 0.04, // Slightly larger text
             ),
           ],
           selectedIndex: selectedIndex,
