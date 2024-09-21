@@ -26,8 +26,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _fetchUserData() async {
     try {
       final response = await supabase
-          .from('users')
-          .select('fName, lName, email, username, age, bDate')
+          .from('user_admin')
+          .select('fname, lname, email, username, age, bDate')
           .eq('id', widget.userId)
           .single();
 
@@ -148,7 +148,7 @@ class _ProfilePageState extends State<ProfilePage> {
             radius: 50,
             backgroundColor: isDarkMode ? Colors.white : Colors.grey[300],
             child: Text(
-              (userData!['fName'][0] as String).toUpperCase(),
+              (userData!['fname'][0] as String).toUpperCase(),
               style: TextStyle(
                 fontSize: 40,
                 color: isDarkMode ? Colors.black : Colors.white,
@@ -157,7 +157,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 16),
           Text(
-            '${_capitalize(userData!['fName'])} ${_capitalize(userData!['lName'])}',
+            '${_capitalize(userData!['fname'])} ${_capitalize(userData!['lname'])}',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,

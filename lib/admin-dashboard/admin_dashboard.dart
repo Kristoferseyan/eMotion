@@ -1,3 +1,4 @@
+import 'package:fix_emotion/admin-dashboard/group_member_page.dart';
 import 'package:flutter/material.dart';
 import 'main_dashboard_page.dart';
 import 'settings_page.dart';
@@ -29,9 +30,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           ? const Color(0xFF122E31)
           : const Color(0xFFF3FCFF),
       body: SafeArea(
-        child: _selectedIndex == 0
-            ? DashboardPage(userId: widget.userId, userEmail: widget.userEmail)
-            : SettingsPage(onLogout: _logout),
+        child: _buildPage(),
       ),
       bottomNavigationBar: BottomNavBar(
         selectedIndex: _selectedIndex,
@@ -40,8 +39,21 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
+  // This function returns the correct page based on the selected index.
+  Widget _buildPage() {
+    switch (_selectedIndex) {
+      case 0:
+        return DashboardPage(userId: widget.userId, userEmail: widget.userEmail);
+      case 1:
+        return GroupMembersPage(userId: widget.userId);
+      case 2:
+        return SettingsPage(onLogout: _logout, userId: widget.userId);
+      default:
+        return DashboardPage(userId: widget.userId, userEmail: widget.userEmail); // Default page
+    }
+  }
+
   Future<void> _logout() async {
-    // Add your Supabase signOut logic here
     Navigator.pushReplacementNamed(context, '/login');
   }
 }

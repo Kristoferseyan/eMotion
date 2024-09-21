@@ -27,7 +27,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     'Fear',
   ];
 
-  final AuthenticationService authService = AuthenticationService(); // Create an instance of AuthenticationService
+  final AuthenticationService authService = AuthenticationService();
 
   @override
   void initState() {
@@ -38,13 +38,13 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   Future<void> _fetchUserName() async {
     try {
       final response = await authService.client
-          .from('users')
-          .select('fName')
+          .from('user_admin')
+          .select('fname')
           .eq('id', widget.userId)
           .single();
 
       setState(() {
-        userName = response['fName'] ?? 'User';
+        userName = response['fname'] ?? 'User';
       });
     } catch (error) {
       setState(() {

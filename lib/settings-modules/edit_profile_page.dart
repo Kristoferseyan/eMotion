@@ -49,7 +49,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> _loadProfile() async {
     try {
       final response = await supabase
-          .from('users')
+          .from('user_admin')
           .select()
           .eq('id', widget.userId)
           .single();
@@ -57,8 +57,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final user = response as Map<String, dynamic>;
 
       setState(() {
-        _firstNameController.text = user['fName'] ?? '';
-        _lastNameController.text = user['lName'] ?? '';
+        _firstNameController.text = user['fname'] ?? '';
+        _lastNameController.text = user['lname'] ?? '';
         _emailController.text = user['email'] ?? '';
         _usernameController.text = user['username'] ?? '';
         _ageController.text = user['age']?.toString() ?? '';
@@ -78,8 +78,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> _saveProfile() async {
     if (_formKey.currentState!.validate()) {
       final updates = {
-        'fName': _firstNameController.text,
-        'lName': _lastNameController.text,
+        'fname': _firstNameController.text,
+        'lname': _lastNameController.text,
         'email': _emailController.text,
         'username': _usernameController.text,
         'age': int.tryParse(_ageController.text),
@@ -87,7 +87,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       try {
         final response = await supabase
-            .from('users')
+            .from('user_admin')
             .update(updates)
             .eq('id', widget.userId);
 

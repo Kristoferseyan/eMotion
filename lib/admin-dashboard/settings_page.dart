@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class SettingsPage extends StatelessWidget {
   final VoidCallback onLogout;
 
-  const SettingsPage({Key? key, required this.onLogout}) : super(key: key);
+  const SettingsPage({Key? key, required this.onLogout, required String userId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

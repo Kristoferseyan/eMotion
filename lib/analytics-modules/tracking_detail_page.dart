@@ -35,8 +35,6 @@ class _TrackingDetailPageState extends State<TrackingDetailPage> {
   @override
   void initState() {
     super.initState();
-
-    // Initialize emotionDistribution here so it's accessible throughout the class
     emotionDistribution = Map<String, double>.from(
       jsonDecode(widget.emotionDistributionJson).map(
             (key, value) => MapEntry(key, (value as num).toDouble() * 100),

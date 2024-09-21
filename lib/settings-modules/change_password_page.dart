@@ -47,7 +47,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
       try {
         final response = await supabase
-            .from('users')
+            .from('user_admin')
             .select('password')
             .eq('id', widget.userId)
             .single();
@@ -61,7 +61,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         if (BCrypt.checkpw(_currentPasswordController.text, currentPasswordHash)) {
           final hashedNewPassword = BCrypt.hashpw(_newPasswordController.text, BCrypt.gensalt());
           await supabase
-              .from('users')
+              .from('user_admin')
               .update({'password': hashedNewPassword})
               .eq('id', widget.userId);
 
