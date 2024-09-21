@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fix_emotion/auth-modules/reg-modules/user_info_page.dart';
-import 'package:bcrypt/bcrypt.dart';
 import 'package:fix_emotion/main.dart';
-
 import 'terms_and_conditions_dialog.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -27,8 +24,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   bool _termsRead = false;
   bool _isPasswordVisible = false;
 
-  final supabase = Supabase.instance.client;
-
   @override
   void dispose() {
     _emailController.dispose();
@@ -38,55 +33,25 @@ class _RegistrationPageState extends State<RegistrationPage> {
     super.dispose();
   }
 
-  Future<void> _registerUser() async {
+  void _navigateToUserInfoPage() {
     if (_formKey.currentState!.validate()) {
       if (!_agreedToTerms) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const LoginReg(),
-          ),
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You must accept the Terms and Conditions to continue.')),
         );
         return;
       }
 
-      try {
-        setState(() {
-          _isLoading = true;
-        });
-
-        String hashedPassword = BCrypt.hashpw(_passwordController.text.trim(), BCrypt.gensalt());
-
-        // Inserting into the new "user_admin" table, and defaulting 'role' to 'user'
-        final response = await supabase.from('user_admin').insert({
-          'email': _emailController.text.trim(),
-          'password': hashedPassword,
-          'username': _usernameController.text.trim(),
-          'role': 'user', // Default role for user
-        }).select().single();
-
-        if (response['error'] != null) {
-          throw Exception('Failed to insert user data: ${response['error'].message}');
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration successful!')),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserInfoPage(userId: response['id']),
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => UserInfoPage(
+            email: _emailController.text.trim(),
+            username: _usernameController.text.trim(),
+            password: _passwordController.text.trim(),
           ),
-        );
-      } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${error.toString()}'), backgroundColor: Colors.red),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+        ),
+      );
     }
   }
 
@@ -367,7 +332,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   Widget _buildNextButton() {
     return ElevatedButton(
-      onPressed: (_isLoading || !_agreedToTerms) ? null : _registerUser, // Disable button if terms are not agreed
+      onPressed: (_isLoading || !_agreedToTerms) ? null : _navigateToUserInfoPage, 
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF6EBBC5),
         minimumSize: const Size(double.infinity, 60),

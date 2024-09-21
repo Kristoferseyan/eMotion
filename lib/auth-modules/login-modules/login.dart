@@ -76,7 +76,7 @@ Future<void> _navigateToDashboard() async {
           ),
         ),
       );
-    } else {
+    } else if(role == 'user') {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => Dashboard(
@@ -100,8 +100,11 @@ Future<String?> _getUserRole(String userId) async {
         .eq('id', userId)
         .single();
 
-    if (response != null && response['role'] != null) {
+    if (response['role'] == "admin") {
       return response['role'] as String; 
+    }
+    else if(response['role'] == "user") {
+      return response['role'] as String;
     }
     return null;
   } catch (error) {

@@ -2,10 +2,19 @@ import 'package:fix_emotion/auth-modules/login-modules/login.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:bcrypt/bcrypt.dart';  // Import bcrypt for hashing
 
 class UserInfoPage extends StatefulWidget {
-  final String userId;
-  const UserInfoPage({Key? key, required this.userId}) : super(key: key);
+  final String email;
+  final String username;
+  final String password;
+
+  const UserInfoPage({
+    Key? key,
+    required this.email,
+    required this.username,
+    required this.password,
+  }) : super(key: key);
 
   @override
   _UserInfoPageState createState() => _UserInfoPageState();
@@ -37,24 +46,25 @@ class _UserInfoPageState extends State<UserInfoPage> {
           _isLoading = true;
         });
 
+        // Hash the password before saving it
+        String hashedPassword = BCrypt.hashpw(widget.password, BCrypt.gensalt());
+
         DateTime birthDate = DateFormat('yyyy-MM-dd').parse(_bDateController.text.trim());
         int age = _calculateAge(birthDate);
 
-        // Update to use the new 'user_admin' table
-        final response = await supabase.from('user_admin').update({
+        final response = await supabase.from('user_admin').insert({
+          'email': widget.email,
+          'username': widget.username,
+          'password': hashedPassword,  // Save the hashed password
+          'role': 'user',
           'fname': _fNameController.text.trim(),
           'lname': _lNameController.text.trim(),
           'age': age,
           'bdate': _bDateController.text.trim(),
-        }).eq('id', widget.userId).select();
+        }).select().single();
 
-        if (response.isEmpty) {
-          throw Exception('Failed to save user information.');
-        }
-
-        // Insert default permissions for the user
         final permissionResponse = await supabase.from('user_permissions').insert({
-          'user_id': widget.userId,
+          'user_id': response['id'],
           'camera_access': false,
           'motion_data_sharing': false,
           'anonymous_data_collection': false,
@@ -67,13 +77,15 @@ class _UserInfoPageState extends State<UserInfoPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Information saved successfully!')),
         );
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginPage()),
         );
       } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${error.toString()}'), backgroundColor: Colors.red),
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
         );
       } finally {
         setState(() {
@@ -86,7 +98,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
   int _calculateAge(DateTime birthDate) {
     DateTime today = DateTime.now();
     int age = today.year - birthDate.year;
-    if (today.month < birthDate.month || (today.month == birthDate.month && today.day < birthDate.day)) {
+    if (today.month < birthDate.month ||
+        (today.month == birthDate.month && today.day < birthDate.day)) {
       age--;
     }
     return age;
