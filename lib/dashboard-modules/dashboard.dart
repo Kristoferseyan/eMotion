@@ -29,7 +29,7 @@ class _DashboardState extends State<Dashboard> {
         children: [
           DashboardLayout(userId: widget.userId),
           AnalyticsPage(userId: widget.userId),
-          SettingsPage(userId: widget.userId),
+          SettingsPage(userId: widget.userId, userEmail: widget.userEmail,),
         ],
       ),
       bottomNavigationBar: Container(

@@ -102,7 +102,7 @@ class _MyAppState extends State<MyApp> {
         );
       case '/settings':
         return MaterialPageRoute(
-          builder: (_) => SettingsPage(userId: args['userId'] ?? ''),
+          builder: (_) => SettingsPage(userId: args['userId'] ?? '', userEmail: args['userEmail'],),
         );
       case '/notification-settings':
         return MaterialPageRoute(builder: (_) => NotificationSettingsPage());

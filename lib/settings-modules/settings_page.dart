@@ -2,6 +2,7 @@ import 'package:fix_emotion/settings-modules/app_version_page.dart';
 import 'package:fix_emotion/settings-modules/change_password_page.dart';
 import 'package:fix_emotion/settings-modules/delete_data_page.dart';
 import 'package:fix_emotion/settings-modules/developer_info_page.dart';
+import 'package:fix_emotion/settings-modules/feedback_page.dart';
 import 'package:fix_emotion/settings-modules/login_activity_page.dart';
 import 'package:fix_emotion/settings-modules/privacy_settings_page.dart';
 import 'package:fix_emotion/settings-modules/theme_settings_page.dart';
@@ -13,8 +14,9 @@ import 'notification_settings_page.dart';
 
 class SettingsPage extends StatefulWidget {
   final String userId;
+  final String userEmail;
 
-  const SettingsPage({Key? key, required this.userId}) : super(key: key);
+  const SettingsPage({Key? key, required this.userId, required this.userEmail}) : super(key: key);
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -82,6 +84,13 @@ class _SettingsPageState extends State<SettingsPage> {
                           MaterialPageRoute(builder: (context) => ThemeSettingsPage()),
                         );
                       }),
+                       _buildSettingsTile(Icons.feedback, 'Send Feedback', isDarkMode, () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FeedbackPage(userId: widget.userId, userEmail: widget.userEmail,)),
+                        );
+                      }),
+
                       _buildSectionHeader('Security', isDarkMode),
                       _buildSettingsTile(Icons.history, 'Login Activity', isDarkMode, () {
                         Navigator.push(
