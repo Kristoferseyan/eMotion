@@ -35,6 +35,8 @@ dependencies:
   package_info_plus: ^8.0.2
   pdf: ^3.8.1
   printing: ^5.9.0
+  firebase_messaging: ^15.1.2
+  firebase_core: ^3.5.0
   mailer: ^6.1.2
 
 dev_dependencies:

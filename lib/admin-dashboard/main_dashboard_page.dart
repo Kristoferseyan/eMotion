@@ -24,13 +24,13 @@ class _DashboardPageState extends State<DashboardPage> {
     _fetchUsers();
   }
 
+  // Fetch the users (non-admins) to be invited
   Future<void> _fetchUsers() async {
     try {
-      // Fetch only non-admin users
       final response = await supabase
           .from('user_admin')
           .select()
-          .eq('role', 'user'); // Assuming 'role' field exists and normal users have 'user' as the role.
+          .eq('role', 'user'); // Fetch only non-admin users
 
       setState(() {
         users = List<Map<String, dynamic>>.from(response);
@@ -45,7 +45,48 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  Future<void> _createGroupAndAddUsers() async {
+  // Send an invite notification to selected users
+  Future<void> _sendInviteNotification(String userId, String inviteId, String groupName) async {
+    try {
+      await supabase.from('notifications').insert({
+        'user_id': userId,
+        'message': 'You have been invited to join the group $groupName',
+        'invite_id': inviteId, // Link the invite ID
+        'read': false,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+    } catch (error) {
+      print('Error sending invite notification: $error');
+    }
+  }
+
+  // Create the group and add users
+  // Insert into the group_invitations and notifications table
+  Future<void> _sendGroupInviteAndNotification(String userId, String groupId, String groupName) async {
+    try {
+      // Insert the group invitation
+      final inviteResponse = await supabase.from('group_invitations').insert({
+        'group_id': groupId,
+        'user_id': userId,
+        'admin_id': widget.userId,  // Assuming this is the current admin
+        'status': 'pending',
+        'sent_at': DateTime.now().toIso8601String(),
+      }).select().single();
+
+      // Get the invite ID to use in the notification
+      final inviteId = inviteResponse['id'];
+
+      // Send a notification to the user
+      await _sendInviteNotification(userId, inviteId, groupName);
+
+      print('Invite and notification sent to user $userId');
+    } catch (error) {
+      print('Error sending invite or notification: $error');
+    }
+  }
+
+  // Call this function for each selected user after group creation
+  Future<void> _createGroupAndSendInvites() async {
     final groupName = _groupNameController.text.trim();
     final groupDescription = _groupDescriptionController.text.trim();
 
@@ -78,18 +119,16 @@ class _DashboardPageState extends State<DashboardPage> {
 
       final groupId = groupResponse['id'];
 
-      // Insert selected users into the group_memberships table
+      // Send invite notifications and record in group_invitations
       for (String userId in selectedUserIds) {
-        await supabase.from('group_memberships').insert({
-          'user_id': userId,
-          'group_id': groupId,
-        });
+        await _sendGroupInviteAndNotification(userId, groupId, groupName);
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Group created and users added successfully!')),
+        const SnackBar(content: Text('Group created and invitations sent!')),
       );
 
+      // Reset form after success
       setState(() {
         selectedUsers.clear();
         _groupNameController.clear();
@@ -285,7 +324,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildAddUsersButton() {
     return Center(
       child: ElevatedButton(
-        onPressed: _createGroupAndAddUsers,
+        onPressed: _createGroupAndSendInvites,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 20.0),
           backgroundColor: const Color(0xFF6EBBC5),
@@ -294,7 +333,7 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
         child: const Text(
-          'Create Group and Add Users',
+          'Create Group and Send Invitations',
           style: TextStyle(fontSize: 14, color: Colors.white),
         ),
       ),

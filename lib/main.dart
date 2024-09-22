@@ -105,7 +105,7 @@ class _MyAppState extends State<MyApp> {
           builder: (_) => SettingsPage(userId: args['userId'] ?? '', userEmail: args['userEmail'],),
         );
       case '/notification-settings':
-        return MaterialPageRoute(builder: (_) => NotificationSettingsPage());
+        return MaterialPageRoute(builder: (_) => NotificationSettingsPage(userId: args['userID'],));
       case '/reset-password':
         final token = args['token'] ?? '';
         _logger.info('Navigating to ResetPasswordPage with token: $token');

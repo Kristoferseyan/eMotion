@@ -61,7 +61,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: 20),
                       _buildSectionHeader('Notifications', isDarkMode),
                       _buildSettingsTile(Icons.notifications, 'Notification Settings', isDarkMode, () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationSettingsPage()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationSettingsPage(userId: widget.userId,)));
                       }),
                       const SizedBox(height: 20),
                       _buildSectionHeader('Privacy', isDarkMode),
