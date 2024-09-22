@@ -54,13 +54,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         final String time = '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
 
         return {
-          'session_id': tracking['session_id'], // Ensure session_id is available
+          'session_id': tracking['session_id'],
           'emotion': tracking['emotion'],
           'emotion_distribution': tracking['emotion_distribution'],
           'date': date,
           'time': time,
           'user_feedback': tracking['user_feedback'],
-          'duration': tracking['duration']?.toString() ?? 'Unknown duration', // Add duration field here
+          'duration': tracking['duration']?.toString() ?? 'Unknown duration',
         };
       }).toList();
 

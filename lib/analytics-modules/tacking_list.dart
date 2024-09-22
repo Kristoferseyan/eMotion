@@ -8,7 +8,7 @@ class TrackingList extends StatefulWidget {
   final ValueChanged<String?> onEmotionChanged;
   final bool isDarkMode;
   final String userId;
-  final VoidCallback onItemDeleted; // Callback for refreshing the page
+  final VoidCallback onItemDeleted;
 
   const TrackingList({
     Key? key,
@@ -17,7 +17,7 @@ class TrackingList extends StatefulWidget {
     required this.onEmotionChanged,
     required this.isDarkMode,
     required this.userId,
-    required this.onItemDeleted, // Add this callback
+    required this.onItemDeleted, 
   }) : super(key: key);
 
   @override
@@ -36,18 +36,17 @@ class _TrackingListState extends State<TrackingList> {
   }
 
   Future<void> _deleteTrackingItem(String sessionId, int index) async {
-    // Print userId and sessionId for debugging
     print('UserId: ${widget.userId}');
     print('SessionId: $sessionId');
 
     try {
-      // Attempt to delete the item from Supabase
+
       final response = await supabase
           .from('emotion_tracking')
           .delete()
           .eq('session_id', sessionId);
 
-      // If deletion is successful, remove the item from the list
+
       if (response != null) {
         setState(() {
           _trackingData.removeAt(index);
@@ -55,7 +54,7 @@ class _TrackingListState extends State<TrackingList> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Tracking session deleted successfully')),
         );
-        widget.onItemDeleted(); // Trigger the refresh function on AnalyticsPage
+        widget.onItemDeleted(); 
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,7 +65,6 @@ class _TrackingListState extends State<TrackingList> {
 
   @override
   Widget build(BuildContext context) {
-    // Combine date and time into DateTime and sort by latest first
     final filteredTrackings = (widget.selectedEmotion == 'All'
         ? _trackingData
         : _trackingData.where((tracking) => tracking['emotion'] == widget.selectedEmotion).toList())
@@ -81,7 +79,7 @@ class _TrackingListState extends State<TrackingList> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildSectionTitle('Recent Tracking History', widget.isDarkMode),
+            _buildSectionTitle('Tracking History', widget.isDarkMode),
             _buildEmotionFilterDropdown(widget.isDarkMode),
           ],
         ),

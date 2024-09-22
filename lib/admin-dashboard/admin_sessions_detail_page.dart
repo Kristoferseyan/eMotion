@@ -29,7 +29,7 @@ class _AdminSessionDetailPageState extends State<AdminSessionDetailPage> {
   @override
   void initState() {
     super.initState();
-    _fetchSessionDetails(); // Fetch session details on init
+    _fetchSessionDetails();
   }
 
   // Fetch session details from the database
