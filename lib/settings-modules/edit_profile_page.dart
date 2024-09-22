@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/intl.dart'; // For date formatting
 
 class EditProfilePage extends StatefulWidget {
   final String userId;
@@ -18,8 +19,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _lastNameController;
   late TextEditingController _emailController;
   late TextEditingController _usernameController;
-  late TextEditingController _ageController;
+  late TextEditingController _birthDateController;
 
+  DateTime? _selectedBirthDate;
   bool _isLoading = true;
 
   @override
@@ -29,7 +31,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _lastNameController = TextEditingController();
     _emailController = TextEditingController();
     _usernameController = TextEditingController();
-    _ageController = TextEditingController();
+    _birthDateController = TextEditingController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadProfile();
@@ -42,7 +44,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _lastNameController.dispose();
     _emailController.dispose();
     _usernameController.dispose();
-    _ageController.dispose();
+    _birthDateController.dispose();
     super.dispose();
   }
 
@@ -61,7 +63,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _lastNameController.text = user['lname'] ?? '';
         _emailController.text = user['email'] ?? '';
         _usernameController.text = user['username'] ?? '';
-        _ageController.text = user['age']?.toString() ?? '';
+        if (user['bdate'] != null) {
+          _selectedBirthDate = DateTime.parse(user['bdate']);
+          _birthDateController.text = DateFormat('yyyy-MM-dd').format(_selectedBirthDate!);
+        }
         _isLoading = false;
       });
     } catch (error) {
@@ -82,11 +87,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         'lname': _lastNameController.text,
         'email': _emailController.text,
         'username': _usernameController.text,
-        'age': int.tryParse(_ageController.text),
+        'bdate': _selectedBirthDate?.toIso8601String(),
       };
 
       try {
-        final response = await supabase
+        await supabase
             .from('user_admin')
             .update(updates)
             .eq('id', widget.userId);
@@ -99,6 +104,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
           SnackBar(content: Text('Error updating profile: $error')),
         );
       }
+    }
+  }
+
+  Future<void> _selectBirthDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedBirthDate ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != _selectedBirthDate) {
+      setState(() {
+        _selectedBirthDate = picked;
+        _birthDateController.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
     }
   }
 
@@ -124,7 +144,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(height: 20),
-                      _buildProfileAvatar(),
+                      _buildProfileHeader(isDarkMode),
                       const SizedBox(height: 20),
                       Form(
                         key: _formKey,
@@ -155,11 +175,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               isDarkMode: isDarkMode,
                             ),
                             const SizedBox(height: 16),
-                            _buildTextField(
-                              labelText: 'Age',
-                              controller: _ageController,
+                            _buildDateField(
+                              labelText: 'Birth Date',
+                              controller: _birthDateController,
                               isDarkMode: isDarkMode,
-                              keyboardType: TextInputType.number,
+                              onTap: () => _selectBirthDate(context),
                             ),
                             const SizedBox(height: 20),
                             _buildSaveButton(isDarkMode),
@@ -174,12 +194,58 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildProfileAvatar() {
-    return CircleAvatar(
-      radius: 50,
-      backgroundColor: Colors.grey[200],
-      child: Icon(Icons.person, size: 50, color: Colors.grey[400]),
+  Widget _buildProfileHeader(bool isDarkMode) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDarkMode
+              ? const [Color(0xFF1D4D4F), Color(0xFF122E31)]
+              : const [Color(0xFFA2E3F6), Color(0xFFF3FCFF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: isDarkMode ? Colors.black26 : Colors.grey.withOpacity(0.3),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: isDarkMode ? Colors.white : Colors.grey[300],
+            child: Text(
+              _firstNameController.text.isNotEmpty
+                  ? _firstNameController.text[0].toUpperCase()
+                  : '',
+              style: TextStyle(
+                fontSize: 40,
+                color: isDarkMode ? Colors.black : Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '${_capitalize(_firstNameController.text)} ${_capitalize(_lastNameController.text)}',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  String _capitalize(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1).toLowerCase();
   }
 
   Widget _buildTextField({
@@ -193,13 +259,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-        filled: true,
-        fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
+        labelStyle: TextStyle(
+          color: isDarkMode ? Colors.white : const Color(0xFF122E31),
+          fontWeight: FontWeight.w500,
         ),
+        filled: true,
+        fillColor: isDarkMode ? Color.fromARGB(58, 255, 255, 255) : Colors.white,
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: isDarkMode ? const Color(0xFF6EBBC5) : Colors.grey,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: isDarkMode ? const Color(0xFF6EBBC5) : Colors.blueAccent,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -210,11 +288,52 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  Widget _buildDateField({
+    required String labelText,
+    required TextEditingController controller,
+    required bool isDarkMode,
+    required VoidCallback onTap,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: TextStyle(
+          color: isDarkMode ? Colors.white : const Color(0xFF122E31),
+          fontWeight: FontWeight.w500,
+        ),
+        filled: true,
+        fillColor: isDarkMode ? Color.fromARGB(58, 255, 255, 255) : Colors.white,
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: isDarkMode ? const Color(0xFF6EBBC5) : Colors.grey,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: isDarkMode ? const Color(0xFF6EBBC5) : Colors.blueAccent,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+      ),
+      readOnly: true,
+      onTap: onTap,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please select your $labelText';
+        }
+        return null;
+      },
+    );
+  }
+
   Widget _buildSaveButton(bool isDarkMode) {
     return ElevatedButton(
       onPressed: _saveProfile,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isDarkMode ? const Color(0xFF1A3C40) : const Color.fromARGB(255, 110, 187, 197),
+        backgroundColor: isDarkMode ? const Color(0xFF1A3C40) : const Color(0xFF6EBBC5),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),

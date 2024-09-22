@@ -14,7 +14,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final supabase = Supabase.instance.client;
-  final AuthenticationService authService = AuthenticationService(); // Create an instance of AuthenticationService
+  final AuthenticationService authService = AuthenticationService(); 
   Map<String, dynamic>? userData;
 
   @override
@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       final response = await supabase
           .from('user_admin')
-          .select('fname, lname, email, username, age, bDate')
+          .select('fname, lname, email, username, age, bdate')
           .eq('id', widget.userId)
           .single();
 
@@ -88,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       context,
                       icon: Icons.calendar_today,
                       title: 'Birthdate',
-                      value: userData!['bDate'] ?? '',
+                      value: userData!['bdate'] ?? '',
                     ),
                     const SizedBox(height: 10),
                     _buildProfileDetailCard(
