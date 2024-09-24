@@ -33,6 +33,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
         .select()
         .eq('created_by', widget.userId);
 
+    // Directly access the response data
     if (response is List) {
       setState(() {
         groups = List<Map<String, dynamic>>.from(response);
@@ -51,6 +52,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
         .select('user_admin(id, fname, lname, email)')
         .eq('group_id', groupId);
 
+    // Directly access the response data
     if (response is List) {
       setState(() {
         members = List<Map<String, dynamic>>.from(response);
@@ -72,11 +74,35 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           .select()
           .eq('user_id', userId);
 
+      // Directly access the session response
       if (sessionResponse is List) {
         setState(() {
           userSessions[userId] = List<Map<String, dynamic>>.from(sessionResponse);
         });
       }
+    }
+  }
+
+  // Delete a group member
+  Future<void> _deleteGroupMember(String groupId, String memberId) async {
+    final response = await supabase
+        .from('group_memberships')
+        .delete()
+        .eq('group_id', groupId)
+        .eq('user_id', memberId);
+
+    // Check if there's an error in the response
+    if (response == null || response.error == null) {
+      setState(() {
+        members.removeWhere((member) => member['user_admin']['id'] == memberId);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Member removed successfully')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error deleting member')),
+      );
     }
   }
 
@@ -148,7 +174,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     );
   }
 
-  // Build the member list view with expandable session lists
+  // Build the member list view with expandable session lists and delete functionality
   Widget _buildMemberListBox(bool isDarkMode) {
     return Expanded(
       child: Container(
@@ -168,23 +194,36 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
         child: members.isEmpty
             ? const Center(child: Text('No members to display'))
             : ListView.builder(
-                itemCount: members.length,
-                itemBuilder: (context, index) {
-                  final member = members[index]['user_admin'];
-                  final userId = member['id'];
-                  return ExpansionTile(
-                    title: Text(
-                      '${member['fname']} ${member['lname']}',
-                      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-                    ),
-                    subtitle: Text(
-                      member['email'],
-                      style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black87),
-                    ),
-                    children: _buildSessionList(userId, isDarkMode),
-                  );
-                },
+          itemCount: members.length,
+          itemBuilder: (context, index) {
+            final member = members[index]['user_admin'];
+            final userId = member['id'];
+            return Dismissible(
+              key: Key(userId),
+              direction: DismissDirection.endToStart,
+              onDismissed: (direction) {
+                _confirmDeleteMember(context, selectedGroup!, userId);
+              },
+              background: Container(
+                color: Colors.red,
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: const Icon(Icons.delete, color: Colors.white),
               ),
+              child: ExpansionTile(
+                title: Text(
+                  '${member['fname']} ${member['lname']}',
+                  style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                ),
+                subtitle: Text(
+                  member['email'],
+                  style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black87),
+                ),
+                children: _buildSessionList(userId, isDarkMode),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -240,6 +279,34 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
         },
       );
     }).toList();
+  }
+
+  // Helper function to confirm delete
+  void _confirmDeleteMember(BuildContext context, String groupId, String memberId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Member'),
+          content: const Text('Are you sure you want to delete this member?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteGroupMember(groupId, memberId);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Helper function to format the date from the timestamp
