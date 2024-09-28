@@ -28,7 +28,7 @@ class DatabaseService {
           'user_feedback': '', // Add user feedback if available
         });
 
-    if (response['error'] != null) {
+    if (response != null) {
       throw Exception('Error inserting session data: ${response['error']!.message}');
     }
   }

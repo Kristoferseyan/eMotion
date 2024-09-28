@@ -1,7 +1,7 @@
+import 'package:fix_emotion/dashboard-modules/module-boxes/custom_layout.dart';
 import 'package:fix_emotion/dashboard-modules/notifiaction_page.dart';
 import 'package:flutter/material.dart';
 import '../graph/emotion-chart/emotion_chart.dart';
-import 'custom_layout.dart';
 import 'profile_page.dart';
 import '../auth-modules/login-modules/login.dart';
 import '../auth-modules/authentication_service.dart';

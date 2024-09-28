@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:fix_emotion/dashboard-modules/module-boxes/emotion-dictionary/emotionDict.dart';
 import 'package:fix_emotion/dashboard-modules/module-boxes/tracking-modules/track_emo_layout.dart';
+import 'package:flutter/material.dart';
 
 class CustomLayout extends StatelessWidget {
   final double maxWidth;
@@ -31,13 +31,13 @@ class CustomLayout extends StatelessWidget {
             imagePath: 'assets/images/emoTrack.png',
             text: 'Track Emotions',
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TrackEmoLayout(userId: userId),
-                ),
-              );
-            },
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TrackEmoLayout(userId: userId,), // No parameters passed
+              ),
+            );
+          }
           ),
           const SizedBox(height: 16),
           _buildRectangle(
@@ -51,7 +51,7 @@ class CustomLayout extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EmotionDict()),
+                MaterialPageRoute(builder: (context) => EmotionDict()), // Navigate to EmotionDict page
               );
             },
           ),
