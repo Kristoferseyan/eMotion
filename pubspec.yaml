@@ -19,6 +19,8 @@ dependencies:
   camera: ^0.10.5+3
   path: ^1.8.2
   path_provider: ^2.1.0
+  permission_handler: ^10.2.0
+  mime: ^1.0.6
   logging: ^1.2.0
   flutter_dotenv: ^5.1.0
   supabase_flutter: ^2.6.0
@@ -27,7 +29,7 @@ dependencies:
 #    path: ../google_mlkit_commons
 
   google_mlkit_pose_detection:
-    path: D:/Thesis/fix-emotion/lib/pose-detection/painters/google_mlkit_pose_detection
+    path: E:\Repository\fix-emotion\lib\pose-detection\painters\google_mlkit_pose_detection
 
   fl_chart: ^0.68.0
 
