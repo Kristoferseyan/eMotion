@@ -29,7 +29,7 @@ dependencies:
 #    path: ../google_mlkit_commons
 
   google_mlkit_pose_detection:
-    path: E:\Repository\fix-emotion\lib\pose-detection\painters\google_mlkit_pose_detection
+    path: D:\Thesis\fix-emotion\lib\pose-detection\painters\google_mlkit_pose_detection
 
   fl_chart: ^0.68.0
 

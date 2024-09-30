@@ -15,6 +15,7 @@ import 'settings-modules/privacy_settings_page.dart';
 final _logger = Logger('MyApp');
 
 Future<void> main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "assets/auth.env");
   final String? supabaseUrl = dotenv.env['SUPABASE_URL'];
@@ -37,6 +38,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatefulWidget {
+  
   final bool isAuthenticated;
 
   const MyApp({Key? key, required this.isAuthenticated}) : super(key: key);
@@ -48,6 +50,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  
   ThemeMode _themeMode = ThemeMode.system;
 
   void setTheme(ThemeMode themeMode) {

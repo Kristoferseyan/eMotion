@@ -11,8 +11,8 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false, 
       home: AnimatedSplashScreen(
-
         splash: SizedBox.expand(
           child: Image.asset(
             "assets/splashscreen/Sequence_01.gif",
