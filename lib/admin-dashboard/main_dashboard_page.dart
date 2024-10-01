@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'group_management_widget.dart';  // Import the GroupManagementWidget
 
 class DashboardPage extends StatefulWidget {
   final String userId;
@@ -25,49 +26,46 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   // Fetch the users (non-admins) who are visible to the admin
-Future<void> _fetchUsers() async {
-  try {
-    // Step 1: Fetch all non-admin users
-    final userResponse = await supabase
-        .from('user_admin')
-        .select('*')
-        .eq('role', 'user');  // Only non-admin users
+  Future<void> _fetchUsers() async {
+    try {
+      // Step 1: Fetch all non-admin users
+      final userResponse = await supabase
+          .from('user_admin')
+          .select('*')
+          .eq('role', 'user'); // Only non-admin users
 
-    if (userResponse != null) {
-      List<Map<String, dynamic>> allUsers = List<Map<String, dynamic>>.from(userResponse as List);
+      if (userResponse != null) {
+        List<Map<String, dynamic>> allUsers = List<Map<String, dynamic>>.from(userResponse as List);
 
-      // Step 2: Fetch visibility settings for all users
-      final settingsResponse = await supabase
-          .from('user_settings')
-          .select('user_id, is_visible_to_admin');
+        // Step 2: Fetch visibility settings for all users
+        final settingsResponse = await supabase.from('user_settings').select('user_id, is_visible_to_admin');
 
-      if (settingsResponse != null) {
-        // Convert settings response into a map for easy lookup
-        Map<String, bool> visibilityMap = {
-          for (var setting in settingsResponse) setting['user_id']: setting['is_visible_to_admin']
-        };
+        if (settingsResponse != null) {
+          // Convert settings response into a map for easy lookup
+          Map<String, bool> visibilityMap = {
+            for (var setting in settingsResponse) setting['user_id']: setting['is_visible_to_admin']
+          };
 
-        // Step 3: Filter users based on their visibility setting
-        List<Map<String, dynamic>> visibleUsers = allUsers.where((user) {
-          final userId = user['id'] as String;
-          return visibilityMap[userId] == true; // Filter for visible users
-        }).toList();
+          // Step 3: Filter users based on their visibility setting
+          List<Map<String, dynamic>> visibleUsers = allUsers.where((user) {
+            final userId = user['id'] as String;
+            return visibilityMap[userId] == true; // Filter for visible users
+          }).toList();
 
-        setState(() {
-          users = visibleUsers;  // Only visible users are stored
-          for (var user in users) {
-            selectedUsers[user['id']] = false;  // Initialize all users as unselected
-          }
-        });
+          setState(() {
+            users = visibleUsers; // Only visible users are stored
+            for (var user in users) {
+              selectedUsers[user['id']] = false; // Initialize all users as unselected
+            }
+          });
+        }
       }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching users: $error')),
+      );
     }
-  } catch (error) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error fetching users: $error')),
-    );
   }
-}
-
 
   // Send an invite notification to selected users
   Future<void> _sendInviteNotification(String userId, String inviteId, String groupName) async {
@@ -90,7 +88,7 @@ Future<void> _fetchUsers() async {
       final inviteResponse = await supabase.from('group_invitations').insert({
         'group_id': groupId,
         'user_id': userId,
-        'admin_id': widget.userId,  // Admin ID
+        'admin_id': widget.userId, // Admin ID
         'status': 'pending',
         'sent_at': DateTime.now().toIso8601String(),
       }).select().single();
@@ -116,10 +114,7 @@ Future<void> _fetchUsers() async {
       return;
     }
 
-    final selectedUserIds = selectedUsers.entries
-        .where((entry) => entry.value)
-        .map((entry) => entry.key)
-        .toList();
+    final selectedUserIds = selectedUsers.entries.where((entry) => entry.value).map((entry) => entry.key).toList();
 
     if (selectedUserIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -161,28 +156,37 @@ Future<void> _fetchUsers() async {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 5),
-            _buildHeader(isDarkMode),
-            const SizedBox(height: 15),
-            _buildGroupSection(isDarkMode),
-            const SizedBox(height: 15),
-            _buildUserSelectionSection(isDarkMode),
-            const SizedBox(height: 15),
-            _buildAddUsersButton(),
-          ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Admin Dashboard'),
+        backgroundColor: isDarkMode ? const Color(0xFF0D2C2D) : const Color(0xFFB6DDF2),
+      ),
+      backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF), // Added background color
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 5),
+              _buildAdminGroupHeader(isDarkMode), // Replace the Welcome, Admin box here
+              const SizedBox(height: 15),
+              _buildGroupSection(isDarkMode),
+              const SizedBox(height: 15),
+              _buildUserSelectionSection(isDarkMode),
+              const SizedBox(height: 15),
+              _buildAddUsersButton(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildHeader(bool isDarkMode) {
+  // Replacing the old welcome header with the new group management section
+  Widget _buildAdminGroupHeader(bool isDarkMode) {
     return Container(
+      width: double.infinity, // Ensure the container takes the full width
       padding: const EdgeInsets.all(30.0),
       decoration: BoxDecoration(
         color: isDarkMode ? const Color(0xFF1E4A54) : Colors.white,
@@ -196,27 +200,7 @@ Future<void> _fetchUsers() async {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Welcome, Admin',
-            style: TextStyle(
-              color: isDarkMode ? Colors.white : Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Manage user groups and permissions efficiently.',
-            style: TextStyle(
-              color: isDarkMode ? Colors.white70 : Colors.black87,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
+      child: GroupManagementWidget(userId: widget.userId), // Insert the GroupManagementWidget
     );
   }
 
