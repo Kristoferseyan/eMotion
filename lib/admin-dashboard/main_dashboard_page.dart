@@ -21,29 +21,53 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    _fetchUsers();
+    _fetchUsers(); // Fetch users with visibility setting
   }
 
-  // Fetch the users (non-admins) to be invited
-  Future<void> _fetchUsers() async {
-    try {
-      final response = await supabase
-          .from('user_admin')
-          .select()
-          .eq('role', 'user'); // Fetch only non-admin users
+  // Fetch the users (non-admins) who are visible to the admin
+Future<void> _fetchUsers() async {
+  try {
+    // Step 1: Fetch all non-admin users
+    final userResponse = await supabase
+        .from('user_admin')
+        .select('*')
+        .eq('role', 'user');  // Only non-admin users
 
-      setState(() {
-        users = List<Map<String, dynamic>>.from(response);
-        for (var user in users) {
-          selectedUsers[user['id']] = false;
-        }
-      });
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching users: $error')),
-      );
+    if (userResponse != null) {
+      List<Map<String, dynamic>> allUsers = List<Map<String, dynamic>>.from(userResponse as List);
+
+      // Step 2: Fetch visibility settings for all users
+      final settingsResponse = await supabase
+          .from('user_settings')
+          .select('user_id, is_visible_to_admin');
+
+      if (settingsResponse != null) {
+        // Convert settings response into a map for easy lookup
+        Map<String, bool> visibilityMap = {
+          for (var setting in settingsResponse) setting['user_id']: setting['is_visible_to_admin']
+        };
+
+        // Step 3: Filter users based on their visibility setting
+        List<Map<String, dynamic>> visibleUsers = allUsers.where((user) {
+          final userId = user['id'] as String;
+          return visibilityMap[userId] == true; // Filter for visible users
+        }).toList();
+
+        setState(() {
+          users = visibleUsers;  // Only visible users are stored
+          for (var user in users) {
+            selectedUsers[user['id']] = false;  // Initialize all users as unselected
+          }
+        });
+      }
     }
+  } catch (error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error fetching users: $error')),
+    );
   }
+}
+
 
   // Send an invite notification to selected users
   Future<void> _sendInviteNotification(String userId, String inviteId, String groupName) async {
@@ -61,25 +85,20 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   // Create the group and add users
-  // Insert into the group_invitations and notifications table
   Future<void> _sendGroupInviteAndNotification(String userId, String groupId, String groupName) async {
     try {
-      // Insert the group invitation
       final inviteResponse = await supabase.from('group_invitations').insert({
         'group_id': groupId,
         'user_id': userId,
-        'admin_id': widget.userId,  // Assuming this is the current admin
+        'admin_id': widget.userId,  // Admin ID
         'status': 'pending',
         'sent_at': DateTime.now().toIso8601String(),
       }).select().single();
 
-      // Get the invite ID to use in the notification
       final inviteId = inviteResponse['id'];
 
       // Send a notification to the user
       await _sendInviteNotification(userId, inviteId, groupName);
-
-      print('Invite and notification sent to user $userId');
     } catch (error) {
       print('Error sending invite or notification: $error');
     }
@@ -110,7 +129,6 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     try {
-      // Insert the group into the user_groups table
       final groupResponse = await supabase.from('user_groups').insert({
         'group_name': groupName,
         'description': groupDescription,
@@ -119,7 +137,6 @@ class _DashboardPageState extends State<DashboardPage> {
 
       final groupId = groupResponse['id'];
 
-      // Send invite notifications and record in group_invitations
       for (String userId in selectedUserIds) {
         await _sendGroupInviteAndNotification(userId, groupId, groupName);
       }
@@ -128,7 +145,6 @@ class _DashboardPageState extends State<DashboardPage> {
         const SnackBar(content: Text('Group created and invitations sent!')),
       );
 
-      // Reset form after success
       setState(() {
         selectedUsers.clear();
         _groupNameController.clear();

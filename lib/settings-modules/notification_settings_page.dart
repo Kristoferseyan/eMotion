@@ -25,7 +25,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     try {
       // Check if the user already has notification settings
       final response = await Supabase.instance.client
-          .from('user_notifications')
+          .from('user_settings')
           .select()
           .eq('user_id', widget.userId)
           .single(); // Fetch the user's notification settings
@@ -55,7 +55,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     try {
       // Insert the default notification settings
       await Supabase.instance.client
-          .from('user_notifications')
+          .from('user_settings')
           .insert({
             'user_id': widget.userId,
             'email_notifications': false, // Default value
@@ -85,7 +85,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   Future<void> _updateNotificationSettings() async {
     try {
       await Supabase.instance.client
-          .from('user_notifications')
+          .from('user_settings')
           .update({
             'email_notifications': _emailNotifications,
             'push_notifications': _pushNotifications,

@@ -66,7 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: 20),
                       _buildSectionHeader('Privacy', isDarkMode),
                       _buildSettingsTile(Icons.lock, 'Privacy', isDarkMode, () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacySettingsPage()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacySettingsPage(userId: widget.userId,)));
                       }),
                       _buildSettingsTile(Icons.delete, 'Delete Data', isDarkMode, () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => DeletePage(

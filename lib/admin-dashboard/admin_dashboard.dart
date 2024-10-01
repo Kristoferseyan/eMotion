@@ -49,7 +49,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       case 2:
         return SettingsPage(onLogout: _logout, userId: widget.userId);
       default:
-        return DashboardPage(userId: widget.userId, userEmail: widget.userEmail); // Default page
+        return DashboardPage(userId: widget.userId, userEmail: widget.userEmail);
     }
   }
 
