@@ -97,7 +97,7 @@ class _GroupManagementWidgetState extends State<GroupManagementWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Welcome, Admin',
+          'Welcome',
           style: TextStyle(
             color: isDarkMode ? Colors.white : Colors.black,
             fontSize: 20,

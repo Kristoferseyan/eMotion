@@ -10,7 +10,7 @@ class AdminHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 0.0),
         child: Row(
           children: [
             IconButton(
@@ -18,9 +18,9 @@ class AdminHeader extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
             ),
             Text(
-              'Admin Registration',
+              'Monitor Registration',
               style: TextStyle(
-                fontSize: 28,
+                fontSize: 25,
                 fontWeight: FontWeight.bold,
                 color: isDarkMode ? Colors.white : const Color(0xFF505050),
               ),
@@ -228,7 +228,7 @@ class AdminRegisterButton extends StatelessWidget {
       ),
       child: isLoading
           ? const CircularProgressIndicator(color: Colors.white)
-          : const Text('Register as Admin'),
+          : const Text('Register as Monitor'),
     );
   }
 }

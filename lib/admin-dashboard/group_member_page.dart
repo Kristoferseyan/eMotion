@@ -33,10 +33,16 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
         .select()
         .eq('created_by', widget.userId);
 
-    // Directly access the response data
     if (response is List) {
       setState(() {
-        groups = List<Map<String, dynamic>>.from(response);
+        groups.clear(); // Clear the group list to prevent duplication
+        // Check for duplicates
+        for (var group in response) {
+          final groupId = group['id'];
+          if (groups.where((g) => g['id'] == groupId).isEmpty) {
+            groups.add(Map<String, dynamic>.from(group));
+          }
+        }
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -52,10 +58,16 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
         .select('user_admin(id, fname, lname, email)')
         .eq('group_id', groupId);
 
-    // Directly access the response data
     if (response is List) {
       setState(() {
-        members = List<Map<String, dynamic>>.from(response);
+        members.clear(); // Clear the members list before adding to avoid duplication
+        // Check for duplicates
+        for (var member in response) {
+          final userId = member['user_admin']['id'];
+          if (members.where((m) => m['user_admin']['id'] == userId).isEmpty) {
+            members.add(Map<String, dynamic>.from(member));
+          }
+        }
         _fetchUserSessions();
       });
     } else {
@@ -74,7 +86,6 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           .select()
           .eq('user_id', userId);
 
-      // Directly access the session response
       if (sessionResponse is List) {
         setState(() {
           userSessions[userId] = List<Map<String, dynamic>>.from(sessionResponse);
