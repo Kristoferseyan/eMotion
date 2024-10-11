@@ -7,28 +7,28 @@ class DeveloperInfoPage extends StatelessWidget {
       'role': 'Lead Developer',
       'status': 'College Student',
       'institution': 'STI College General Santos Inc.',
-      'photoUrl': 'https://via.placeholder.com/150', // Placeholder for photo URL
+      'photoUrl': 'assets/images/catubig.png', // Updated to local asset
     },
     {
       'name': 'Cerita, John Christopher',
       'role': 'Lead Developer',
       'status': 'College Student',
       'institution': 'STI College General Santos Inc.',
-      'photoUrl': 'https://via.placeholder.com/150', // Placeholder for photo URL
+      'photoUrl': 'assets/images/Zhenru.png', // Updated to local asset
     },
     {
       'name': 'Cornillez, Gemuel',
       'role': 'Project Manager',
       'status': 'College Student',
       'institution': 'STI College General Santos Inc.',
-      'photoUrl': 'https://via.placeholder.com/150', // Placeholder for photo URL
+      'photoUrl': 'assets/images/gemuel.png', // Updated to local asset
     },
     {
       'name': 'Nuevo, Sean Christopher',
       'role': 'Lead Developer',
       'status': 'College Student',
       'institution': 'STI College General Santos Inc.',
-      'photoUrl': 'https://via.placeholder.com/150', // Placeholder for photo URL
+      'photoUrl': 'assets/images/sean.png', // Updated to local asset
     },
   ];
 
@@ -52,7 +52,7 @@ class DeveloperInfoPage extends StatelessWidget {
               elevation: 5,
               margin: const EdgeInsets.symmetric(vertical: 10),
               color: isDarkMode
-                  ? Color.fromARGB(255, 25, 70, 71) // Dark mode card color
+                  ? const Color.fromARGB(255, 25, 70, 71) // Dark mode card color
                   : const Color(0xFFFFFFFF), // Light mode card color
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -65,7 +65,7 @@ class DeveloperInfoPage extends StatelessWidget {
                     // Profile photo section
                     CircleAvatar(
                       radius: 40,
-                      backgroundImage: NetworkImage(developer['photoUrl'] ?? ''),
+                      backgroundImage: AssetImage(developer['photoUrl'] ?? ''),
                       backgroundColor: isDarkMode ? Colors.grey[800] : Colors.grey[300],
                     ),
                     const SizedBox(width: 16),

@@ -3,15 +3,21 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NotificationsPage extends StatelessWidget {
   final String userId;
-  final VoidCallback markAsRead;
+  final Function(String notificationId) markAsRead;
+  final VoidCallback refreshNotifications; // New callback to refresh notifications
 
-  const NotificationsPage({Key? key, required this.userId, required this.markAsRead}) : super(key: key);
+  const NotificationsPage({
+    Key? key,
+    required this.userId,
+    required this.markAsRead,
+    required this.refreshNotifications, // Add this to update notifications
+  }) : super(key: key);
 
   Future<List<Map<String, dynamic>>> _fetchNotifications() async {
     final supabase = Supabase.instance.client;
     final response = await supabase
         .from('notifications')
-        .select()
+        .select('id, message, created_at, read, invite_id')
         .eq('user_id', userId)
         .order('created_at', ascending: false);
 
@@ -24,17 +30,15 @@ class NotificationsPage extends StatelessWidget {
           .from('notifications')
           .delete()
           .eq('id', notificationId);
-
       print('Notification removed successfully');
     } catch (error) {
       print('Error removing notification: $error');
     }
   }
 
-  Future<void> _respondToInvite(BuildContext context, String inviteId, bool accepted) async {
+  Future<void> _respondToInvite(BuildContext context, String inviteId, bool accepted, String notificationId) async {
     final status = accepted ? 'accepted' : 'declined';
     try {
-      // First, get the group_id from the group_invitations table using the invite_id
       final inviteResponse = await Supabase.instance.client
           .from('group_invitations')
           .select('group_id')
@@ -43,40 +47,36 @@ class NotificationsPage extends StatelessWidget {
 
       final groupId = inviteResponse['group_id'];
 
-      // Update the group invitation status
       await Supabase.instance.client
           .from('group_invitations')
           .update({'status': status, 'responded_at': DateTime.now().toIso8601String()})
           .eq('id', inviteId);
 
       if (accepted) {
-        // If the invite is accepted, add the user to the group_memberships table
         await Supabase.instance.client
             .from('group_memberships')
-            .insert({
-              'group_id': groupId,
-              'user_id': userId, // The user accepting the invite
-            });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('You have been added to the group successfully!')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('You declined the group invite.')),
-        );
+            .insert({'group_id': groupId, 'user_id': userId});
       }
 
-      // Close the dialog AFTER showing the Snackbar
-      Navigator.of(context).pop(); // Close the dialog
+      Navigator.of(context).pop(); // Close the dialog first
+      Future.delayed(Duration.zero, () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(accepted ? 'You have been added to the group successfully!' : 'You declined the group invite.')),
+        );
+        markAsRead(notificationId); // Mark notification as read
+        refreshNotifications(); // Call this method to update the badge
+      });
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error responding to invite: $error')),
-      );
+      Navigator.of(context).pop(); // Close the dialog first
+      Future.delayed(Duration.zero, () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error responding to invite: $error')),
+        );
+      });
     }
   }
 
-  void _showInviteDialog(BuildContext dialogContext, String message, String inviteId) {
+  void _showInviteDialog(BuildContext dialogContext, String message, String inviteId, String notificationId) {
     showDialog(
       context: dialogContext,
       builder: (BuildContext context) {
@@ -86,13 +86,13 @@ class NotificationsPage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                _respondToInvite(context, inviteId, true); // Pass the invite ID
+                _respondToInvite(context, inviteId, true, notificationId); // Pass the invite and notification IDs
               },
               child: const Text('Accept'),
             ),
             TextButton(
               onPressed: () {
-                _respondToInvite(context, inviteId, false); // Pass the invite ID
+                _respondToInvite(context, inviteId, false, notificationId); // Pass the invite and notification IDs
               },
               child: const Text('Decline'),
             ),
@@ -148,15 +148,16 @@ class NotificationsPage extends StatelessWidget {
                 title: Text(notification['message']),
                 subtitle: Text(notification['created_at']),
                 onTap: () {
-                  // If it's an invite, show the dialog
                   if (notification['message'].contains('invited to join the group')) {
                     _showInviteDialog(
                       context,
                       notification['message'],
-                      notification['invite_id'], // Invite ID from the notifications table
+                      notification['invite_id'],
+                      notification['id'], // Pass the notification ID for deletion
                     );
                   } else {
-                    markAsRead();
+                    markAsRead(notification['id']); // Call markAsRead with the notification ID
+                    refreshNotifications(); // Refresh the badge count
                   }
                 },
               ),

@@ -16,7 +16,7 @@ final _logger = Logger('MyApp');
 
 Future<void> main() async {
 
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();      
   await dotenv.load(fileName: "assets/auth.env");
   final String? supabaseUrl = dotenv.env['SUPABASE_URL'];
   final String? supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];

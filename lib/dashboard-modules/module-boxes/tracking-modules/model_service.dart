@@ -10,7 +10,7 @@ class ModelService {
   Future<void> loadModel() async {
     try {
       await Tflite.loadModel(
-        model: "assets/models/eMotion2.tflite",
+        model: "assets/models/emotion_model_mobilenetv2.tflite",
         labels: "assets/models/labels.txt",
         numThreads: 2,
       );

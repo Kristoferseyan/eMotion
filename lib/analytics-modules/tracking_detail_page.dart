@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../graph/pie_chart_widget.dart';
 
-
 class TrackingDetailPage extends StatefulWidget {
   final String emotion;
   final String date;
@@ -37,7 +36,7 @@ class _TrackingDetailPageState extends State<TrackingDetailPage> {
     super.initState();
     emotionDistribution = Map<String, double>.from(
       jsonDecode(widget.emotionDistributionJson).map(
-            (key, value) => MapEntry(key, (value as num).toDouble() * 100),
+        (key, value) => MapEntry(key, (value as num).toDouble() * 100),
       ),
     );
   }
@@ -50,8 +49,7 @@ class _TrackingDetailPageState extends State<TrackingDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tracking Details'),
-        backgroundColor:
-        isDarkMode ? const Color(0xFF0D2C2D) : const Color(0xFFB6DDF2),
+        backgroundColor: isDarkMode ? const Color(0xFF0D2C2D) : const Color(0xFFB6DDF2),
         actions: [
           IconButton(
             icon: const Icon(Icons.picture_as_pdf),
@@ -59,7 +57,7 @@ class _TrackingDetailPageState extends State<TrackingDetailPage> {
           ),
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView( // Added SingleChildScrollView to make the page scrollable
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,19 +84,16 @@ class _TrackingDetailPageState extends State<TrackingDetailPage> {
               ),
             ),
             const SizedBox(height: 10),
-            Expanded(
-              child: RepaintBoundary(
-                key: _chartKey,
-                child: PieChartWidget(emotionData: emotionDistribution),
-              ),
+            RepaintBoundary(
+              key: _chartKey,
+              child: PieChartWidget(emotionData: emotionDistribution),
             ),
             const SizedBox(height: 20),
             _buildEmotionPercentages(emotionDistribution, isDarkMode),
           ],
         ),
       ),
-      backgroundColor:
-      isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
+      backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
     );
   }
 
@@ -167,7 +162,7 @@ class _TrackingDetailPageState extends State<TrackingDetailPage> {
       final pixelRatio = MediaQuery.of(context).devicePixelRatio;
       ui.Image chartImage = await boundary.toImage(pixelRatio: pixelRatio);
       ByteData? byteData =
-      await chartImage.toByteData(format: ui.ImageByteFormat.png);
+          await chartImage.toByteData(format: ui.ImageByteFormat.png);
       Uint8List chartBytes = byteData!.buffer.asUint8List();
 
       await PDFGenerator.saveTrackingDetailsAsPDF(

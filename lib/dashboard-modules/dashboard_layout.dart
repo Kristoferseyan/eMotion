@@ -1,11 +1,13 @@
+import 'dart:async';
 import 'package:fix_emotion/dashboard-modules/module-boxes/custom_layout.dart';
 import 'package:fix_emotion/dashboard-modules/notifiaction_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../auth-modules/authentication_service.dart';
+import '../auth-modules/login-modules/login.dart';
 import '../graph/emotion-chart/emotion_chart.dart';
 import 'profile_page.dart';
-import '../auth-modules/login-modules/login.dart';
-import '../auth-modules/authentication_service.dart';
-
 
 class DashboardLayout extends StatefulWidget {
   final String userId;
@@ -16,11 +18,12 @@ class DashboardLayout extends StatefulWidget {
   _DashboardLayoutState createState() => _DashboardLayoutState();
 }
 
-class _DashboardLayoutState extends State<DashboardLayout> {
+class _DashboardLayoutState extends State<DashboardLayout> with WidgetsBindingObserver {
   String selectedEmotion = 'Happiness';
   String? userName;
   int unreadNotificationCount = 0;
-  bool showNotifications = false; // Controls whether notifications are displayed or not
+  bool _isInForeground = true;
+  bool showNotifications = false;
 
   final List<String> emotions = [
     'Happiness',
@@ -32,13 +35,42 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     'Fear',
   ];
 
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
   final AuthenticationService authService = AuthenticationService();
+  Timer? _notificationTimer;
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _fetchUserName();
     _fetchUnreadNotifications();
+    _startPollingNotifications();
+    _initializeNotifications();
+  }
+
+  void _initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('notiflogo');
+    final InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
+  void _startPollingNotifications() {
+    _notificationTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+      _fetchUnreadNotifications();
+    });
+  }
+
+  @override
+  void dispose() {
+    _notificationTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   Future<void> _fetchUserName() async {
@@ -60,37 +92,84 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     }
   }
 
-  // Fetch unread notification count
   Future<void> _fetchUnreadNotifications() async {
     try {
       final response = await authService.client
           .from('notifications')
           .select()
           .eq('user_id', widget.userId)
-          .eq('status', 'unread');
+          .eq('read', false);
+
+      int newUnreadCount = response.length;
+
+      if (newUnreadCount > unreadNotificationCount) {
+        _handleNotification('New Group Invite', 'You have a new group invite!');
+      }
 
       setState(() {
-        unreadNotificationCount = response.length;
+        unreadNotificationCount = newUnreadCount;
       });
     } catch (error) {
       print('Error fetching notifications: $error');
     }
   }
 
-  Future<void> _markNotificationsAsRead() async {
+  void _showInAppNotification(BuildContext context, String title, String body) {
+    final snackBar = SnackBar(
+      content: Text('$title: $body'),
+      duration: Duration(seconds: 5),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  Future<void> _showLocalNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'new_group_invite_channel',
+      'Group Invites',
+      channelDescription: 'Notifications for new group invitations.',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+    );
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+      0, // Notification ID
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: 'Default_Sound',
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {
+      _isInForeground = state == AppLifecycleState.resumed;
+    });
+  }
+
+  void _handleNotification(String title, String body) {
+    if (_isInForeground) {
+      _showInAppNotification(context, title, body);
+    } else {
+      _showLocalNotification(title, body);
+    }
+  }
+
+  Future<void> _markNotificationAsRead(String notificationId) async {
     try {
       await authService.client
           .from('notifications')
-          .update({'status': 'read'})
-          .eq('user_id', widget.userId)
-          .eq('status', 'unread');
+          .update({'read': true})
+          .eq('id', notificationId);
 
       setState(() {
-        unreadNotificationCount = 0;
-        showNotifications = false;
+        unreadNotificationCount--;
       });
     } catch (error) {
-      print('Error marking notifications as read: $error');
+      print('Error marking notification as read: $error');
     }
   }
 
@@ -132,27 +211,31 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: Scaffold(
-        backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
-        body: SafeArea(
-          child: userName == null
-              ? const Center(child: CircularProgressIndicator())
-              : DashboardBody(
-                  userId: widget.userId,
-                  userName: userName!,
-                  selectedEmotion: selectedEmotion,
-                  emotions: emotions,
-                  unreadNotificationCount: unreadNotificationCount,
-                  onEmotionChanged: (newEmotion) {
-                    setState(() {
-                      selectedEmotion = newEmotion;
-                    });
-                  },
-                  onProfileButtonPressed: () => _navigateToProfilePage(context),
-                  onNotificationButtonPressed: _toggleNotifications,
-                  showNotifications: showNotifications,
-                  markAsRead: _markNotificationsAsRead,
-                ),
+      child: ScaffoldMessenger(
+        key: scaffoldMessengerKey,
+        child: Scaffold(
+          backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
+          body: SafeArea(
+            child: userName == null
+                ? const Center(child: CircularProgressIndicator())
+                : DashboardBody(
+                    userId: widget.userId,
+                    userName: userName!,
+                    selectedEmotion: selectedEmotion,
+                    emotions: emotions,
+                    unreadNotificationCount: unreadNotificationCount,
+                    onEmotionChanged: (newEmotion) {
+                      setState(() {
+                        selectedEmotion = newEmotion;
+                      });
+                    },
+                    onProfileButtonPressed: () => _navigateToProfilePage(context),
+                    onNotificationButtonPressed: _toggleNotifications,
+                    showNotifications: showNotifications,
+                    markAsRead: _markNotificationAsRead,
+                    refreshNotifications: _fetchUnreadNotifications, // Pass the callback
+                  ),
+          ),
         ),
       ),
     );
@@ -167,7 +250,6 @@ class _DashboardLayoutState extends State<DashboardLayout> {
     );
   }
 
-  // Toggle the notification view on and off
   void _toggleNotifications() {
     setState(() {
       showNotifications = !showNotifications;
@@ -185,7 +267,8 @@ class DashboardBody extends StatelessWidget {
   final VoidCallback onNotificationButtonPressed;
   final bool showNotifications;
   final int unreadNotificationCount;
-  final VoidCallback markAsRead;
+  final ValueChanged<String> markAsRead;
+  final VoidCallback refreshNotifications; // New parameter for refreshing notifications
 
   const DashboardBody({
     Key? key,
@@ -199,6 +282,7 @@ class DashboardBody extends StatelessWidget {
     required this.showNotifications,
     required this.unreadNotificationCount,
     required this.markAsRead,
+    required this.refreshNotifications, // Add the refreshNotifications callback
   }) : super(key: key);
 
   @override
@@ -216,8 +300,8 @@ class DashboardBody extends StatelessWidget {
             SizedBox(
               height: 350,
               child: EmotionChart(
-                userId: userId, // Pass userId to EmotionChart
-                selectedEmotions: [selectedEmotion], // Pass selected emotion
+                userId: userId,
+                selectedEmotions: [selectedEmotion],
                 emotions: emotions,
                 onEmotionChanged: (newEmotions) {
                   if (newEmotions.isNotEmpty) {
@@ -230,9 +314,7 @@ class DashboardBody extends StatelessWidget {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: isDarkMode
-                      ? const Color.fromARGB(255, 23, 57, 61)
-                      : const Color(0xFFF3FCFF),
+                  color: isDarkMode ? const Color.fromARGB(255, 23, 57, 61) : const Color(0xFFF3FCFF),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
@@ -243,6 +325,7 @@ class DashboardBody extends StatelessWidget {
                     ? NotificationsPage(
                         userId: userId,
                         markAsRead: markAsRead,
+                        refreshNotifications: refreshNotifications, // Pass refreshNotifications
                       )
                     : CustomLayout(
                         maxWidth: constraints.maxWidth,
