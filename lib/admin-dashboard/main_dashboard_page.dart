@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'group_management_widget.dart';  // Import the GroupManagementWidget
+import 'group_management_widget.dart'; // Import the GroupManagementWidget
 
 class DashboardPage extends StatefulWidget {
   final String userId;
@@ -157,10 +157,6 @@ class _DashboardPageState extends State<DashboardPage> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Admin Dashboard'),
-        backgroundColor: isDarkMode ? const Color(0xFF0D2C2D) : const Color(0xFFB6DDF2),
-      ),
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF), // Added background color
       body: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -168,7 +164,9 @@ class _DashboardPageState extends State<DashboardPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 5),
+              const SizedBox(height: 20),
+              _buildHeader(isDarkMode), // Custom header without AppBar
+              const SizedBox(height: 15),
               _buildAdminGroupHeader(isDarkMode), // Replace the Welcome, Admin box here
               const SizedBox(height: 15),
               _buildGroupSection(isDarkMode),
@@ -183,7 +181,21 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // Replacing the old welcome header with the new group management section
+  // Custom header without AppBar
+  Widget _buildHeader(bool isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 0.0),
+      child: Text(
+        'Monitoring Dashboard',
+        style: TextStyle(
+          color: isDarkMode ? Colors.white : Colors.black,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   Widget _buildAdminGroupHeader(bool isDarkMode) {
     return Container(
       width: double.infinity, // Ensure the container takes the full width

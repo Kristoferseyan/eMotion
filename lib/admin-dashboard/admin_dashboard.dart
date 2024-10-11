@@ -47,7 +47,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       case 1:
         return GroupMembersPage(userId: widget.userId);
       case 2:
-        return SettingsPage(onLogout: _logout, userId: widget.userId);
+        return SettingsPage(onLogout: _logout, userId: widget.userId, userEmail: '',);
       default:
         return DashboardPage(userId: widget.userId, userEmail: widget.userEmail);
     }

@@ -81,11 +81,11 @@ Future<void> _registerAdmin() async {
       }).select().single();
 
       if (response == null || response.isEmpty) {
-        throw Exception('Failed to register admin');
+        throw Exception('Failed to register Monitor');
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Admin registration successful!')),
+        const SnackBar(content: Text('Monitor registration successful!')),
       );
 
       // Redirect to the login page after successful registration

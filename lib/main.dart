@@ -288,7 +288,7 @@ class _LoginRegState extends State<LoginReg> {
     return Container(
       margin: const EdgeInsets.only(top: 10),
       child: Text(
-        _isUserRegistration ? 'User registration selected' : 'Admin registration selected',
+        _isUserRegistration ? 'User registration selected' : 'Monitor registration selected',
         style: const TextStyle(color: Colors.white, fontSize: 16),
       ),
     );
