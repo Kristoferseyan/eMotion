@@ -10,14 +10,10 @@ import 'package:uuid/uuid.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
 
-// Emotion and Model services for emotion detection
 import 'database_service.dart';
 import 'model_service.dart';
 import 'emotion_service.dart';
-
-import '../../../auth-modules/authentication_service.dart';
 
 
 class TrackEmoLayout extends StatefulWidget {
@@ -406,79 +402,87 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
     }
   }
 
-  // Process camera image and detect both poses and emotions
-  void _processCameraImage(CameraImage image) async {
-    if (_isBusy) {
-      print('Skipping frame as system is busy');
-      return; // Drop frames when busy
-    }
-    // Do not process images if recording video
-    if (_saveSessionAsVideo && _controller != null && _controller!.value.isRecordingVideo) {
-      return;
-    }
-    _isBusy = true;
-
-    final inputImage = _inputImageFromCameraImage(image);
-    if (inputImage != null) {
-      try {
-        // Step 1: Pose Detection - Always detect pose
-        final poses = await _poseDetector.processImage(inputImage);
-
-        // Step 2: Check if any valid poses are detected
-        if (poses.isNotEmpty) {
-          print("Pose detected: ${poses.length} poses found");
-
-          // Log the keypoints or landmarks if available
-          for (var pose in poses) {
-            print("Pose keypoints: ${pose.landmarks}");
-
-            // Step 3: Calculate the bounding box for the pose
-            Rect boundingBox = calculateBoundingBox(pose.landmarks.values.toList());
-
-            // Pose detected, now handle the pose drawing
-            if (inputImage.metadata?.size != null && inputImage.metadata?.rotation != null) {
-              final painter = PosePainter(
-                poses,
-                inputImage.metadata!.size,
-                inputImage.metadata!.rotation,
-                _controller!.description.lensDirection,
-              );
-              setState(() {
-                _customPaint = CustomPaint(painter: painter); // Render the pose on the screen
-              });
-            }
-
-            // Step 4: Run emotion detection through the model service with the bounding box
-            final detectedEmotionResult = await _modelService.runModelOnFrame(image, boundingBox);
-
-            if (detectedEmotionResult != null && detectedEmotionResult.isNotEmpty) {
-              setState(() {
-                detectedEmotion = detectedEmotionResult; // Update the detected emotion on the UI
-              });
-
-              // Save the detected emotion and update _scores map
-              _emotionService.saveEmotion(detectedEmotionResult);
-
-              // Update _scores with the detected emotion counts or probabilities
-              final emotionProbabilities = _emotionService.calculateEmotionProbabilities();
-              _scores = _emotionService.mapProbabilitiesToScores(emotionProbabilities);
-
-              print('Detected Emotion: $detectedEmotionResult');
-              print('Emotion Scores: $_scores'); // Check if _scores is being updated properly
-            }
-          }
-        } else {
-          print("No pose detected");
-        }
-      } catch (e) {
-        print('Error during model inference: $e');
-      } finally {
-        _isBusy = false; // Reset the busy flag after processing
-      }
-    } else {
-      _isBusy = false; // Reset the busy flag if inputImage is null
-    }
+// Process camera image and detect both poses and emotions
+void _processCameraImage(CameraImage image) async {
+  if (_isBusy) {
+    print('Skipping frame as system is busy');
+    return; // Drop frames when busy
   }
+  // Do not process images if recording video
+  if (_saveSessionAsVideo && _controller != null && _controller!.value.isRecordingVideo) {
+    return;
+  }
+  _isBusy = true;
+
+  final inputImage = _inputImageFromCameraImage(image);
+  if (inputImage != null) {
+    try {
+      // Step 1: Pose Detection - Always detect pose
+      final poses = await _poseDetector.processImage(inputImage);
+
+      // Step 2: Check if any valid poses are detected
+      if (poses.isNotEmpty) {
+        print("Pose detected: ${poses.length} poses found");
+
+        // Log the keypoints or landmarks if available
+        for (var pose in poses) {
+          print("Pose keypoints: ${pose.landmarks}");
+
+          // Step 3: Calculate the bounding box for the pose
+          Rect boundingBox = calculateBoundingBox(pose.landmarks.values.toList());
+
+          // Print bounding box details
+          print("Bounding Box: Left = ${boundingBox.left}, Top = ${boundingBox.top}, Width = ${boundingBox.width}, Height = ${boundingBox.height}");
+
+          // Pose detected, now handle the pose drawing
+          if (inputImage.metadata?.size != null && inputImage.metadata?.rotation != null) {
+            final painter = PosePainter(
+              poses,
+              inputImage.metadata!.size,
+              inputImage.metadata!.rotation,
+              _controller!.description.lensDirection,
+            );
+            setState(() {
+              _customPaint = CustomPaint(painter: painter); // Render the pose on the screen
+            });
+          }
+
+          // Debugging: Print the frame size being sent to the model
+          print('Camera Image dimensions: width=${image.width}, height=${image.height}');
+          print('Bounding box size: ${boundingBox.width}x${boundingBox.height}');
+
+          // Step 4: Run emotion detection through the model service with the bounding box
+          final detectedEmotionResult = await _modelService.runModelOnFrame(image, boundingBox);
+
+          if (detectedEmotionResult != null && detectedEmotionResult.isNotEmpty) {
+            setState(() {
+              detectedEmotion = detectedEmotionResult; // Update the detected emotion on the UI
+            });
+
+            // Save the detected emotion and update _scores map
+            _emotionService.saveEmotion(detectedEmotionResult);
+
+            // Update _scores with the detected emotion counts or probabilities
+            final emotionProbabilities = _emotionService.calculateEmotionProbabilities();
+            _scores = _emotionService.mapProbabilitiesToScores(emotionProbabilities);
+
+            print('Detected Emotion: $detectedEmotionResult');
+            print('Emotion Scores: $_scores'); // Check if _scores is being updated properly
+          }
+        }
+      } else {
+        print("No pose detected");
+      }
+    } catch (e) {
+      print('Error during model inference: $e');
+    } finally {
+      _isBusy = false; // Reset the busy flag after processing
+    }
+  } else {
+    _isBusy = false; // Reset the busy flag if inputImage is null
+  }
+}
+
 
   // Calculate the bounding box for the pose
   Rect calculateBoundingBox(List<PoseLandmark> landmarks) {
