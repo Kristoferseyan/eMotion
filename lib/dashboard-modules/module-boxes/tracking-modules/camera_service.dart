@@ -14,7 +14,7 @@ class CameraService {
     // Always use the back camera
     final cameraDescription = _getCamera(CameraLensDirection.back);
 
-    _cameraController = CameraController(cameraDescription, ResolutionPreset.low);
+    _cameraController = CameraController(cameraDescription, ResolutionPreset.medium);
 
     try {
       await _cameraController.initialize();

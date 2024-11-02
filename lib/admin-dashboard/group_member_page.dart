@@ -140,14 +140,6 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
       decoration: BoxDecoration(
         color: isDarkMode ? const Color(0xFF1E4A54) : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,14 +185,6 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF1E4A54) : Colors.white,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
         ),
         child: members.isEmpty
             ? const Center(child: Text('No members to display'))

@@ -1,4 +1,5 @@
 import 'package:fix_emotion/admin-dashboard/group_member_page.dart';
+import 'package:fix_emotion/admin-dashboard/group_overview_page.dart'; // Import GroupOverviewPage
 import 'package:flutter/material.dart';
 import 'main_dashboard_page.dart';
 import 'settings_page.dart';
@@ -47,7 +48,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
       case 1:
         return GroupMembersPage(userId: widget.userId);
       case 2:
-        return SettingsPage(onLogout: _logout, userId: widget.userId, userEmail: '',);
+        return GroupOverviewPage(userId: widget.userId); // Group Overview page
+      case 3:
+        return SettingsPage(onLogout: _logout, userId: widget.userId, userEmail: widget.userEmail);
       default:
         return DashboardPage(userId: widget.userId, userEmail: widget.userEmail);
     }

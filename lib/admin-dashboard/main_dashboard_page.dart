@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'group_management_widget.dart'; // Import the GroupManagementWidget
 
 class DashboardPage extends StatefulWidget {
   final String userId;
@@ -22,40 +21,34 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    _fetchUsers(); // Fetch users with visibility setting
+    _fetchUsers(); 
   }
 
-  // Fetch the users (non-admins) who are visible to the admin
   Future<void> _fetchUsers() async {
     try {
-      // Step 1: Fetch all non-admin users
       final userResponse = await supabase
           .from('user_admin')
           .select('*')
-          .eq('role', 'user'); // Only non-admin users
-
+          .eq('role', 'user'); 
       if (userResponse != null) {
         List<Map<String, dynamic>> allUsers = List<Map<String, dynamic>>.from(userResponse as List);
 
-        // Step 2: Fetch visibility settings for all users
         final settingsResponse = await supabase.from('user_settings').select('user_id, is_visible_to_admin');
 
         if (settingsResponse != null) {
-          // Convert settings response into a map for easy lookup
           Map<String, bool> visibilityMap = {
             for (var setting in settingsResponse) setting['user_id']: setting['is_visible_to_admin']
           };
 
-          // Step 3: Filter users based on their visibility setting
           List<Map<String, dynamic>> visibleUsers = allUsers.where((user) {
             final userId = user['id'] as String;
-            return visibilityMap[userId] == true; // Filter for visible users
+            return visibilityMap[userId] == true;
           }).toList();
 
           setState(() {
-            users = visibleUsers; // Only visible users are stored
+            users = visibleUsers;
             for (var user in users) {
-              selectedUsers[user['id']] = false; // Initialize all users as unselected
+              selectedUsers[user['id']] = false;
             }
           });
         }
@@ -67,13 +60,12 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  // Send an invite notification to selected users
   Future<void> _sendInviteNotification(String userId, String inviteId, String groupName) async {
     try {
       await supabase.from('notifications').insert({
         'user_id': userId,
         'message': 'You have been invited to join the group $groupName',
-        'invite_id': inviteId, // Link the invite ID
+        'invite_id': inviteId,
         'read': false,
         'created_at': DateTime.now().toIso8601String(),
       });
@@ -82,27 +74,24 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  // Create the group and add users
   Future<void> _sendGroupInviteAndNotification(String userId, String groupId, String groupName) async {
     try {
       final inviteResponse = await supabase.from('group_invitations').insert({
         'group_id': groupId,
         'user_id': userId,
-        'admin_id': widget.userId, // Admin ID
+        'admin_id': widget.userId,
         'status': 'pending',
         'sent_at': DateTime.now().toIso8601String(),
       }).select().single();
 
       final inviteId = inviteResponse['id'];
 
-      // Send a notification to the user
       await _sendInviteNotification(userId, inviteId, groupName);
     } catch (error) {
       print('Error sending invite or notification: $error');
     }
   }
 
-  // Call this function for each selected user after group creation
   Future<void> _createGroupAndSendInvites() async {
     final groupName = _groupNameController.text.trim();
     final groupDescription = _groupDescriptionController.text.trim();
@@ -157,7 +146,7 @@ class _DashboardPageState extends State<DashboardPage> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF), // Added background color
+      backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF), 
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: SingleChildScrollView(
@@ -165,9 +154,7 @@ class _DashboardPageState extends State<DashboardPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              _buildHeader(isDarkMode), // Custom header without AppBar
-              const SizedBox(height: 15),
-              _buildAdminGroupHeader(isDarkMode), // Replace the Welcome, Admin box here
+              _buildHeader(isDarkMode),
               const SizedBox(height: 15),
               _buildGroupSection(isDarkMode),
               const SizedBox(height: 15),
@@ -196,40 +183,12 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildAdminGroupHeader(bool isDarkMode) {
-    return Container(
-      width: double.infinity, // Ensure the container takes the full width
-      padding: const EdgeInsets.all(30.0),
-      decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E4A54) : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: GroupManagementWidget(userId: widget.userId), // Insert the GroupManagementWidget
-    );
-  }
-
   Widget _buildGroupSection(bool isDarkMode) {
     return Container(
       padding: const EdgeInsets.all(15.0),
       decoration: BoxDecoration(
         color: isDarkMode ? const Color(0xFF1E4A54) : Colors.white,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,14 +240,6 @@ class _DashboardPageState extends State<DashboardPage> {
       decoration: BoxDecoration(
         color: isDarkMode ? const Color(0xFF1E4A54) : Colors.white,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

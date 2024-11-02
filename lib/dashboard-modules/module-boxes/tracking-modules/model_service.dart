@@ -13,8 +13,8 @@ class ModelService {
   Future<void> loadModel() async {
     try {
       _interpreter = await Interpreter.fromAsset(
-        'assets/models/emotion_model_mobilenetv2.tflite', // Use your model path
-        options: InterpreterOptions()..threads = 2, // Adjust thread count
+        'assets/models/emotion_model_quantized.tflite',
+        options: InterpreterOptions()..threads = 2, 
       );
       print('Model loaded successfully');
     } catch (e) {

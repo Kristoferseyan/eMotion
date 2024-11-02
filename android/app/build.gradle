@@ -71,7 +71,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            def newApkName = "eMotion-2.0.0-alpha.apk"
+            def newApkName = "eMotion-224x224zhenrumodel.apk"
             outputFileName = newApkName
         }
     }

@@ -63,6 +63,16 @@ class BottomNavBar extends StatelessWidget {
               textSize: 12.0, 
             ),
             GButton(
+              icon: Icons.analytics,
+              iconActiveColor: isDarkMode
+                  ? const Color.fromARGB(255, 49, 123, 136)
+                  : Colors.white,
+              iconColor: const Color.fromARGB(255, 49, 123, 136),
+              text: 'Group Overview', 
+              textColor: const Color.fromARGB(255, 60, 60, 60), 
+              textSize: 12.0, 
+            ),
+            GButton(
               icon: Icons.settings,
               iconActiveColor: isDarkMode
                   ? const Color.fromARGB(255, 49, 123, 136)
