@@ -59,8 +59,31 @@ class EmotionChartData {
     }
   }
 
-  // Helper method to trim spaces around emotion names
+  // Helper method to sanitize emotion names
   static String _sanitizeEmotion(String emotion) {
-    return emotion.trim(); // Remove leading/trailing spaces from the emotion name
+    final trimmedEmotion = emotion.trim().toLowerCase();
+
+    final corrections = {
+      'happyness': 'Happiness',
+      'hapiness': 'Happiness',
+      'sadness': 'Sadness',
+      'anger': 'Anger',
+      'suprise': 'Surprise',
+      'disguist': 'Disgust',
+      'fear': 'Fear',
+      'neutral': 'Neutral',
+      'happy': 'Happiness',
+      'sad': 'Sadness',
+      'angry': 'Anger',
+      'surprised': 'Surprise',
+      'disgusted': 'Disgust',
+      'afraid': 'Fear',
+    };
+
+    return corrections[trimmedEmotion] ?? _capitalize(trimmedEmotion);
+  }
+
+  static String _capitalize(String text) {
+    return text.isEmpty ? text : '${text[0].toUpperCase()}${text.substring(1)}';
   }
 }

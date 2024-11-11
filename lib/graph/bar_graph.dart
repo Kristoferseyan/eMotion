@@ -114,7 +114,7 @@ Widget getBottomTitles(
   if (value.toInt() >= 0 && value.toInt() < sortedScores.length) {
     final emotion = sortedScores.keys.elementAt(value.toInt());
     return SideTitleWidget(
-      child: Text(showEmojis ? getEmojiForEmotion(emotion) : emotion, style: style),
+      child: Text(showEmojis ? getEmojiForEmotion(emotion) : _sanitizeEmotionName(emotion), style: style),
       axisSide: meta.axisSide,
     );
   } else {
@@ -123,12 +123,12 @@ Widget getBottomTitles(
 }
 
 String getEmojiForEmotion(String emotion) {
-  switch (emotion) {
-    case 'Angry':
+  switch (_sanitizeEmotionName(emotion)) { // Ensure sanitized name is used
+    case 'Anger':
       return '😠';
-    case 'Happy':
+    case 'Happiness':
       return '😄';
-    case 'Sad':
+    case 'Sadness':
       return '😢';
     case 'Disgust':
       return '🤢';
@@ -141,4 +141,28 @@ String getEmojiForEmotion(String emotion) {
     default:
       return '?';
   }
+}
+
+// Helper to sanitize emotion names
+String _sanitizeEmotionName(String emotion) {
+  final trimmedEmotion = emotion.trim().toLowerCase();
+
+  final corrections = {
+    'happyness': 'Happiness',
+    'hapiness': 'Happiness',
+    'sadnes': 'Sadness',
+    'anger ': 'Anger',
+    'suprise': 'Surprise',
+    'supprise': 'Surprise',
+    'disguist': 'Disgust',
+    'fear ': 'Fear',
+    'neutral ': 'Neutral',
+    ' surprise ': 'Surprise',
+  };
+
+  return corrections[trimmedEmotion] ?? _capitalize(trimmedEmotion);
+}
+
+String _capitalize(String text) {
+  return text.isEmpty ? text : '${text[0].toUpperCase()}${text.substring(1)}';
 }

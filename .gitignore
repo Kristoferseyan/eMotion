@@ -10,6 +10,8 @@
 .svn/
 assets/auth.env
 migrate_working_dir/
+assets/ml
+assets/models
 
 # IntelliJ related
 *.iml
