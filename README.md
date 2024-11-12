@@ -1,5 +1,3 @@
----
-
 # eMotion
 
 **eMotion** is a mobile application designed to detect and analyze emotions through body movements. Unlike traditional emotion detection tools that rely on facial expressions, *eMotion* focuses exclusively on body language, offering a unique approach to emotional intelligence technology. This privacy-conscious app aims to provide insights into emotional states while protecting user privacy by avoiding facial recognition.
@@ -22,7 +20,7 @@ The recommended way to install *eMotion* is by downloading the APK file directly
 ## Usage
 
 1. Launch the app and allow any required permissions.
-2. Follow the on-screen instructions to start tracking emotions based on body movement.
+2. Register and sign in to explore the application.
 3. View your emotion analytics on the dashboard. You can also save sessions for future reference or training.
 
 ## Citation
@@ -41,5 +39,3 @@ Please ensure your use of the Google ML Kit Pose Detection API aligns with [Goog
 ## License
 
 This project is licensed under a **View-Only License**. The code is provided for viewing purposes only. Copying, modification, redistribution, or any other use is prohibited without prior permission. See the [LICENSE](./LICENSE) file for more details.
-
----
