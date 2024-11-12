@@ -14,6 +14,7 @@ assets/ml
 assets/models
 lib/auth-modules/authentication_service.dart
 assets/images/
+/lib/settings-modules/app_version_page.dart
 
 # IntelliJ related
 *.iml
