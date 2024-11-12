@@ -12,6 +12,7 @@ assets/auth.env
 migrate_working_dir/
 assets/ml
 assets/models
+lib/auth-modules/authentication_service.dart
 
 # IntelliJ related
 *.iml
