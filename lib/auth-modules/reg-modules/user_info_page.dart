@@ -2,7 +2,7 @@ import 'package:fix_emotion/auth-modules/login-modules/login.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:bcrypt/bcrypt.dart';  // Import bcrypt for hashing
+import 'package:bcrypt/bcrypt.dart';  
 
 class UserInfoPage extends StatefulWidget {
   final String email;
@@ -46,7 +46,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
           _isLoading = true;
         });
 
-        // Hash the password before saving it
+        
         String hashedPassword = BCrypt.hashpw(widget.password, BCrypt.gensalt());
 
         DateTime birthDate = DateFormat('yyyy-MM-dd').parse(_bDateController.text.trim());
@@ -55,7 +55,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
         final response = await supabase.from('user_admin').insert({
           'email': widget.email,
           'username': widget.username,
-          'password': hashedPassword,  // Save the hashed password
+          'password': hashedPassword,  
           'role': 'user',
           'fname': _fNameController.text.trim(),
           'lname': _lNameController.text.trim(),

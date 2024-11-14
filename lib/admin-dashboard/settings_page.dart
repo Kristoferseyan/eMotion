@@ -25,7 +25,7 @@ class SettingsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(isDarkMode), // Header with "Settings"
+            _buildHeader(isDarkMode), 
             const SizedBox(height: 20),
             _buildSettingsTile(
               context,
@@ -60,14 +60,14 @@ class SettingsPage extends StatelessWidget {
               },
             ),
             const SizedBox(height: 10),
-            _buildLogoutTile(context, isDarkMode), // Logout button in the same style as tiles
+            _buildLogoutTile(context, isDarkMode), 
           ],
         ),
       ),
     );
   }
 
-  // Updated header without the AppBar and without any background
+  
   Widget _buildHeader(bool isDarkMode) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 0.0),

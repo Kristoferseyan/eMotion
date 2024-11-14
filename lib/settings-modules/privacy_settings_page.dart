@@ -12,31 +12,31 @@ class PrivacySettingsPage extends StatefulWidget {
 
 class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
   bool _isVisibleToAdmin = true;
-  bool _loading = true; // For showing loading indicator
+  bool _loading = true; 
 
   @override
   void initState() {
     super.initState();
-    _loadVisibilitySetting(); // Load the visibility setting from the database when page initializes
+    _loadVisibilitySetting(); 
   }
 
-  // Fetch the visibility setting for the current user from the database
+  
   Future<void> _loadVisibilitySetting() async {
     try {
-      // Query the visibility setting for the current user
+      
       final response = await Supabase.instance.client
           .from('user_settings')
           .select()
           .eq('user_id', widget.userId)
-          .single(); // Get the user's visibility setting
+          .single(); 
 
       if (response != null) {
         setState(() {
-          _isVisibleToAdmin = response['is_visible_to_admin'] ?? true; // Default to true if not set
+          _isVisibleToAdmin = response['is_visible_to_admin'] ?? true; 
         });
       }
     } catch (error) {
-      // If the setting doesn't exist, create default settings
+      
       if (error.toString().contains("multiple (or no) rows")) {
         await _createVisibilitySetting();
       } else {
@@ -47,25 +47,25 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
       }
     } finally {
       setState(() {
-        _loading = false; // Stop showing the loading indicator
+        _loading = false; 
       });
     }
   }
 
-  // Create default visibility setting if it doesn't exist
+  
   Future<void> _createVisibilitySetting() async {
     try {
       await Supabase.instance.client
           .from('user_settings')
           .insert({
             'user_id': widget.userId,
-            'is_visible_to_admin': true, // Default value
+            'is_visible_to_admin': true, 
             'created_at': DateTime.now().toIso8601String(),
             'updated_at': DateTime.now().toIso8601String(),
           });
 
       setState(() {
-        _isVisibleToAdmin = true; // Default visibility set to true
+        _isVisibleToAdmin = true; 
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -79,7 +79,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     }
   }
 
-  // Update the visibility setting for the current user in the database
+  
   Future<void> _updateVisibilitySetting(bool newValue) async {
     try {
       await Supabase.instance.client
@@ -91,7 +91,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
           .eq('user_id', widget.userId);
 
       setState(() {
-        _isVisibleToAdmin = newValue; // Update the local state after updating the DB
+        _isVisibleToAdmin = newValue; 
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -122,12 +122,12 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator()) // Show a loader while fetching data
+          ? const Center(child: CircularProgressIndicator()) 
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: ListView(
                 children: <Widget>[
-                  // Data Collection Section
+                  
                   _buildExpandableSection(
                     context: context,
                     icon: Icons.person,
@@ -140,7 +140,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                     isDarkMode: isDarkMode,
                   ),
 
-                  // Use of Emotional Data Section
+                  
                   _buildExpandableSection(
                     context: context,
                     icon: Icons.insights,
@@ -152,7 +152,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                     isDarkMode: isDarkMode,
                   ),
 
-                  // Data Security Section
+                  
                   _buildExpandableSection(
                     context: context,
                     icon: Icons.security,
@@ -161,7 +161,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                     isDarkMode: isDarkMode,
                   ),
 
-                  // User Responsibilities Section
+                  
                   _buildExpandableSection(
                     context: context,
                     icon: Icons.lock,
@@ -170,7 +170,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                     isDarkMode: isDarkMode,
                   ),
 
-                  // Changes to Terms and Conditions Section
+                  
                   _buildExpandableSection(
                     context: context,
                     icon: Icons.update,
@@ -179,7 +179,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                     isDarkMode: isDarkMode,
                   ),
 
-                  // Contact Information Section
+                  
                   _buildExpandableSection(
                     context: context,
                     icon: Icons.contact_mail,
@@ -188,13 +188,13 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                     isDarkMode: isDarkMode,
                   ),
 
-                  // Toggle for Visibility
+                  
                   SwitchListTile(
                     title: const Text('Visible to Admins'),
                     subtitle: const Text('Enable whether you appear on the admin\'s dashboard'),
                     value: _isVisibleToAdmin,
                     onChanged: (bool value) {
-                      _updateVisibilitySetting(value); // Update visibility setting on change
+                      _updateVisibilitySetting(value); 
                     },
                   ),
                 ],
@@ -203,7 +203,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     );
   }
 
-  // Expandable Section Widget for each section
+  
   Widget _buildExpandableSection({
     required BuildContext context,
     required IconData icon,

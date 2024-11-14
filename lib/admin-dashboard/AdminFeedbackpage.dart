@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AdminFeedbackPage extends StatefulWidget {
   final String userId;
-  final String userEmail; // The user's email address
+  final String userEmail; 
 
   const AdminFeedbackPage({Key? key, required this.userId, required this.userEmail}) : super(key: key);
 
@@ -23,7 +23,7 @@ class _AdminFeedbackPageState extends State<AdminFeedbackPage> {
   @override
   void initState() {
     super.initState();
-    _fetchUserName(); // Fetch user's name when the page initializes
+    _fetchUserName(); 
   }
 
   @override
@@ -32,7 +32,7 @@ class _AdminFeedbackPageState extends State<AdminFeedbackPage> {
     super.dispose();
   }
 
-  // Fetch user's name from Supabase based on user ID
+  
   Future<void> _fetchUserName() async {
     try {
       final response = await supabase
@@ -63,14 +63,14 @@ class _AdminFeedbackPageState extends State<AdminFeedbackPage> {
     });
 
     try {
-      // Save the feedback to the database
+      
       await supabase.from('feedback').insert({
         'user_id': widget.userId,
         'feedback': _feedbackController.text,
         'submitted_at': DateTime.now().toIso8601String(),
       });
 
-      // Send the feedback via email
+      
       await _sendFeedbackEmail(widget.userEmail, _feedbackController.text, _userName.isNotEmpty ? _userName : widget.userId);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -89,16 +89,16 @@ class _AdminFeedbackPageState extends State<AdminFeedbackPage> {
     }
   }
 
-  // Function to send the feedback email
+  
   Future<void> _sendFeedbackEmail(String userEmail, String feedbackText, String userNameOrId) async {
-    final smtpServer = gmail('d06273540@gmail.com', 'rlzdtfsmlldudcfn'); // Use the same email for authentication
+    final smtpServer = gmail('d06273540@gmail.com', 'rlzdtfsmlldudcfn'); 
 
     final message = Message()
-      ..from = Address('d06273540@gmail.com', 'eMotion Mail') // Use the same email for "from"
-      ..recipients.add('d06273540@gmail.com') // Your email that will receive the feedback
-      ..subject = 'Feedback from $userNameOrId' // Include user's name or ID in the subject
-      ..text = 'Feedback from $userNameOrId (Email: $userEmail):\n\n$feedbackText' // Include user's name or ID in the email body
-      ..headers = {'Reply-To': userEmail}; // Set user's email as the "Reply-To"
+      ..from = Address('d06273540@gmail.com', 'eMotion Mail') 
+      ..recipients.add('d06273540@gmail.com') 
+      ..subject = 'Feedback from $userNameOrId' 
+      ..text = 'Feedback from $userNameOrId (Email: $userEmail):\n\n$feedbackText' 
+      ..headers = {'Reply-To': userEmail}; 
 
     try {
       final sendReport = await send(message, smtpServer);
@@ -141,7 +141,7 @@ class _AdminFeedbackPageState extends State<AdminFeedbackPage> {
     );
   }
 
-  // Build the feedback input field
+  
   Widget _buildFeedbackTextField(bool isDarkMode) {
     return TextFormField(
       controller: _feedbackController,
@@ -177,7 +177,7 @@ class _AdminFeedbackPageState extends State<AdminFeedbackPage> {
     );
   }
 
-  // Build the submit button
+  
   Widget _buildSubmitButton(bool isDarkMode) {
     return ElevatedButton(
       onPressed: _isSubmitting ? null : _submitFeedback,

@@ -168,7 +168,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // Custom header without AppBar
+  
   Widget _buildHeader(bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 0.0),

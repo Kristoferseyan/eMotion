@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AdminTermsAndConditionsDialog extends StatelessWidget {
-  final VoidCallback onAccept; // Callback for accepting the terms
+  final VoidCallback onAccept; 
 
   const AdminTermsAndConditionsDialog({Key? key, required this.onAccept}) : super(key: key);
 
@@ -28,13 +28,13 @@ class AdminTermsAndConditionsDialog extends StatelessWidget {
               '- Refrain from sharing user data with any third party unless authorized by the user or the organization.\n\n'
               'By proceeding with admin registration, you acknowledge that you have read, understood, and agree to these terms and conditions.',
             ),
-            // Additional terms can be placed here
+            
           ],
         ),
       ),
       actions: [
         TextButton(
-          onPressed: onAccept, // Accept and proceed to registration
+          onPressed: onAccept, 
           child: const Text('Accept'),
         ),
       ],

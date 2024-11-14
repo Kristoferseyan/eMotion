@@ -20,25 +20,25 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     _loadNotificationSettings();
   }
 
-  // Fetch or create the notification settings for the user
+  
   Future<void> _loadNotificationSettings() async {
     try {
-      // Check if the user already has notification settings
+      
       final response = await Supabase.instance.client
           .from('user_settings')
           .select()
           .eq('user_id', widget.userId)
-          .single(); // Fetch the user's notification settings
+          .single(); 
 
       if (response != null) {
-        // If the settings exist, load them into the UI
+        
         setState(() {
           _emailNotifications = response['email_notifications'] ?? false;
           _pushNotifications = response['push_notifications'] ?? false;
         });
       }
     } catch (error) {
-      // If no settings exist, insert default settings for the user
+      
       if (error.toString().contains("multiple (or no) rows")) {
         await _createNotificationSettings();
       } else {
@@ -50,21 +50,21 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     }
   }
 
-  // Create default notification settings for the user if they don't exist
+  
   Future<void> _createNotificationSettings() async {
     try {
-      // Insert the default notification settings
+      
       await Supabase.instance.client
           .from('user_settings')
           .insert({
             'user_id': widget.userId,
-            'email_notifications': false, // Default value
-            'push_notifications': false, // Default value
+            'email_notifications': false, 
+            'push_notifications': false, 
             'created_at': DateTime.now().toIso8601String(),
             'updated_at': DateTime.now().toIso8601String(),
           });
 
-      // Update the UI with default values
+      
       setState(() {
         _emailNotifications = false;
         _pushNotifications = false;
@@ -81,7 +81,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     }
   }
 
-  // Update the notification settings in the database
+  
   Future<void> _updateNotificationSettings() async {
     try {
       await Supabase.instance.client
@@ -116,7 +116,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.save),
-            onPressed: _updateNotificationSettings, // Save changes when pressing this button
+            onPressed: _updateNotificationSettings, 
           ),
         ],
       ),

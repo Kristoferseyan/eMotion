@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Header Widget
+
 class AdminHeader extends StatelessWidget {
   final bool isDarkMode;
 
@@ -32,7 +32,7 @@ class AdminHeader extends StatelessWidget {
   }
 }
 
-// Text Field Widget
+
 class AdminTextField extends StatelessWidget {
   final String labelText;
   final TextEditingController controller;
@@ -66,7 +66,7 @@ class AdminTextField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
-        style: const TextStyle(color: Colors.black), // Set text color to black
+        style: const TextStyle(color: Colors.black), 
         decoration: InputDecoration(
           labelText: labelText,
           labelStyle: TextStyle(
@@ -95,7 +95,7 @@ class AdminTextField extends StatelessWidget {
   }
 }
 
-// Password Field Widget
+
 class AdminPasswordField extends StatelessWidget {
   final String labelText;
   final TextEditingController controller;
@@ -133,7 +133,7 @@ class AdminPasswordField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         obscureText: !isPasswordVisible,
-        style: const TextStyle(color: Colors.black), // Set text color to black
+        style: const TextStyle(color: Colors.black), 
         decoration: InputDecoration(
           labelText: labelText,
           labelStyle: TextStyle(
@@ -166,11 +166,11 @@ class AdminPasswordField extends StatelessWidget {
   }
 }
 
-// Organization Group Toggle Widget
-// Organization Group Toggle Widget
+
+
 class AdminToggle extends StatelessWidget {
-  final bool isOrganizationSelected; // This is true if the toggle is ON (organization)
-  final ValueChanged<bool> onToggle; // Function to call when the toggle changes
+  final bool isOrganizationSelected; 
+  final ValueChanged<bool> onToggle; 
 
   const AdminToggle({
     Key? key,
@@ -185,17 +185,17 @@ class AdminToggle extends StatelessWidget {
       children: [
         IconButton(
           icon: Icon(Icons.group, color: !isOrganizationSelected ? Colors.blue : Colors.grey),
-          onPressed: () => onToggle(false), // Group option when toggle is OFF
+          onPressed: () => onToggle(false), 
         ),
         Switch(
-          value: isOrganizationSelected, // Toggle ON means organization is selected
+          value: isOrganizationSelected, 
           onChanged: onToggle,
           activeColor: Colors.blue,
           inactiveThumbColor: Colors.grey,
         ),
         IconButton(
           icon: Icon(Icons.apartment, color: isOrganizationSelected ? Colors.blue : Colors.grey),
-          onPressed: () => onToggle(true), // Organization option when toggle is ON
+          onPressed: () => onToggle(true), 
         ),
       ],
     );
@@ -203,7 +203,7 @@ class AdminToggle extends StatelessWidget {
 }
 
 
-// Register Button Widget
+
 class AdminRegisterButton extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onPressed;

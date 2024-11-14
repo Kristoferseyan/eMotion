@@ -7,28 +7,28 @@ class DeveloperInfoPage extends StatelessWidget {
       'role': 'Lead Developer',
       'status': 'College Student',
       'institution': 'STI College General Santos Inc.',
-      'photoUrl': 'assets/images/catubig.png', // Updated to local asset
+      'photoUrl': 'assets/images/catubig.png', 
     },
     {
       'name': 'Cerita, John Christopher',
       'role': 'Lead Developer',
       'status': 'College Student',
       'institution': 'STI College General Santos Inc.',
-      'photoUrl': 'assets/images/Zhenru.png', // Updated to local asset
+      'photoUrl': 'assets/images/Zhenru.png', 
     },
     {
       'name': 'Cornillez, Gemuel',
       'role': 'Project Manager',
       'status': 'College Student',
       'institution': 'STI College General Santos Inc.',
-      'photoUrl': 'assets/images/gemuel.png', // Updated to local asset
+      'photoUrl': 'assets/images/gemuel.png', 
     },
     {
       'name': 'Nuevo, Sean Christopher',
       'role': 'Lead Developer',
       'status': 'College Student',
       'institution': 'STI College General Santos Inc.',
-      'photoUrl': 'assets/images/sean.png', // Updated to local asset
+      'photoUrl': 'assets/images/sean.png', 
     },
   ];
 
@@ -52,8 +52,8 @@ class DeveloperInfoPage extends StatelessWidget {
               elevation: 5,
               margin: const EdgeInsets.symmetric(vertical: 10),
               color: isDarkMode
-                  ? const Color.fromARGB(255, 25, 70, 71) // Dark mode card color
-                  : const Color(0xFFFFFFFF), // Light mode card color
+                  ? const Color.fromARGB(255, 25, 70, 71) 
+                  : const Color(0xFFFFFFFF), 
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -62,14 +62,14 @@ class DeveloperInfoPage extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Profile photo section
+                    
                     CircleAvatar(
                       radius: 40,
                       backgroundImage: AssetImage(developer['photoUrl'] ?? ''),
                       backgroundColor: isDarkMode ? Colors.grey[800] : Colors.grey[300],
                     ),
                     const SizedBox(width: 16),
-                    // Developer details section
+                    
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

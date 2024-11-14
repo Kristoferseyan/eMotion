@@ -18,8 +18,8 @@ class SocialLoginButtons extends StatelessWidget {
       children: [
         const SizedBox(height: 17),
         SizedBox(
-          width: 300, // Full width
-          height: 55.0, // Height to match your login button
+          width: 300, 
+          height: 55.0, 
           child: SignInButton(
             Buttons.Google,
             text: "Sign in with Google",

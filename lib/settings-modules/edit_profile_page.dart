@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:intl/intl.dart'; // For date formatting
+import 'package:intl/intl.dart'; 
 
 class EditProfilePage extends StatefulWidget {
   final String userId;

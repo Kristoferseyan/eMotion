@@ -28,7 +28,7 @@ class EmotionDropdown extends StatelessWidget {
       ),
       onChanged: (String? newValue) {
         if (newValue != null) {
-          onEmotionChanged([newValue]); // Select only the chosen emotion
+          onEmotionChanged([newValue]); 
         }
       },
       items: emotions.map<DropdownMenuItem<String>>((String value) {

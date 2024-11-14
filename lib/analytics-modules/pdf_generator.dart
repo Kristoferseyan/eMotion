@@ -12,11 +12,11 @@ class PDFGenerator {
     required String time,
     required String duration,
     required Map<String, double> emotionDistribution,
-    Uint8List? chartImageBytes, // Accept chart image bytes
+    Uint8List? chartImageBytes, 
   }) async {
     final pdf = pw.Document();
 
-    // Create the PDF content
+    
     pdf.addPage(
       pw.Page(
         build: (pw.Context context) {
@@ -38,7 +38,7 @@ class PDFGenerator {
               pw.Text('Emotion Distribution:',
                   style: pw.TextStyle(fontSize: 18)),
               pw.SizedBox(height: 10),
-              // Emotion percentages
+              
               ...emotionDistribution.entries.map((entry) {
                 return pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -54,7 +54,7 @@ class PDFGenerator {
                 pw.Center(
                   child: pw.Image(
                     pw.MemoryImage(chartImageBytes),
-                    width: 300, // Adjust size as needed
+                    width: 300, 
                   ),
                 ),
               ],
@@ -64,7 +64,7 @@ class PDFGenerator {
       ),
     );
 
-    // Save the PDF file
+    
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => pdf.save(),
     );

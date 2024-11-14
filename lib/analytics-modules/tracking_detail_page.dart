@@ -57,7 +57,7 @@ class _TrackingDetailPageState extends State<TrackingDetailPage> {
           ),
         ],
       ),
-      body: SingleChildScrollView( // Added SingleChildScrollView to make the page scrollable
+      body: SingleChildScrollView( 
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +156,7 @@ class _TrackingDetailPageState extends State<TrackingDetailPage> {
 
   void _onSavePdfPressed() async {
     try {
-      // Capture chart image
+      
       RenderRepaintBoundary boundary = _chartKey.currentContext!
           .findRenderObject() as RenderRepaintBoundary;
       final pixelRatio = MediaQuery.of(context).devicePixelRatio;
@@ -172,10 +172,10 @@ class _TrackingDetailPageState extends State<TrackingDetailPage> {
         time: widget.time,
         duration: widget.duration,
         emotionDistribution: emotionDistribution,
-        chartImageBytes: chartBytes, // Pass the chart image bytes
+        chartImageBytes: chartBytes, 
       );
     } catch (e) {
-      // Handle errors
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to save PDF: $e')),
       );

@@ -36,22 +36,22 @@ class PosePainter extends CustomPainter {
     final boundingBoxPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0
-      ..color = Colors.red;  // Red color for the bounding box
+      ..color = Colors.red;  
 
     for (final pose in poses) {
-      // Draw landmarks
+      
       pose.landmarks.forEach((_, landmark) {
         canvas.drawCircle(
           Offset(
             translateX(
-              landmark.x,  // Access x directly
+              landmark.x,  
               size,
               imageSize,
               rotation,
               cameraLensDirection,
             ),
             translateY(
-              landmark.y,  // Access y directly
+              landmark.y,  
               size,
               imageSize,
               rotation,
@@ -63,10 +63,10 @@ class PosePainter extends CustomPainter {
         );
       });
 
-      // Calculate bounding box
+      
       Rect boundingBox = calculateBoundingBox(pose.landmarks.values.toList());
 
-      // Draw bounding box
+      
       canvas.drawRect(
         Rect.fromLTRB(
           translateX(boundingBox.left, size, imageSize, rotation, cameraLensDirection),
@@ -77,7 +77,7 @@ class PosePainter extends CustomPainter {
         boundingBoxPaint,
       );
 
-      // Draw pose connections (arms, legs, etc.)
+      
       void paintLine(
         PoseLandmarkType type1,
         PoseLandmarkType type2,
@@ -98,17 +98,17 @@ class PosePainter extends CustomPainter {
         );
       }
 
-      // Draw arms
+      
       paintLine(PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow, leftPaint);
       paintLine(PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist, leftPaint);
       paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow, rightPaint);
       paintLine(PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist, rightPaint);
 
-      // Draw body
+      
       paintLine(PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip, leftPaint);
       paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightHip, rightPaint);
 
-      // Draw legs
+      
       paintLine(PoseLandmarkType.leftHip, PoseLandmarkType.leftKnee, leftPaint);
       paintLine(PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle, leftPaint);
       paintLine(PoseLandmarkType.rightHip, PoseLandmarkType.rightKnee, rightPaint);
@@ -116,7 +116,7 @@ class PosePainter extends CustomPainter {
     }
   }
 
-  // Bounding box calculation function
+  
   Rect calculateBoundingBox(List<PoseLandmark> landmarks) {
     double minX = double.infinity;
     double minY = double.infinity;
@@ -124,8 +124,8 @@ class PosePainter extends CustomPainter {
     double maxY = double.negativeInfinity;
 
     for (var landmark in landmarks) {
-      final double x = landmark.x;  // Use x instead of position.x
-      final double y = landmark.y;  // Use y instead of position.y
+      final double x = landmark.x;  
+      final double y = landmark.y;  
 
       if (x < minX) minX = x;
       if (y < minY) minY = y;

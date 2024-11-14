@@ -17,7 +17,7 @@ class AdminSessionDetailPage extends StatefulWidget {
 class _AdminSessionDetailPageState extends State<AdminSessionDetailPage> {
   final supabase = Supabase.instance.client;
 
-  // Variables to hold session details
+  
   String emotion = '';
   String date = '';
   String time = '';
@@ -32,14 +32,14 @@ class _AdminSessionDetailPageState extends State<AdminSessionDetailPage> {
     _fetchSessionDetails();
   }
 
-  // Fetch session details from the database
+  
   Future<void> _fetchSessionDetails() async {
     try {
       final response = await supabase
           .from('emotion_tracking')
           .select()
           .eq('session_id', widget.sessionId)
-          .single(); // Fetch only one session by session_id
+          .single(); 
 
       if (response != null) {
         final session = response;
@@ -50,7 +50,7 @@ class _AdminSessionDetailPageState extends State<AdminSessionDetailPage> {
           time = _formatTime(session['timestamp']);
           duration = session['duration']?.toString() ?? 'Unknown';
 
-          // Convert emotion_distribution from JSON to Map<String, double>
+          
           emotionDistribution = Map<String, double>.from(
             (jsonDecode(session['emotion_distribution']) as Map<String, dynamic>)
                 .map((key, value) => MapEntry(key, (value as num).toDouble() * 100)),

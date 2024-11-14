@@ -9,7 +9,7 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final TextEditingController _emailController = TextEditingController();
   bool _isLoading = false;
-  bool _isNextButtonEnabled = false; // State to manage Next button
+  bool _isNextButtonEnabled = false; 
 
   Future<void> _sendResetLink() async {
     final email = _emailController.text.trim();
@@ -32,8 +32,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         const SnackBar(content: Text('Password reset link has been sent to your email')),
       );
 
-      // Simulate enabling the Next button after the link is clicked
-      // This would normally be triggered by deep link navigation
+      
+      
       Future.delayed(Duration(seconds: 5), () {
         setState(() {
           _isNextButtonEnabled = true;
@@ -103,7 +103,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   ? () {
                       Navigator.pushNamed(context, '/reset-password');
                     }
-                  : null, // Disable the button if _isNextButtonEnabled is false
+                  : null, 
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 backgroundColor: isDarkMode ? Colors.grey[800] : const Color(0xFFB6DDF2),

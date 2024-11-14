@@ -44,12 +44,12 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
     super.dispose();
   }
 
-  // Validate passwords
+  
   bool _validatePasswords() {
     return _passwordController.text == _confirmPasswordController.text;
   }
 
-  // Register the admin based on selected toggle (Organization/Group)
+  
 Future<void> _registerAdmin() async {
   if (_formKey.currentState!.validate()) {
     if (!_agreedToTerms) {
@@ -65,8 +65,8 @@ Future<void> _registerAdmin() async {
 
       String hashedPassword = BCrypt.hashpw(_passwordController.text.trim(), BCrypt.gensalt());
 
-      // Use the toggle value to determine if it's an organization or group
-      String userType = _isOrganizationSelected ? 'organization' : 'group'; // Logic based on the toggle state
+      
+      String userType = _isOrganizationSelected ? 'organization' : 'group'; 
 
       final response = await supabase.from('user_admin').insert({
         'email': _emailController.text.trim(),
@@ -76,8 +76,8 @@ Future<void> _registerAdmin() async {
         'organization_name': _isOrganizationSelected ? _organizationNameController.text.trim() : null,
         'organization_role': _isOrganizationSelected ? _roleController.text.trim() : null,
         'group_name': !_isOrganizationSelected ? _groupNameController.text.trim() : null,
-        'type': userType, // Set type based on the toggle logic
-        'role': 'admin', // Set the role as 'admin' by default
+        'type': userType, 
+        'role': 'admin', 
       }).select().single();
 
       if (response == null || response.isEmpty) {
@@ -88,7 +88,7 @@ Future<void> _registerAdmin() async {
         const SnackBar(content: Text('Monitor registration successful!')),
       );
 
-      // Redirect to the login page after successful registration
+      
       Navigator.pushReplacementNamed(context, '/login');
 
     } catch (error) {
@@ -104,25 +104,25 @@ Future<void> _registerAdmin() async {
 }
 
 
-  // Toggle password visibility
+  
   void _togglePasswordVisibility() {
     setState(() {
       _isPasswordVisible = !_isPasswordVisible;
     });
   }
 
-  // Show terms and conditions
+  
   void _showTermsAndConditions() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AdminTermsAndConditionsDialog(
           onAccept: () {
-            Navigator.of(context).pop(); // Close the dialog
+            Navigator.of(context).pop(); 
             setState(() {
-              _agreedToTerms = true; // Proceed to registration
+              _agreedToTerms = true; 
             });
-            _registerAdmin(); // Call the registration function after accepting terms
+            _registerAdmin(); 
           },
         );
       },
@@ -205,7 +205,7 @@ Future<void> _registerAdmin() async {
               const SizedBox(height: 20),
               AdminRegisterButton(
                 isLoading: _isLoading,
-                onPressed: _showTermsAndConditions, // Show terms before registering
+                onPressed: _showTermsAndConditions, 
               ),
             ],
           ),

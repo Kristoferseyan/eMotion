@@ -14,15 +14,15 @@ class PieChartWidget extends StatelessWidget {
     List<PieChartSectionData> sections = emotionData.entries.map((entry) {
       String emotionKey = _sanitizeEmotion(entry.key.trim());
       Color color = _getColor(emotionKey);
-      double value = entry.value * 100; // Assuming value is in percentage, multiply by 100 for display
+      double value = entry.value * 100; 
 
       return PieChartSectionData(
         color: color,
         value: value,
-        title: '${value.toStringAsFixed(0)}%', // Show as integer percentage
+        title: '${value.toStringAsFixed(0)}%', 
         radius: 60,
         titleStyle: TextStyle(
-          fontSize: _getTitleFontSize(value), // Adjust font size based on value
+          fontSize: _getTitleFontSize(value), 
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -109,11 +109,11 @@ class PieChartWidget extends StatelessWidget {
       case 'Neutral':
         return Colors.grey;
       default:
-        return Colors.grey; // Default color for unknown emotions
+        return Colors.grey; 
     }
   }
 
-  // Helper method to sanitize emotion names
+  
   String _sanitizeEmotion(String emotion) {
     final trimmedEmotion = emotion.trim().toLowerCase();
     

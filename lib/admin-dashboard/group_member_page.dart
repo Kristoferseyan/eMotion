@@ -18,7 +18,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
   List<Map<String, dynamic>> groups = [];
   List<Map<String, dynamic>> members = [];
   String? selectedGroup;
-  Map<String, List<Map<String, dynamic>>> userSessions = {}; // To store sessions per user
+  Map<String, List<Map<String, dynamic>>> userSessions = {}; 
 
   @override
   void initState() {
@@ -26,7 +26,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     _fetchGroups();
   }
 
-  // Fetch groups created by this admin
+  
   Future<void> _fetchGroups() async {
     final response = await supabase
         .from('user_groups')
@@ -35,8 +35,8 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
 
     if (response is List) {
       setState(() {
-        groups.clear(); // Clear the group list to prevent duplication
-        // Check for duplicates
+        groups.clear(); 
+        
         for (var group in response) {
           final groupId = group['id'];
           if (groups.where((g) => g['id'] == groupId).isEmpty) {
@@ -51,7 +51,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     }
   }
 
-  // Fetch members and their sessions for the selected group
+  
   Future<void> _fetchGroupMembers(String groupId) async {
     final response = await supabase
         .from('group_memberships')
@@ -60,8 +60,8 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
 
     if (response is List) {
       setState(() {
-        members.clear(); // Clear the members list before adding to avoid duplication
-        // Check for duplicates
+        members.clear(); 
+        
         for (var member in response) {
           final userId = member['user_admin']['id'];
           if (members.where((m) => m['user_admin']['id'] == userId).isEmpty) {
@@ -77,7 +77,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     }
   }
 
-  // Fetch sessions for each member and retrieve their names
+  
   Future<void> _fetchUserSessions() async {
     for (var member in members) {
       final userId = member['user_admin']['id'];
@@ -94,7 +94,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     }
   }
 
-  // Delete a group member
+  
   Future<void> _deleteGroupMember(String groupId, String memberId) async {
     final response = await supabase
         .from('group_memberships')
@@ -102,7 +102,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
         .eq('group_id', groupId)
         .eq('user_id', memberId);
 
-    // Check if there's an error in the response
+    
     if (response == null || response.error == null) {
       setState(() {
         members.removeWhere((member) => member['user_admin']['id'] == memberId);
@@ -133,7 +133,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     );
   }
 
-  // Build the group selection dropdown box
+  
   Widget _buildGroupSelectionBox(bool isDarkMode) {
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -177,7 +177,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     );
   }
 
-  // Build the member list view with expandable session lists and delete functionality
+  
   Widget _buildMemberListBox(bool isDarkMode) {
     return Expanded(
       child: Container(
@@ -223,7 +223,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     );
   }
 
-  // Build the session list for each user
+  
   List<Widget> _buildSessionList(String userId, bool isDarkMode) {
     if (!userSessions.containsKey(userId)) {
       return [const Center(child: CircularProgressIndicator())];
@@ -276,7 +276,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     }).toList();
   }
 
-  // Helper function to confirm delete
+  
   void _confirmDeleteMember(BuildContext context, String groupId, String memberId) {
     showDialog(
       context: context,
@@ -304,13 +304,13 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     );
   }
 
-  // Helper function to format the date from the timestamp
+  
   String _formatDate(String timestamp) {
     final DateTime dateTime = DateTime.parse(timestamp);
     return '${dateTime.year}-${dateTime.month}-${dateTime.day}';
   }
 
-  // Helper function to format the time from the timestamp
+  
   String _formatTime(String timestamp) {
     final DateTime dateTime = DateTime.parse(timestamp);
     return '${dateTime.hour}:${dateTime.minute}';

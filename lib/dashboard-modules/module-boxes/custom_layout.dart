@@ -34,7 +34,7 @@ class CustomLayout extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => TrackEmoLayout(userId: userId,), // No parameters passed
+                builder: (context) => TrackEmoLayout(userId: userId,), 
               ),
             );
           }
@@ -51,7 +51,7 @@ class CustomLayout extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EmotionDict()), // Navigate to EmotionDict page
+                MaterialPageRoute(builder: (context) => EmotionDict()), 
               );
             },
           ),

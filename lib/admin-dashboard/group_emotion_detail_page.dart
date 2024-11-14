@@ -80,9 +80,9 @@ Future<void> _fetchOverallEmotionData() async {
         Map<String, dynamic> distribution = jsonDecode(session['emotion_distribution']);
         totalSessions++;
 
-        // Accumulate emotion values with sanitization
+        
         distribution.forEach((emotion, value) {
-          final sanitizedEmotion = _sanitizeEmotionName(emotion); // Sanitize emotion names
+          final sanitizedEmotion = _sanitizeEmotionName(emotion); 
           emotionTotals[sanitizedEmotion] = (emotionTotals[sanitizedEmotion] ?? 0) + (value as num).toDouble();
         });
       }
@@ -97,11 +97,11 @@ Future<void> _fetchOverallEmotionData() async {
 
   setState(() {
     overallEmotionData = _sanitizeEmotionData(emotionTotals);
-    currentEmotionData = overallEmotionData; // Set this as the default chart data
+    currentEmotionData = overallEmotionData; 
   });
 }
 
-// Ensure emotion names are consistent
+
 String _sanitizeEmotionName(String emotion) {
   final trimmedEmotion = emotion.trim().toLowerCase();
 
@@ -115,10 +115,10 @@ String _sanitizeEmotionName(String emotion) {
     'disguist': 'Disgust',
     'fear ': 'Fear',
     'neutral ': 'Neutral',
-    ' surprise ': 'Surprise', // add cases as needed
+    ' surprise ': 'Surprise', 
   };
 
-  // Capitalize correctly and return corrected names
+  
   return corrections[trimmedEmotion] ?? _capitalize(trimmedEmotion);
 }
 
@@ -128,7 +128,7 @@ String _capitalize(String text) {
 
 Future<void> _fetchEmotionDataForMember(String memberId) async {
   if (selectedMemberId == memberId) {
-    // If the same member is tapped again, revert to overall data
+    
     setState(() {
       currentEmotionData = overallEmotionData;
       selectedMemberId = null;
@@ -155,7 +155,7 @@ Future<void> _fetchEmotionDataForMember(String memberId) async {
     });
   } else {
     setState(() {
-      currentEmotionData = {}; // Clear the chart if no data is available
+      currentEmotionData = {}; 
     });
   }
 }

@@ -71,7 +71,7 @@ class _TrackingListState extends State<TrackingList> {
       ..sort((a, b) {
         final aDateTime = DateTime.parse('${a['date']} ${a['time']}');
         final bDateTime = DateTime.parse('${b['date']} ${b['time']}');
-        return bDateTime.compareTo(aDateTime); // Sort so latest is on top
+        return bDateTime.compareTo(aDateTime); 
       });
 
     return Column(
@@ -155,7 +155,7 @@ class _TrackingListState extends State<TrackingList> {
             ),
             direction: DismissDirection.endToStart,
             onDismissed: (direction) async {
-              final sessionId = tracking['session_id']?.toString(); // Ensure it's a string
+              final sessionId = tracking['session_id']?.toString(); 
 
               if (sessionId != null && sessionId.isNotEmpty) {
                 await _deleteTrackingItem(sessionId, index);

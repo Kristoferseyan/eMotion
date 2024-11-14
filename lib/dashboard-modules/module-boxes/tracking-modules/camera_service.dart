@@ -11,7 +11,7 @@ class CameraService {
       throw Exception('No cameras available.');
     }
 
-    // Always use the back camera
+    
     final cameraDescription = _getCamera(CameraLensDirection.back);
 
     _cameraController = CameraController(cameraDescription, ResolutionPreset.medium);

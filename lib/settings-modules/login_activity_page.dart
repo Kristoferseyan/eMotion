@@ -9,7 +9,7 @@ class LoginActivityPage extends StatelessWidget {
   Future<List<Map<String, dynamic>>> fetchLoginActivities() async {
     final supabase = Supabase.instance.client;
 
-    // Fetch all login times from the login_activity table, ordered by login_time
+    
     final response = await supabase
         .from('login_activity')
         .select('login_time')

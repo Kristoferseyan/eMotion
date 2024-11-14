@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fix_emotion/auth-modules/login-modules/login.dart';
-import '../auth-modules/authentication_service.dart'; // Import your AuthenticationService
+import '../auth-modules/authentication_service.dart'; 
 
 class ProfilePage extends StatefulWidget {
   final String userId;

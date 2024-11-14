@@ -131,8 +131,6 @@ class ModelService {
       throw Exception("Cannot reshape array of length ${input.length} into shape $shape (expected length: $expectedLength)");
     }
     
-    // Reshape logic (if needed) can go here, but since Float32List does not support reshaping, 
-    // we will assume the input is already formatted correctly. Return the input as-is.
     return input;
   }
 }

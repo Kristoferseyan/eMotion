@@ -21,7 +21,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   void initState() {
     super.initState();
-    // Log the token received on this page for debugging
+    
     _logger.info('ResetPasswordPage initialized with token: ${widget.accessToken}');
   }
 
@@ -52,7 +52,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     });
 
     try {
-      // Retrieve the user associated with the accessToken
+      
       final response = await Supabase.instance.client
           .from('users')
           .select()
@@ -65,7 +65,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
       final userId = response['id'];
 
-      // Update the user's password in the custom `users` table
+      
       final updateResponse = await Supabase.instance.client
           .from('users')
           .update({'password': password})

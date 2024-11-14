@@ -14,7 +14,7 @@ class DatabaseService {
     required int duration,
   }) async {
     final emotionDistributionJson = jsonEncode(emotionDistribution);
-    final timestamp = DateTime.now().toIso8601String(); // Use current timestamp
+    final timestamp = DateTime.now().toIso8601String(); 
 
     final response = await _client
         .from('emotion_tracking')
@@ -25,7 +25,7 @@ class DatabaseService {
           'duration': duration,
           'emotion': emotion,
           'emotion_distribution': emotionDistributionJson,
-          'user_feedback': '', // Add user feedback if available
+          'user_feedback': '', 
         });
 
     if (response != null) {

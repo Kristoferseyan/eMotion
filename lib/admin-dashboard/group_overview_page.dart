@@ -15,14 +15,14 @@ class GroupOverviewPage extends StatefulWidget {
 class _GroupOverviewPageState extends State<GroupOverviewPage> {
   final supabase = Supabase.instance.client;
   List<Map<String, dynamic>> groups = [];
-  Map<String, int> groupMemberCounts = {}; // Map to store the number of members per group
-  Map<String, Map<String, double>> groupEmotionAverages = {}; // Stores average emotions per group
+  Map<String, int> groupMemberCounts = {}; 
+  Map<String, Map<String, double>> groupEmotionAverages = {}; 
   bool _loadingGroups = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchGroups(); // Fetch groups on page load
+    _fetchGroups(); 
   }
 
   Future<void> _fetchGroups() async {
@@ -39,7 +39,7 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
       if (response != null) {
         groups = List<Map<String, dynamic>>.from(response as List);
         await _fetchGroupMemberCounts();
-        await _fetchGroupEmotionAverages(); // Fetch average emotions for each group
+        await _fetchGroupEmotionAverages(); 
       }
 
       setState(() {
@@ -108,7 +108,7 @@ class _GroupOverviewPageState extends State<GroupOverviewPage> {
               jsonDecode(session['emotion_distribution']);
           sessionCount++;
 
-          // Add emotion percentages to totals
+          
           distribution.forEach((emotion, percentage) {
             emotionTotals[emotion] = (emotionTotals[emotion] ?? 0) + percentage;
           });
@@ -233,7 +233,7 @@ Widget _buildGroupList(bool isDarkMode) {
   );
 }
 
-// Show a dialog to confirm deletion
+
 void _showDeleteConfirmationDialog(String groupId, String groupName) {
   showDialog(
     context: context,
@@ -242,13 +242,13 @@ void _showDeleteConfirmationDialog(String groupId, String groupName) {
       content: Text('Are you sure you want to delete the group "$groupName"?'),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(), // Close the dialog
+          onPressed: () => Navigator.of(context).pop(), 
           child: Text('Cancel'),
         ),
         TextButton(
           onPressed: () async {
-            Navigator.of(context).pop(); // Close the dialog
-            await _deleteGroup(groupId); // Call delete function
+            Navigator.of(context).pop(); 
+            await _deleteGroup(groupId); 
           },
           child: Text(
             'Delete',
@@ -260,7 +260,7 @@ void _showDeleteConfirmationDialog(String groupId, String groupName) {
   );
 }
 
-// Function to delete the group from Supabase and update the UI
+
 Future<void> _deleteGroup(String groupId) async {
   try {
     await supabase.from('user_groups').delete().eq('id', groupId);

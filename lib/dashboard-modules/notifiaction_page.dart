@@ -4,13 +4,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class NotificationsPage extends StatelessWidget {
   final String userId;
   final Function(String notificationId) markAsRead;
-  final VoidCallback refreshNotifications; // New callback to refresh notifications
+  final VoidCallback refreshNotifications; 
 
   const NotificationsPage({
     Key? key,
     required this.userId,
     required this.markAsRead,
-    required this.refreshNotifications, // Add this to update notifications
+    required this.refreshNotifications, 
   }) : super(key: key);
 
   Future<List<Map<String, dynamic>>> _fetchNotifications() async {
@@ -58,16 +58,16 @@ class NotificationsPage extends StatelessWidget {
             .insert({'group_id': groupId, 'user_id': userId});
       }
 
-      Navigator.of(context).pop(); // Close the dialog first
+      Navigator.of(context).pop(); 
       Future.delayed(Duration.zero, () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(accepted ? 'You have been added to the group successfully!' : 'You declined the group invite.')),
         );
-        markAsRead(notificationId); // Mark notification as read
-        refreshNotifications(); // Call this method to update the badge
+        markAsRead(notificationId); 
+        refreshNotifications(); 
       });
     } catch (error) {
-      Navigator.of(context).pop(); // Close the dialog first
+      Navigator.of(context).pop(); 
       Future.delayed(Duration.zero, () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error responding to invite: $error')),
@@ -86,13 +86,13 @@ class NotificationsPage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                _respondToInvite(context, inviteId, true, notificationId); // Pass the invite and notification IDs
+                _respondToInvite(context, inviteId, true, notificationId); 
               },
               child: const Text('Accept'),
             ),
             TextButton(
               onPressed: () {
-                _respondToInvite(context, inviteId, false, notificationId); // Pass the invite and notification IDs
+                _respondToInvite(context, inviteId, false, notificationId); 
               },
               child: const Text('Decline'),
             ),
@@ -153,11 +153,11 @@ class NotificationsPage extends StatelessWidget {
                       context,
                       notification['message'],
                       notification['invite_id'],
-                      notification['id'], // Pass the notification ID for deletion
+                      notification['id'], 
                     );
                   } else {
-                    markAsRead(notification['id']); // Call markAsRead with the notification ID
-                    refreshNotifications(); // Refresh the badge count
+                    markAsRead(notification['id']); 
+                    refreshNotifications(); 
                   }
                 },
               ),

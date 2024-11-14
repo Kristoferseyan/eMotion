@@ -27,7 +27,7 @@ class _EmotionChartState extends State<EmotionChart> {
   @override
   void initState() {
     super.initState();
-    // Fetch the emotion data with userId and selectedEmotions
+    
     _emotionDataFuture = EmotionChartData.fetchEmotionData(widget.userId, widget.selectedEmotions);
   }
 
@@ -36,7 +36,7 @@ class _EmotionChartState extends State<EmotionChart> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectedEmotions != widget.selectedEmotions) {
       setState(() {
-        // Re-fetch the emotion data if the selected emotions change
+        
         _emotionDataFuture = EmotionChartData.fetchEmotionData(widget.userId, widget.selectedEmotions);
       });
     }
@@ -162,7 +162,7 @@ class _EmotionChartState extends State<EmotionChart> {
                             return LineChartBarData(
                               spots: entry.value,
                               isCurved: true,
-                              color: _getColor(entry.key), // Use the same _getColor method from PieChart
+                              color: _getColor(entry.key), 
                               barWidth: 3,
                               isStrokeCapRound: true,
                               dotData: FlDotData(show: true),

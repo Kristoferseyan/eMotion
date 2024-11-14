@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class GroupManagementWidget extends StatefulWidget {
-  final String userId; // Admin ID passed to the widget
+  final String userId; 
 
   const GroupManagementWidget({Key? key, required this.userId}) : super(key: key);
 
@@ -14,15 +14,15 @@ class _GroupManagementWidgetState extends State<GroupManagementWidget> {
   final supabase = Supabase.instance.client;
   List<Map<String, dynamic>> groups = [];
   bool _loadingGroups = false;
-  bool _showGroupList = false; // Controls whether to show the group list
+  bool _showGroupList = false; 
 
   @override
   void initState() {
     super.initState();
-    _fetchGroups(); // Fetch the groups created by this admin
+    _fetchGroups(); 
   }
 
-  // Fetch the groups created by this admin
+  
   Future<void> _fetchGroups() async {
     setState(() {
       _loadingGroups = true;
@@ -32,7 +32,7 @@ class _GroupManagementWidgetState extends State<GroupManagementWidget> {
       final response = await supabase
           .from('user_groups')
           .select('*')
-          .eq('created_by', widget.userId); // Fetch groups created by the admin
+          .eq('created_by', widget.userId); 
 
       setState(() {
         groups = List<Map<String, dynamic>>.from(response as List);
@@ -48,7 +48,7 @@ class _GroupManagementWidgetState extends State<GroupManagementWidget> {
     }
   }
 
-  // Delete a group by ID
+  
   Future<void> _deleteGroup(String groupId) async {
     try {
       await supabase.from('user_groups').delete().eq('id', groupId);
@@ -56,7 +56,7 @@ class _GroupManagementWidgetState extends State<GroupManagementWidget> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Group deleted successfully')),
       );
-      // Fetch the updated group list
+      
       _fetchGroups();
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,7 +65,7 @@ class _GroupManagementWidgetState extends State<GroupManagementWidget> {
     }
   }
 
-  // Confirm deletion of the group
+  
   void _confirmDeleteGroup(String groupId) {
     showDialog(
       context: context,
@@ -130,7 +130,7 @@ class _GroupManagementWidgetState extends State<GroupManagementWidget> {
     );
   }
 
-  // Build the list of groups created by the admin
+  
   Widget _buildGroupList(bool isDarkMode) {
     if (groups.isEmpty) {
       return Padding(

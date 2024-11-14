@@ -27,7 +27,7 @@ class _TermsAndConditionsDialogState extends State<TermsAndConditionsDialog> {
         ],
       ),
       content: SizedBox(
-        height: 400, // Makes sure it doesn't overflow on small screens
+        height: 400, 
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),

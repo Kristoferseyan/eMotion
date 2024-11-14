@@ -26,15 +26,15 @@ class TrackEmoLayout extends StatefulWidget {
 
 class _TrackEmoLayoutState extends State<TrackEmoLayout> {
   final PoseDetector _poseDetector = PoseDetector(options: PoseDetectorOptions());
-  final ModelService _modelService = ModelService(); // For emotion detection
-  final EmotionService _emotionService = EmotionService(); // To manage emotions
+  final ModelService _modelService = ModelService(); 
+  final EmotionService _emotionService = EmotionService(); 
   final DatabaseService _databaseService = DatabaseService(Supabase.instance.client);
 
   static List<CameraDescription> _cameras = [];
   CameraController? _controller;
   int _cameraIndex = -1;
-  bool _isBusy = false; // Tracks if the system is processing a frame
-  bool _isInterpreterBusy = false; // Tracks if the emotion detection model is processing a frame
+  bool _isBusy = false; 
+  bool _isInterpreterBusy = false; 
   CustomPaint? _customPaint;
   Map<String, int> _scores = {};
 
@@ -58,7 +58,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
     super.initState();
     _userId = widget.userId;
     _initialize();
-    _loadModel(); // Load the emotion detection model
+    _loadModel(); 
   }
 
   void _initialize() async {
@@ -80,7 +80,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
     try {
       debugPrint('model loaded');
       await _modelService.loadModel();
-      debugPrint('Model loaded'); // Load the TensorFlow Lite model
+      debugPrint('Model loaded'); 
     } catch (e) {
       debugPrint('Error loading model: $e');
     }
@@ -90,14 +90,14 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
   void dispose() {
     _stopLiveFeed();
     _poseDetector.close();
-    _controller?.dispose(); // Only dispose here
+    _controller?.dispose(); 
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: _onWillPop, // Prevent back navigation while tracking
+      onWillPop: _onWillPop, 
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Track Emotion'),
@@ -129,7 +129,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
                     width: 350,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: MyBarGraph(scores: _scores), // Updated to show emotion probabilities
+                      child: MyBarGraph(scores: _scores), 
                     ),
                   ),
                 ),
@@ -166,7 +166,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
                 ],
               ),
             ),
-            // New Row for the checkbox and label
+            
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -217,7 +217,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
+              Navigator.of(context).pop(); 
             },
             child: const Text('OK'),
           ),
@@ -281,7 +281,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
     }
 
     if (_controller!.value.isRecordingVideo) {
-      // A recording is already started, do nothing.
+      
       return;
     }
 
@@ -296,7 +296,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
 
       await _controller!.startVideoRecording();
 
-      // Show SnackBar when video recording starts
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Recording started')),
       );
@@ -310,13 +310,13 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
   Future<void> _pauseLiveFeed() async {
     if (_controller != null) {
       if (_controller!.value.isStreamingImages) {
-        await _controller?.stopImageStream(); // Stop the image stream only if streaming
+        await _controller?.stopImageStream(); 
       }
       if (_controller!.value.isRecordingVideo) {
         await _stopVideoRecording();
       }
     }
-    setState(() {}); // Update the UI to reflect the paused state
+    setState(() {}); 
   }
 
   Future<void> _stopLiveFeed() async {
@@ -345,11 +345,11 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
         );
         final videoUrl = await _uploadVideoToSupabase(videoFile);
         if (videoUrl != null) {
-          // Get the most frequent emotion; default to "Neutral" if none
+          
           final mostFrequentEmotion = _emotionService.getMostFrequentEmotion();
           final emotionClass = mostFrequentEmotion.isNotEmpty ? mostFrequentEmotion : 'Neutral';
 
-          // Save metadata
+          
           await _saveVideoMetadataToSupabase(videoUrl, emotionClass);
         }
         return videoUrl;
@@ -365,7 +365,7 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
 
   Future<String?> _saveVideoToDownloads(XFile videoFile) async {
     try {
-      // Request storage permissions
+      
       if (Platform.isAndroid) {
         var status = await Permission.storage.request();
         if (!status.isGranted) {
@@ -382,15 +382,15 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
         final String fileName = 'tracking_session_${DateTime.now().millisecondsSinceEpoch}.mp4';
         filePath = '${directory.path}/$fileName';
 
-        // Copy the file to the Downloads directory
+        
         await videoFile.saveTo(filePath);
       } else if (Platform.isIOS) {
-        // On iOS, the Downloads folder is not accessible
+        
         final directory = await getApplicationDocumentsDirectory();
         final String fileName = 'tracking_session_${DateTime.now().millisecondsSinceEpoch}.mp4';
         filePath = '${directory.path}/$fileName';
 
-        // Copy the file to the directory
+        
         await videoFile.saveTo(filePath);
       } else {
         return null;
@@ -402,13 +402,13 @@ class _TrackEmoLayoutState extends State<TrackEmoLayout> {
     }
   }
 
-// Process camera image and detect both poses and emotions
+
 void _processCameraImage(CameraImage image) async {
   if (_isBusy) {
     print('Skipping frame as system is busy');
-    return; // Drop frames when busy
+    return; 
   }
-  // Do not process images if recording video
+  
   if (_saveSessionAsVideo && _controller != null && _controller!.value.isRecordingVideo) {
     return;
   }
@@ -417,24 +417,24 @@ void _processCameraImage(CameraImage image) async {
   final inputImage = _inputImageFromCameraImage(image);
   if (inputImage != null) {
     try {
-      // Step 1: Pose Detection - Always detect pose
+      
       final poses = await _poseDetector.processImage(inputImage);
 
-      // Step 2: Check if any valid poses are detected
+      
       if (poses.isNotEmpty) {
         print("Pose detected: ${poses.length} poses found");
 
-        // Log the keypoints or landmarks if available
+        
         for (var pose in poses) {
           print("Pose keypoints: ${pose.landmarks}");
 
-          // Step 3: Calculate the bounding box for the pose
+          
           Rect boundingBox = calculateBoundingBox(pose.landmarks.values.toList());
 
-          // Print bounding box details
+          
           print("Bounding Box: Left = ${boundingBox.left}, Top = ${boundingBox.top}, Width = ${boundingBox.width}, Height = ${boundingBox.height}");
 
-          // Pose detected, now handle the pose drawing
+          
           if (inputImage.metadata?.size != null && inputImage.metadata?.rotation != null) {
             final painter = PosePainter(
               poses,
@@ -443,31 +443,31 @@ void _processCameraImage(CameraImage image) async {
               _controller!.description.lensDirection,
             );
             setState(() {
-              _customPaint = CustomPaint(painter: painter); // Render the pose on the screen
+              _customPaint = CustomPaint(painter: painter); 
             });
           }
 
-          // Debugging: Print the frame size being sent to the model
+          
           print('Camera Image dimensions: width=${image.width}, height=${image.height}');
           print('Bounding box size: ${boundingBox.width}x${boundingBox.height}');
 
-          // Step 4: Run emotion detection through the model service with the bounding box
+          
           final detectedEmotionResult = await _modelService.runModelOnFrame(image, boundingBox);
 
           if (detectedEmotionResult != null && detectedEmotionResult.isNotEmpty) {
             setState(() {
-              detectedEmotion = detectedEmotionResult; // Update the detected emotion on the UI
+              detectedEmotion = detectedEmotionResult; 
             });
 
-            // Save the detected emotion and update _scores map
+            
             _emotionService.saveEmotion(detectedEmotionResult);
 
-            // Update _scores with the detected emotion counts or probabilities
+            
             final emotionProbabilities = _emotionService.calculateEmotionProbabilities();
             _scores = _emotionService.mapProbabilitiesToScores(emotionProbabilities);
 
             print('Detected Emotion: $detectedEmotionResult');
-            print('Emotion Scores: $_scores'); // Check if _scores is being updated properly
+            print('Emotion Scores: $_scores'); 
           }
         }
       } else {
@@ -476,15 +476,15 @@ void _processCameraImage(CameraImage image) async {
     } catch (e) {
       print('Error during model inference: $e');
     } finally {
-      _isBusy = false; // Reset the busy flag after processing
+      _isBusy = false; 
     }
   } else {
-    _isBusy = false; // Reset the busy flag if inputImage is null
+    _isBusy = false; 
   }
 }
 
 
-  // Calculate the bounding box for the pose
+  
   Rect calculateBoundingBox(List<PoseLandmark> landmarks) {
     double minX = double.infinity;
     double minY = double.infinity;
@@ -545,7 +545,7 @@ void _processCameraImage(CameraImage image) async {
     final sessionEndTime = DateTime.now();
     final duration = sessionEndTime.difference(_sessionStartTime!).inSeconds;
 
-    // Get most frequent emotion and emotion distribution
+    
     final mostFrequentEmotion = _emotionService.getMostFrequentEmotion();
     final emotionDistribution = _emotionService.calculateEmotionProbabilities();
 
@@ -569,7 +569,7 @@ void _processCameraImage(CameraImage image) async {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop(); 
               },
               child: const Text('OK'),
             ),
@@ -581,7 +581,7 @@ void _processCameraImage(CameraImage image) async {
     } catch (e) {
       print('Error during session save: $e');
 
-      // Show error dialog
+      
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -590,7 +590,7 @@ void _processCameraImage(CameraImage image) async {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop(); 
               },
               child: const Text('OK'),
             ),
@@ -603,9 +603,9 @@ void _processCameraImage(CameraImage image) async {
 
   void _toggleCameraPlaying() async {
     if (_isCameraPlaying) {
-      await _pauseLiveFeed(); // Pause the camera feed and stop tracking
+      await _pauseLiveFeed(); 
     } else {
-      _startTracking(); // Resume the camera feed and start tracking
+      _startTracking(); 
     }
     setState(() {
       _isCameraPlaying = !_isCameraPlaying;
@@ -613,12 +613,12 @@ void _processCameraImage(CameraImage image) async {
   }
 
   void _startTracking() async {
-    _sessionStartTime = DateTime.now(); // Record session start time
+    _sessionStartTime = DateTime.now(); 
     if (_saveSessionAsVideo) {
       await _initializeController();
       await _startVideoRecording();
     } else {
-      await _startLiveFeed(); // Start the camera feed and image stream
+      await _startLiveFeed(); 
     }
     setState(() {
       _isCameraPlaying = true;
@@ -636,14 +636,14 @@ void _processCameraImage(CameraImage image) async {
     setState(() {
       _isGraphVisible = false;
       _customPaint = null;
-      detectedEmotion = ''; // Reset detected emotion
+      detectedEmotion = ''; 
       _isCameraPlaying = false;
     });
   }
 
   Future<bool> _onWillPop() async {
     if (!_isCameraPlaying) {
-      return true; // Allow back navigation if the camera is paused
+      return true; 
     }
 
     final shouldExit = await _showStopTrackingDialog(context);
@@ -659,14 +659,14 @@ void _processCameraImage(CameraImage image) async {
         actions: [
           TextButton(
             onPressed: () {
-              _toggleCameraPlaying(); // Stop tracking
-              Navigator.of(context).pop(true); // Allow exit
+              _toggleCameraPlaying(); 
+              Navigator.of(context).pop(true); 
             },
             child: const Text('Yes'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(false); // Stay on the screen
+              Navigator.of(context).pop(false); 
             },
             child: const Text('No'),
           ),
@@ -690,7 +690,7 @@ void _processCameraImage(CameraImage image) async {
         SnackBar(content: Text('Video uploaded to Supabase: $fileName')),
       );
 
-      // Retrieve URL of the uploaded video
+      
       final videoUrl = Supabase.instance.client.storage
           .from('videos_bucket')
           .getPublicUrl(fileName);

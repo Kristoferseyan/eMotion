@@ -124,7 +124,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                         },
                         isDarkMode: isDarkMode,
                         userId: widget.userId,
-                        onItemDeleted: _refreshData, // Pass the refresh function
+                        onItemDeleted: _refreshData, 
                       ),
                     ],
                   ),

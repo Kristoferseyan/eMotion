@@ -13,47 +13,47 @@ class MyBarGraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Print statement to check if the widget is building and the scores being passed
+    
     print("Building MyBarGraph with scores: $scores");
 
-    // Sort the scores alphabetically by key
+    
     final sortedScores = Map.fromEntries(
       scores.entries.toList()
         ..sort((a, b) => a.key.compareTo(b.key)),
     );
 
-    // Calculate the maximum score to normalize the data
+    
     final maxScore = scores.values.isNotEmpty ? scores.values.reduce((a, b) => a > b ? a : b) : 1;
 
-    // Print maxScore for debugging
+    
     print("Max score: $maxScore");
 
-    // Handle empty or all-zero data by setting a default maxScore
-    final maxY = 100.0; // Max is fixed to 100% for the percentage-based graph
+    
+    final maxY = 100.0; 
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Container(
-        height: MediaQuery.of(context).size.height / 2.5, // Adjust height to limit overlap
+        height: MediaQuery.of(context).size.height / 2.5, 
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(125, 201, 201, 201), // Background color
-          borderRadius: BorderRadius.circular(15), // Rounded corners
+          color: const Color.fromARGB(125, 201, 201, 201), 
+          borderRadius: BorderRadius.circular(15), 
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
               spreadRadius: 4,
               blurRadius: 8,
-              offset: const Offset(0, 4), // Shadow for a 3D effect
+              offset: const Offset(0, 4), 
             ),
           ],
         ),
         child: BarChart(
           BarChartData(
-            maxY: maxY, // Fixed maxY at 100% to show percentages
+            maxY: maxY, 
             minY: 0,
             gridData: const FlGridData(show: false),
-            borderData: FlBorderData(show: false), // Removed borders
+            borderData: FlBorderData(show: false), 
             titlesData: FlTitlesData(
               show: true,
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -83,14 +83,14 @@ class MyBarGraph extends StatelessWidget {
                 x: index,
                 barRods: [
                   BarChartRodData(
-                    toY: percentage, // Scale the value to a percentage of the max score
-                    width: 24, // Slightly wider bars
-                    color: Colors.blueAccent, // Bar color
+                    toY: percentage, 
+                    width: 24, 
+                    color: Colors.blueAccent, 
                     borderRadius: const BorderRadius.all(Radius.circular(6)),
                     backDrawRodData: BackgroundBarChartRodData(
                       show: true,
-                      toY: maxY, // Use 100 as the background bar
-                      color: Colors.grey[300], // Background bar color
+                      toY: maxY, 
+                      color: Colors.grey[300], 
                     ),
                   ),
                 ],
@@ -123,7 +123,7 @@ Widget getBottomTitles(
 }
 
 String getEmojiForEmotion(String emotion) {
-  switch (_sanitizeEmotionName(emotion)) { // Ensure sanitized name is used
+  switch (_sanitizeEmotionName(emotion)) { 
     case 'Anger':
       return '😠';
     case 'Happiness':
@@ -143,7 +143,7 @@ String getEmojiForEmotion(String emotion) {
   }
 }
 
-// Helper to sanitize emotion names
+
 String _sanitizeEmotionName(String emotion) {
   final trimmedEmotion = emotion.trim().toLowerCase();
 

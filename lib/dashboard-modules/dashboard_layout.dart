@@ -135,7 +135,7 @@ class _DashboardLayoutState extends State<DashboardLayout> with WidgetsBindingOb
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
-      0, // Notification ID
+      0, 
       title,
       body,
       platformChannelSpecifics,
@@ -233,7 +233,7 @@ class _DashboardLayoutState extends State<DashboardLayout> with WidgetsBindingOb
                     onNotificationButtonPressed: _toggleNotifications,
                     showNotifications: showNotifications,
                     markAsRead: _markNotificationAsRead,
-                    refreshNotifications: _fetchUnreadNotifications, // Pass the callback
+                    refreshNotifications: _fetchUnreadNotifications, 
                   ),
           ),
         ),
@@ -268,7 +268,7 @@ class DashboardBody extends StatelessWidget {
   final bool showNotifications;
   final int unreadNotificationCount;
   final ValueChanged<String> markAsRead;
-  final VoidCallback refreshNotifications; // New parameter for refreshing notifications
+  final VoidCallback refreshNotifications; 
 
   const DashboardBody({
     Key? key,
@@ -282,7 +282,7 @@ class DashboardBody extends StatelessWidget {
     required this.showNotifications,
     required this.unreadNotificationCount,
     required this.markAsRead,
-    required this.refreshNotifications, // Add the refreshNotifications callback
+    required this.refreshNotifications, 
   }) : super(key: key);
 
   @override
@@ -325,7 +325,7 @@ class DashboardBody extends StatelessWidget {
                     ? NotificationsPage(
                         userId: userId,
                         markAsRead: markAsRead,
-                        refreshNotifications: refreshNotifications, // Pass refreshNotifications
+                        refreshNotifications: refreshNotifications, 
                       )
                     : CustomLayout(
                         maxWidth: constraints.maxWidth,

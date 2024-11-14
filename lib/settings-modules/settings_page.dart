@@ -27,7 +27,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Use the current theme's brightness instead of MediaQuery
+    
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
