@@ -1,0 +1,203 @@
+Date : 2024-11-21 18:55:17
+Directory : d:\FINAL THESIS DEFENSE\fix-emotion
+Total : 104 files,  10774 codes, 180 comments, 1354 blanks, all 12308 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| Dart       |         57 |      9,016 |          0 |      1,058 |     10,074 |
+| XML        |         10 |        489 |         54 |         20 |        563 |
+| C++        |         11 |        452 |         94 |        144 |        690 |
+| JSON       |          4 |        248 |          0 |          4 |        252 |
+| CMake      |          4 |        245 |          0 |         45 |        290 |
+| Gradle     |          3 |        109 |          0 |         22 |        131 |
+| YAML       |          3 |         71 |          8 |         12 |         91 |
+| Swift      |          6 |         66 |          7 |         20 |         93 |
+| HTML       |          1 |         38 |         16 |          6 |         60 |
+| Markdown   |          2 |         29 |          0 |         18 |         47 |
+| Properties |          2 |          8 |          1 |          2 |         11 |
+| Kotlin     |          1 |          3 |          0 |          3 |          6 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                   |        104 |     10,774 |        180 |      1,354 |     12,308 |
+| . (Files)                                                                                                           |          4 |         97 |          8 |         28 |        133 |
+| android                                                                                                             |         13 |        205 |         53 |         44 |        302 |
+| android (Files)                                                                                                     |          3 |         41 |          0 |          9 |         50 |
+| android\app                                                                                                         |          9 |        159 |         52 |         34 |        245 |
+| android\app (Files)                                                                                                 |          1 |         71 |          0 |         14 |         85 |
+| android\app\src                                                                                                     |          8 |         88 |         52 |         20 |        160 |
+| android\app\src\debug                                                                                               |          1 |          3 |          4 |          1 |          8 |
+| android\app\src\main                                                                                                |          6 |         82 |         44 |         18 |        144 |
+| android\app\src\main (Files)                                                                                        |          1 |         53 |         12 |          9 |         74 |
+| android\app\src\main\kotlin                                                                                         |          1 |          3 |          0 |          3 |          6 |
+| android\app\src\main\kotlin\com                                                                                     |          1 |          3 |          0 |          3 |          6 |
+| android\app\src\main\kotlin\com\example                                                                             |          1 |          3 |          0 |          3 |          6 |
+| android\app\src\main\kotlin\com\example\fix_emotion                                                                 |          1 |          3 |          0 |          3 |          6 |
+| android\app\src\main\res                                                                                            |          4 |         26 |         32 |          6 |         64 |
+| android\app\src\main\res\drawable                                                                                   |          1 |          4 |          7 |          2 |         13 |
+| android\app\src\main\res\drawable-v21                                                                               |          1 |          4 |          7 |          2 |         13 |
+| android\app\src\main\res\values                                                                                     |          1 |          9 |          9 |          1 |         19 |
+| android\app\src\main\res\values-night                                                                               |          1 |          9 |          9 |          1 |         19 |
+| android\app\src\profile                                                                                             |          1 |          3 |          4 |          1 |          8 |
+| android\gradle                                                                                                      |          1 |          5 |          1 |          1 |          7 |
+| android\gradle\wrapper                                                                                              |          1 |          5 |          1 |          1 |          7 |
+| ios                                                                                                                 |          8 |        229 |          4 |         13 |        246 |
+| ios\Runner                                                                                                          |          7 |        222 |          2 |          9 |        233 |
+| ios\Runner (Files)                                                                                                  |          2 |         13 |          0 |          3 |         16 |
+| ios\RunnerTests                                                                                                     |          1 |          7 |          2 |          4 |         13 |
+| ios\Runner\Assets.xcassets                                                                                          |          3 |        148 |          0 |          4 |        152 |
+| ios\Runner\Assets.xcassets\AppIcon.appiconset                                                                       |          1 |        122 |          0 |          1 |        123 |
+| ios\Runner\Assets.xcassets\LaunchImage.imageset                                                                     |          2 |         26 |          0 |          3 |         29 |
+| ios\Runner\Base.lproj                                                                                               |          2 |         61 |          2 |          2 |         65 |
+| lib                                                                                                                 |         57 |      9,016 |          0 |      1,058 |     10,074 |
+| lib (Files)                                                                                                         |          2 |        287 |          0 |         38 |        325 |
+| lib\admin-dashboard                                                                                                 |         10 |      1,884 |          0 |        251 |      2,135 |
+| lib\analytics-modules                                                                                               |          4 |        601 |          0 |         63 |        664 |
+| lib\auth-modules                                                                                                    |         13 |      1,868 |          0 |        189 |      2,057 |
+| lib\auth-modules (Files)                                                                                            |          1 |         12 |          0 |          3 |         15 |
+| lib\auth-modules\login-modules                                                                                      |          6 |        620 |          0 |         74 |        694 |
+| lib\auth-modules\reg-modules                                                                                        |          6 |      1,236 |          0 |        112 |      1,348 |
+| lib\auth-modules\reg-modules (Files)                                                                                |          3 |        796 |          0 |         56 |        852 |
+| lib\auth-modules\reg-modules\admin-registration                                                                     |          3 |        440 |          0 |         56 |        496 |
+| lib\dashboard-modules                                                                                               |         11 |      1,859 |          0 |        226 |      2,085 |
+| lib\dashboard-modules (Files)                                                                                       |          4 |        817 |          0 |         75 |        892 |
+| lib\dashboard-modules\module-boxes                                                                                  |          7 |      1,042 |          0 |        151 |      1,193 |
+| lib\dashboard-modules\module-boxes (Files)                                                                          |          1 |        113 |          0 |          5 |        118 |
+| lib\dashboard-modules\module-boxes\emotion-dictionary                                                               |          1 |        115 |          0 |          6 |        121 |
+| lib\dashboard-modules\module-boxes\tracking-modules                                                                 |          5 |        814 |          0 |        140 |        954 |
+| lib\graph                                                                                                           |          5 |        617 |          0 |         77 |        694 |
+| lib\graph (Files)                                                                                                   |          2 |        275 |          0 |         38 |        313 |
+| lib\graph\emotion-chart                                                                                             |          3 |        342 |          0 |         39 |        381 |
+| lib\pose-detection                                                                                                  |          2 |        166 |          0 |         21 |        187 |
+| lib\pose-detection\painters                                                                                         |          2 |        166 |          0 |         21 |        187 |
+| lib\settings-modules                                                                                                |         10 |      1,734 |          0 |        193 |      1,927 |
+| macos                                                                                                               |          6 |        458 |          5 |         16 |        479 |
+| macos\Flutter                                                                                                       |          1 |         20 |          3 |          4 |         27 |
+| macos\Runner                                                                                                        |          4 |        431 |          0 |          8 |        439 |
+| macos\Runner (Files)                                                                                                |          2 |         20 |          0 |          6 |         26 |
+| macos\RunnerTests                                                                                                   |          1 |          7 |          2 |          4 |         13 |
+| macos\Runner\Assets.xcassets                                                                                        |          1 |         68 |          0 |          1 |         69 |
+| macos\Runner\Assets.xcassets\AppIcon.appiconset                                                                     |          1 |         68 |          0 |          1 |         69 |
+| macos\Runner\Base.lproj                                                                                             |          1 |        343 |          0 |          1 |        344 |
+| web                                                                                                                 |          2 |         73 |         16 |          7 |         96 |
+| windows                                                                                                             |         14 |        696 |         94 |        188 |        978 |
+| windows (Files)                                                                                                     |          1 |         89 |          0 |         20 |        109 |
+| windows\flutter                                                                                                     |          4 |        145 |          9 |         29 |        183 |
+| windows\runner                                                                                                      |          9 |        462 |         85 |        139 |        686 |
++---------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                                            | language   | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| d:\FINAL THESIS DEFENSE\fix-emotion\README.md                                                                       | Markdown   |         26 |          0 |         16 |         42 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\analysis_options.yaml                                                           | YAML       |          1 |          0 |          1 |          2 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\app\build.gradle                                                        | Gradle     |         71 |          0 |         14 |         85 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\app\src\debug\AndroidManifest.xml                                       | XML        |          3 |          4 |          1 |          8 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\app\src\main\AndroidManifest.xml                                        | XML        |         53 |         12 |          9 |         74 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\app\src\main\kotlin\com\example\fix_emotion\MainActivity.kt             | Kotlin     |          3 |          0 |          3 |          6 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\app\src\main\res\drawable-v21\launch_background.xml                     | XML        |          4 |          7 |          2 |         13 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\app\src\main\res\drawable\launch_background.xml                         | XML        |          4 |          7 |          2 |         13 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\app\src\main\res\values-night\styles.xml                                | XML        |          9 |          9 |          1 |         19 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\app\src\main\res\values\styles.xml                                      | XML        |          9 |          9 |          1 |         19 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\app\src\profile\AndroidManifest.xml                                     | XML        |          3 |          4 |          1 |          8 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\build.gradle                                                            | Gradle     |         16 |          0 |          3 |         19 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\gradle.properties                                                       | Properties |          3 |          0 |          1 |          4 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\gradle\wrapper\gradle-wrapper.properties                                | Properties |          5 |          1 |          1 |          7 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\android\settings.gradle                                                         | Gradle     |         22 |          0 |          5 |         27 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\devtools_options.yaml                                                           | YAML       |          1 |          0 |          1 |          2 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\ios\RunnerTests\RunnerTests.swift                                               | Swift      |          7 |          2 |          4 |         13 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\ios\Runner\AppDelegate.swift                                                    | Swift      |         12 |          0 |          2 |         14 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\ios\Runner\Assets.xcassets\AppIcon.appiconset\Contents.json                     | JSON       |        122 |          0 |          1 |        123 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\ios\Runner\Assets.xcassets\LaunchImage.imageset\Contents.json                   | JSON       |         23 |          0 |          1 |         24 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\ios\Runner\Assets.xcassets\LaunchImage.imageset\README.md                       | Markdown   |          3 |          0 |          2 |          5 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\ios\Runner\Base.lproj\LaunchScreen.storyboard                                   | XML        |         36 |          1 |          1 |         38 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\ios\Runner\Base.lproj\Main.storyboard                                           | XML        |         25 |          1 |          1 |         27 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\ios\Runner\Runner-Bridging-Header.h                                             | C++        |          1 |          0 |          1 |          2 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\admin-dashboard\AdminFeedbackpage.dart                                      | Dart       |        172 |          0 |         28 |        200 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\admin-dashboard\admin_dashboard.dart                                        | Dart       |         53 |          0 |         10 |         63 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\admin-dashboard\admin_sessions_detail_page.dart                             | Dart       |        161 |          0 |         22 |        183 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\admin-dashboard\group_emotion_detail_page.dart                              | Dart       |        301 |          0 |         50 |        351 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\admin-dashboard\group_management_widget.dart                                | Dart       |        153 |          0 |         21 |        174 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\admin-dashboard\group_member_page.dart                                      | Dart       |        280 |          0 |         39 |        319 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\admin-dashboard\group_overview_page.dart                                    | Dart       |        249 |          0 |         35 |        284 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\admin-dashboard\main_dashboard_page.dart                                    | Dart       |        275 |          0 |         31 |        306 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\admin-dashboard\nav_bar.dart                                                | Dart       |         88 |          0 |          5 |         93 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\admin-dashboard\settings_page.dart                                          | Dart       |        152 |          0 |         10 |        162 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\analytics-modules\analytics_page.dart                                       | Dart       |        168 |          0 |         22 |        190 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\analytics-modules\pdf_generator.dart                                        | Dart       |         66 |          0 |          7 |         73 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\analytics-modules\tacking_list.dart                                         | Dart       |        197 |          0 |         19 |        216 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\analytics-modules\tracking_detail_page.dart                                 | Dart       |        170 |          0 |         15 |        185 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\login-modules\forgot_password.dart                             | Dart       |        109 |          0 |         14 |        123 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\login-modules\login.dart                                       | Dart       |        213 |          0 |         25 |        238 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\login-modules\login_form.dart                                  | Dart       |        102 |          0 |          4 |        106 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\login-modules\login_header.dart                                | Dart       |         29 |          0 |          4 |         33 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\login-modules\reset_password.dart                              | Dart       |        135 |          0 |         23 |        158 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\login-modules\social_login_buttons.dart                        | Dart       |         32 |          0 |          4 |         36 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\logo.dart                                                      | Dart       |         12 |          0 |          3 |         15 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\reg-modules\admin-registration\admin_registration.dart         | Dart       |        189 |          0 |         28 |        217 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\reg-modules\admin-registration\admin_widgets.dart              | Dart       |        212 |          0 |         23 |        235 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\reg-modules\admin-registration\terms_and_conditions_admin.dart | Dart       |         39 |          0 |          5 |         44 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\reg-modules\registration.dart                                  | Dart       |        349 |          0 |         22 |        371 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\reg-modules\terms_and_conditions_dialog.dart                   | Dart       |        161 |          0 |          7 |        168 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\auth-modules\reg-modules\user_info_page.dart                                | Dart       |        286 |          0 |         27 |        313 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\dashboard-modules\dashboard.dart                                            | Dart       |         94 |          0 |          7 |        101 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\dashboard-modules\dashboard_layout.dart                                     | Dart       |        366 |          0 |         35 |        401 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\dashboard-modules\module-boxes\custom_layout.dart                           | Dart       |        113 |          0 |          5 |        118 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\dashboard-modules\module-boxes\emotion-dictionary\emotionDict.dart          | Dart       |        115 |          0 |          6 |        121 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\dashboard-modules\module-boxes\tracking-modules\camera_service.dart         | Dart       |         32 |          0 |         11 |         43 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\dashboard-modules\module-boxes\tracking-modules\database_service.dart       | Dart       |         30 |          0 |          6 |         36 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\dashboard-modules\module-boxes\tracking-modules\emotion_service.dart        | Dart       |         44 |          0 |          1 |         45 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\dashboard-modules\module-boxes\tracking-modules\model_service.dart          | Dart       |         83 |          0 |         11 |         94 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\dashboard-modules\module-boxes\tracking-modules\track_emo_layout.dart       | Dart       |        625 |          0 |        111 |        736 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\dashboard-modules\notifiaction_page.dart                                    | Dart       |        153 |          0 |         18 |        171 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\dashboard-modules\profile_page.dart                                         | Dart       |        204 |          0 |         15 |        219 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\graph\bar_graph.dart                                                        | Dart       |        146 |          0 |         23 |        169 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\graph\emotion-chart\emotion_chart.dart                                      | Dart       |        234 |          0 |         14 |        248 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\graph\emotion-chart\emotion_chart_data.dart                                 | Dart       |         70 |          0 |         20 |         90 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\graph\emotion-chart\emotion_dropdown.dart                                   | Dart       |         38 |          0 |          5 |         43 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\graph\pie_chart_widget.dart                                                 | Dart       |        129 |          0 |         15 |        144 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\main.dart                                                                   | Dart       |        260 |          0 |         34 |        294 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\pose-detection\painters\coordinates_translator.dart                         | Dart       |         49 |          0 |          4 |         53 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\pose-detection\painters\pose_painter.dart                                   | Dart       |        117 |          0 |         17 |        134 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\settings-modules\change_password_page.dart                                  | Dart       |        188 |          0 |         17 |        205 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\settings-modules\delete_data_page.dart                                      | Dart       |        119 |          0 |         13 |        132 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\settings-modules\developer_info_page.dart                                   | Dart       |        116 |          0 |          6 |        122 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\settings-modules\edit_profile_page.dart                                     | Dart       |        328 |          0 |         24 |        352 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\settings-modules\feedback_page.dart                                         | Dart       |        172 |          0 |         29 |        201 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\settings-modules\login_activity_page.dart                                   | Dart       |         80 |          0 |         11 |         91 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\settings-modules\notification_settings_page.dart                            | Dart       |        155 |          0 |         24 |        179 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\settings-modules\privacy_settings_page.dart                                 | Dart       |        224 |          0 |         36 |        260 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\settings-modules\settings_page.dart                                         | Dart       |        241 |          0 |         21 |        262 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\settings-modules\theme_settings_page.dart                                   | Dart       |        111 |          0 |         12 |        123 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\lib\splashScreen.dart                                                           | Dart       |         27 |          0 |          4 |         31 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\macos\Flutter\GeneratedPluginRegistrant.swift                                   | Swift      |         20 |          3 |          4 |         27 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\macos\RunnerTests\RunnerTests.swift                                             | Swift      |          7 |          2 |          4 |         13 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\macos\Runner\AppDelegate.swift                                                  | Swift      |          8 |          0 |          2 |         10 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\macos\Runner\Assets.xcassets\AppIcon.appiconset\Contents.json                   | JSON       |         68 |          0 |          1 |         69 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\macos\Runner\Base.lproj\MainMenu.xib                                            | XML        |        343 |          0 |          1 |        344 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\macos\Runner\MainFlutterWindow.swift                                            | Swift      |         12 |          0 |          4 |         16 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\pubspec.yaml                                                                    | YAML       |         69 |          8 |         10 |         87 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\web\index.html                                                                  | HTML       |         38 |         16 |          6 |         60 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\web\manifest.json                                                               | JSON       |         35 |          0 |          1 |         36 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\CMakeLists.txt                                                          | CMake      |         89 |          0 |         20 |        109 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\flutter\CMakeLists.txt                                                  | CMake      |         98 |          0 |         12 |        110 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\flutter\generated_plugin_registrant.cc                                  | C++        |         18 |          4 |          5 |         27 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\flutter\generated_plugin_registrant.h                                   | C++        |          5 |          5 |          6 |         16 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\flutter\generated_plugins.cmake                                         | CMake      |         24 |          0 |          6 |         30 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\runner\CMakeLists.txt                                                   | CMake      |         34 |          0 |          7 |         41 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\runner\flutter_window.cpp                                               | C++        |         49 |          7 |         16 |         72 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\runner\flutter_window.h                                                 | C++        |         20 |          5 |          9 |         34 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\runner\main.cpp                                                         | C++        |         30 |          4 |         10 |         44 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\runner\resource.h                                                       | C++        |          9 |          6 |          2 |         17 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\runner\utils.cpp                                                        | C++        |         54 |          2 |         10 |         66 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\runner\utils.h                                                          | C++        |          8 |          6 |          6 |         20 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\runner\win32_window.cpp                                                 | C++        |        210 |         24 |         55 |        289 |
+| d:\FINAL THESIS DEFENSE\fix-emotion\windows\runner\win32_window.h                                                   | C++        |         48 |         31 |         24 |        103 |
+| Total                                                                                                               |            |     10,774 |        180 |      1,354 |     12,308 |
++---------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

@@ -15,7 +15,6 @@ import 'settings-modules/privacy_settings_page.dart';
 final _logger = Logger('MyApp');
 
 Future<void> main() async {
-
   WidgetsFlutterBinding.ensureInitialized();      
   await dotenv.load(fileName: "assets/auth.env");
   final String? supabaseUrl = dotenv.env['SUPABASE_URL'];
@@ -25,18 +24,15 @@ Future<void> main() async {
     _logger.severe("Environment variables for Supabase are missing!");
     throw Exception("Environment variables for Supabase are missing!");
   }
-
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
   );
-
   final supabase = Supabase.instance.client;
   final bool isAuthenticated = supabase.auth.currentSession != null;
 
   runApp(SplashScreen(isAuthenticated: isAuthenticated));
 }
-
 class MyApp extends StatefulWidget {
   
   final bool isAuthenticated;

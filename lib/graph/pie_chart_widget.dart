@@ -12,17 +12,17 @@ class PieChartWidget extends StatelessWidget {
     final isDarkMode = brightness == Brightness.dark;
 
     List<PieChartSectionData> sections = emotionData.entries.map((entry) {
-      String emotionKey = _sanitizeEmotion(entry.key.trim());
+      String emotionKey = entry.key.trim();
       Color color = _getColor(emotionKey);
-      double value = entry.value * 100; 
+      double value = entry.value;
 
       return PieChartSectionData(
         color: color,
         value: value,
-        title: '${value.toStringAsFixed(0)}%', 
+        title: '${value.toStringAsFixed(1)}%',
         radius: 60,
         titleStyle: TextStyle(
-          fontSize: _getTitleFontSize(value), 
+          fontSize: _getTitleFontSize(value), // Adjust font size based on value
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -56,7 +56,7 @@ class PieChartWidget extends StatelessWidget {
       spacing: 12,
       runSpacing: 12,
       children: emotionData.keys.map((emotion) {
-        String emotionKey = _sanitizeEmotion(emotion.trim());
+        String emotionKey = emotion.trim();
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -106,38 +106,8 @@ class PieChartWidget extends StatelessWidget {
         return Colors.green;
       case 'Fear':
         return Colors.deepPurpleAccent;
-      case 'Neutral':
-        return Colors.grey;
       default:
-        return Colors.grey; 
+        return Colors.grey;
     }
-  }
-
-  
-  String _sanitizeEmotion(String emotion) {
-    final trimmedEmotion = emotion.trim().toLowerCase();
-    
-    final corrections = {
-      'happyness': 'Happiness',
-      'hapiness': 'Happiness',
-      'sadnes': 'Sadness',
-      'anger': 'Anger',
-      'suprise': 'Surprise',
-      'disguist': 'Disgust',
-      'fear': 'Fear',
-      'neutral': 'Neutral',
-      'happy': 'Happiness',
-      'sad': 'Sadness',
-      'angry': 'Anger',
-      'surprised': 'Surprise',
-      'disgusted': 'Disgust',
-      'afraid': 'Fear',
-    };
-
-    return corrections[trimmedEmotion] ?? _capitalize(trimmedEmotion);
-  }
-
-  String _capitalize(String text) {
-    return text.isEmpty ? text : '${text[0].toUpperCase()}${text.substring(1)}';
   }
 }

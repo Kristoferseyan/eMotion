@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login_header.dart';
 import 'login_form.dart';
-import 'social_login_buttons.dart';
 import '../logo.dart';
 import 'package:fix_emotion/dashboard-modules/dashboard.dart';
 import '../authentication_service.dart';
@@ -62,56 +61,52 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-Future<void> _navigateToDashboard() async {
-  final userData = await authService.getUserData();
-  if (userData != null) {
-    final role = await _getUserRole(userData['userId']!);
+  Future<void> _navigateToDashboard() async {
+    final userData = await authService.getUserData();
+    if (userData != null) {
+      final role = await _getUserRole(userData['userId']!);
 
-    if (role == 'admin') {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => AdminDashboard(
-            userId: userData['userId']!,
-            userEmail: userData['userEmail']!,
+      if (role == 'admin') {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => AdminDashboard(
+              userId: userData['userId']!,
+              userEmail: userData['userEmail']!,
+            ),
           ),
-        ),
-      );
-    } else if(role == 'user') {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => Dashboard(
-            userId: userData['userId']!,
-            userEmail: userData['userEmail']!,
+        );
+      } else if (role == 'user') {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => Dashboard(
+              userId: userData['userId']!,
+              userEmail: userData['userEmail']!,
+            ),
           ),
-        ),
-      );
+        );
+      }
     }
   }
-}
 
+  Future<String?> _getUserRole(String userId) async {
+    try {
+      final response = await authService.client
+          .from('user_admin')
+          .select('role')
+          .eq('id', userId)
+          .single();
 
-
-Future<String?> _getUserRole(String userId) async {
-  try {
-
-    final response = await authService.client
-        .from('user_admin')
-        .select('role')
-        .eq('id', userId)
-        .single();
-
-    if (response['role'] == "admin") {
-      return response['role'] as String; 
+      if (response['role'] == "admin") {
+        return response['role'] as String;
+      } else if (response['role'] == "user") {
+        return response['role'] as String;
+      }
+      return null;
+    } catch (error) {
+      print('Error fetching user role: $error');
+      return null;
     }
-    else if(response['role'] == "user") {
-      return response['role'] as String;
-    }
-    return null;
-  } catch (error) {
-    print('Error fetching user role: $error');
-    return null;
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -146,10 +141,6 @@ Future<String?> _getUserRole(String userId) async {
                         errorMessage: _errorMessage,
                         onLogin: _loginUser,
                         onForgotPassword: _navigateToForgotPassword,
-                      ),
-                      SocialLoginButtons(
-                        onGoogleSignIn: _googleSignIn,
-                        isLoading: _isLoading,
                       ),
                     ],
                   ),
@@ -194,24 +185,6 @@ Future<String?> _getUserRole(String userId) async {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed: $_errorMessage')),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _googleSignIn() async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      await authService.signInWithGoogle();
-    } catch (error) {
-      print('Error during Google Sign-In: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error during Google Sign-In: $error')),
       );
     } finally {
       setState(() {

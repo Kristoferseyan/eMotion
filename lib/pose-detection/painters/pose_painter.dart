@@ -15,7 +15,6 @@ class PosePainter extends CustomPainter {
   final Size imageSize;
   final InputImageRotation rotation;
   final CameraLensDirection cameraLensDirection;
-
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -62,11 +61,7 @@ class PosePainter extends CustomPainter {
           paint,
         );
       });
-
-      
       Rect boundingBox = calculateBoundingBox(pose.landmarks.values.toList());
-
-      
       canvas.drawRect(
         Rect.fromLTRB(
           translateX(boundingBox.left, size, imageSize, rotation, cameraLensDirection),
@@ -76,8 +71,6 @@ class PosePainter extends CustomPainter {
         ),
         boundingBoxPaint,
       );
-
-      
       void paintLine(
         PoseLandmarkType type1,
         PoseLandmarkType type2,
@@ -97,8 +90,6 @@ class PosePainter extends CustomPainter {
           paintType,
         );
       }
-
-      
       paintLine(PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow, leftPaint);
       paintLine(PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist, leftPaint);
       paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow, rightPaint);
@@ -115,7 +106,6 @@ class PosePainter extends CustomPainter {
       paintLine(PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle, rightPaint);
     }
   }
-
   
   Rect calculateBoundingBox(List<PoseLandmark> landmarks) {
     double minX = double.infinity;
