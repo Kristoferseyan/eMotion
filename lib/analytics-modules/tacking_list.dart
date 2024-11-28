@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';  
 import 'tracking_detail_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -26,7 +27,6 @@ class TrackingList extends StatefulWidget {
 
 class _TrackingListState extends State<TrackingList> {
   List<Map<String, dynamic>> _trackingData = [];
-
   final supabase = Supabase.instance.client;
 
   @override
@@ -36,16 +36,11 @@ class _TrackingListState extends State<TrackingList> {
   }
 
   Future<void> _deleteTrackingItem(String sessionId, int index) async {
-    print('UserId: ${widget.userId}');
-    print('SessionId: $sessionId');
-
     try {
-
       final response = await supabase
           .from('emotion_tracking')
           .delete()
           .eq('session_id', sessionId);
-
 
       if (response != null) {
         setState(() {
@@ -54,7 +49,7 @@ class _TrackingListState extends State<TrackingList> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Tracking session deleted successfully')),
         );
-        widget.onItemDeleted(); 
+        widget.onItemDeleted();
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,13 +60,15 @@ class _TrackingListState extends State<TrackingList> {
 
   @override
   Widget build(BuildContext context) {
+    
     final filteredTrackings = (widget.selectedEmotion == 'All'
         ? _trackingData
         : _trackingData.where((tracking) => tracking['emotion'] == widget.selectedEmotion).toList())
       ..sort((a, b) {
-        final aDateTime = DateTime.parse('${a['date']} ${a['time']}');
-        final bDateTime = DateTime.parse('${b['date']} ${b['time']}');
-        return bDateTime.compareTo(aDateTime); 
+        
+        final aDateTime = DateTime.parse(a['timestamp']);
+        final bDateTime = DateTime.parse(b['timestamp']);
+        return bDateTime.compareTo(aDateTime);
       });
 
     return Column(
@@ -89,6 +86,7 @@ class _TrackingListState extends State<TrackingList> {
     );
   }
 
+  
   Widget _buildSectionTitle(String title, bool isDarkMode) {
     return Text(
       title,
@@ -100,6 +98,7 @@ class _TrackingListState extends State<TrackingList> {
     );
   }
 
+  
   Widget _buildEmotionFilterDropdown(bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -125,6 +124,7 @@ class _TrackingListState extends State<TrackingList> {
     );
   }
 
+  
   Widget _buildRecentTrackingList(List<Map<String, dynamic>> filteredTrackings, bool isDarkMode) {
     return Container(
       height: 300,
@@ -145,6 +145,11 @@ class _TrackingListState extends State<TrackingList> {
         itemBuilder: (context, index) {
           final tracking = filteredTrackings[index];
 
+          
+          final timestamp = DateTime.parse(tracking['timestamp']);
+          final dateFormatted = DateFormat('MMM dd, yyyy').format(timestamp); 
+          final timeFormatted = DateFormat('h:mm a').format(timestamp); 
+
           return Dismissible(
             key: Key(tracking['session_id'].toString()),
             background: Container(
@@ -155,7 +160,7 @@ class _TrackingListState extends State<TrackingList> {
             ),
             direction: DismissDirection.endToStart,
             onDismissed: (direction) async {
-              final sessionId = tracking['session_id']?.toString(); 
+              final sessionId = tracking['session_id']?.toString();
 
               if (sessionId != null && sessionId.isNotEmpty) {
                 await _deleteTrackingItem(sessionId, index);
@@ -172,8 +177,8 @@ class _TrackingListState extends State<TrackingList> {
                   MaterialPageRoute(
                     builder: (context) => TrackingDetailPage(
                       emotion: tracking['emotion'],
-                      date: tracking['date'],
-                      time: tracking['time'],
+                      date: dateFormatted, 
+                      time: timeFormatted, 
                       duration: tracking['duration']?.toString() ?? 'Unknown duration',
                       emotionDistributionJson: tracking['emotion_distribution'],
                     ),
@@ -201,7 +206,7 @@ class _TrackingListState extends State<TrackingList> {
                     style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                   ),
                   subtitle: Text(
-                    '${tracking['date']} ${tracking['time']}',
+                    '$dateFormatted at $timeFormatted',  
                     style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
                   ),
                 ),

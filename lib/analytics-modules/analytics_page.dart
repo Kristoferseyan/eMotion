@@ -16,68 +16,54 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   final supabase = Supabase.instance.client;
   String _selectedEmotion = 'All';
 
-  Future<Map<String, dynamic>> _fetchData() async {
-    Map<String, double> emotionData = {};
-    List<Map<String, dynamic>> recentTrackings = [];
+  
+  Future<Map<String, dynamic>> _fetchPieChartData() async {
+    final oneWeekAgo = DateTime.now().subtract(Duration(days: 7));
+    final formattedDate = oneWeekAgo.toIso8601String();
 
-    try {
-      final emotionResponse = await supabase
-          .from('emotion_tracking')
-          .select('session_id, emotion, emotion_distribution, timestamp, user_feedback, duration')
-          .eq('user_id', widget.userId);
+    
+    final response = await supabase
+        .from('emotion_tracking')
+        .select('emotion')
+        .eq('user_id', widget.userId)
+        .gte('timestamp', formattedDate); 
 
-      if (emotionResponse.isEmpty) {
-        print("No data found for user: ${widget.userId}");
-        return {};
-      }
-
-      Map<String, int> emotionCount = {};
-
-      for (var record in emotionResponse as List<dynamic>) {
-        String emotion = record['emotion'];
-        if (emotionCount.containsKey(emotion)) {
-          emotionCount[emotion] = emotionCount[emotion]! + 1;
-        } else {
-          emotionCount[emotion] = 1;
-        }
-      }
-
-      int total = emotionCount.values.fold(0, (sum, count) => sum + count);
-      emotionData = {
-        for (var entry in emotionCount.entries)
-          entry.key: (entry.value / total) * 100,
-      };
-
-      recentTrackings = List<Map<String, dynamic>>.from(emotionResponse).map((tracking) {
-        final DateTime timestamp = DateTime.parse(tracking['timestamp']);
-        final String date = '${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}';
-        final String time = '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
-
-        return {
-          'session_id': tracking['session_id'],
-          'emotion': tracking['emotion'],
-          'emotion_distribution': tracking['emotion_distribution'],
-          'date': date,
-          'time': time,
-          'user_feedback': tracking['user_feedback'],
-          'duration': tracking['duration']?.toString() ?? 'Unknown duration',
-        };
-      }).toList();
-
-    } catch (error) {
-      print('Error fetching data: $error');
+    if (response.isEmpty) {
+      print('No data found for the past week.');
+      return {};
     }
+
+    Map<String, int> emotionCount = {};
+
+    for (var record in response) {
+      String emotion = record['emotion'];
+      emotionCount[emotion] = (emotionCount[emotion] ?? 0) + 1;
+    }
+
+    int total = emotionCount.values.fold(0, (sum, count) => sum + count);
+    final emotionData = {
+      for (var entry in emotionCount.entries)
+        entry.key: (entry.value / total) * 100,
+    };
 
     return {
       'emotionData': emotionData,
-      'recentTrackings': recentTrackings,
     };
   }
 
-  void _refreshData() {
-    setState(() {
-      _fetchData();
-    });
+  
+  Future<List<Map<String, dynamic>>> _fetchAllTrackingData() async {
+    final response = await supabase
+        .from('emotion_tracking')
+        .select('session_id, emotion, timestamp, user_feedback, duration, emotion_distribution')
+        .eq('user_id', widget.userId);
+
+    if (response.isEmpty) {
+      print('No data found.');
+      return [];
+    }
+
+    return List<Map<String, dynamic>>.from(response);
   }
 
   @override
@@ -87,7 +73,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF122E31) : const Color(0xFFF3FCFF),
       body: FutureBuilder<Map<String, dynamic>>(
-        future: _fetchData(),
+        future: _fetchPieChartData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -95,41 +81,55 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             final emotionData = snapshot.data!['emotionData'] as Map<String, double>;
-            final recentTrackings = snapshot.data!['recentTrackings'] as List<Map<String, dynamic>>;
 
-            return SafeArea(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeader(isDarkMode),
-                      const SizedBox(height: 20),
-                      _buildSectionTitle('Dominant Emotion in a Week', isDarkMode),
-                      const SizedBox(height: 10),
-                      _buildCard(
-                        context,
-                        child: PieChartWidget(emotionData: emotionData),
-                        isDarkMode: isDarkMode,
+            return FutureBuilder<List<Map<String, dynamic>>>(
+              future: _fetchAllTrackingData(),
+              builder: (context, trackingSnapshot) {
+                if (trackingSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (trackingSnapshot.hasError) {
+                  return Center(child: Text('Error: ${trackingSnapshot.error}'));
+                } else if (trackingSnapshot.hasData && trackingSnapshot.data!.isNotEmpty) {
+                  final recentTrackings = trackingSnapshot.data!;
+
+                  return SafeArea(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildHeader(isDarkMode),
+                            const SizedBox(height: 20),
+                            _buildSectionTitle('Dominant Emotion in a Week', isDarkMode),
+                            const SizedBox(height: 10),
+                            _buildCard(
+                              context,
+                              child: PieChartWidget(emotionData: emotionData),
+                              isDarkMode: isDarkMode,
+                            ),
+                            const SizedBox(height: 20),
+                            TrackingList(
+                              recentTrackings: recentTrackings,
+                              selectedEmotion: _selectedEmotion,
+                              onEmotionChanged: (newValue) {
+                                setState(() {
+                                  _selectedEmotion = newValue ?? 'All';
+                                });
+                              },
+                              isDarkMode: isDarkMode,
+                              userId: widget.userId,
+                              onItemDeleted: _refreshData,
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 20),
-                      TrackingList(
-                        recentTrackings: recentTrackings,
-                        selectedEmotion: _selectedEmotion,
-                        onEmotionChanged: (newValue) {
-                          setState(() {
-                            _selectedEmotion = newValue ?? 'All';
-                          });
-                        },
-                        isDarkMode: isDarkMode,
-                        userId: widget.userId,
-                        onItemDeleted: _refreshData, 
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
+                  );
+                } else {
+                  return const Center(child: Text('No data available.'));
+                }
+              },
             );
           } else {
             return const Center(child: Text('No data available.'));
@@ -137,6 +137,12 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         },
       ),
     );
+  }
+
+  void _refreshData() {
+    setState(() {
+      
+    });
   }
 
   Widget _buildHeader(bool isDarkMode) {
