@@ -23,6 +23,10 @@ The recommended way to install *eMotion* is by downloading the APK file directly
 2. Register and sign in to explore the application.
 3. View your emotion analytics on the dashboard. You can also save sessions for future reference or training.
 
+## Images
+
+![462550979_1299228401530108_4127669552789472928_n](https://github.com/user-attachments/assets/43e9c8cd-352f-4150-9911-169892cf5a64)
+
 ## Citation
 
 This project utilizes the dataset from the BoLD (BOdy Language Dataset) Challenge:
