@@ -8,6 +8,7 @@ class EmotionChart extends StatefulWidget {
   final List<String> selectedEmotions;
   final List<String> emotions;
   final ValueChanged<List<String>> onEmotionChanged;
+  final String timeRange;
 
   const EmotionChart({
     Key? key,
@@ -15,6 +16,7 @@ class EmotionChart extends StatefulWidget {
     required this.selectedEmotions,
     required this.emotions,
     required this.onEmotionChanged,
+    required this.timeRange,
   }) : super(key: key);
 
   @override
@@ -27,17 +29,24 @@ class _EmotionChartState extends State<EmotionChart> {
   @override
   void initState() {
     super.initState();
-    
-    _emotionDataFuture = EmotionChartData.fetchEmotionData(widget.userId, widget.selectedEmotions);
+    _fetchEmotionData();
+  }
+
+  void _fetchEmotionData() {
+    _emotionDataFuture = EmotionChartData.fetchEmotionData(
+      widget.userId,
+      widget.selectedEmotions,
+      widget.timeRange,
+    );
   }
 
   @override
   void didUpdateWidget(EmotionChart oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectedEmotions != widget.selectedEmotions) {
+    if (oldWidget.selectedEmotions != widget.selectedEmotions ||
+        oldWidget.timeRange != widget.timeRange) {
       setState(() {
-        
-        _emotionDataFuture = EmotionChartData.fetchEmotionData(widget.userId, widget.selectedEmotions);
+        _fetchEmotionData();
       });
     }
   }
@@ -70,7 +79,7 @@ class _EmotionChartState extends State<EmotionChart> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Weekly Emotions',
+                    '${widget.timeRange} Emotions',
                     style: TextStyle(
                       color: isDarkMode ? Colors.white : Colors.black,
                       fontSize: 18,
@@ -152,7 +161,10 @@ class _EmotionChartState extends State<EmotionChart> {
                           ),
                           borderData: FlBorderData(
                             show: true,
-                            border: Border.all(color: isDarkMode ? const Color(0xff37434d) : const Color(0xff37434d), width: 1),
+                            border: Border.all(
+                              color: isDarkMode ? const Color(0xff37434d) : const Color(0xff37434d),
+                              width: 1,
+                            ),
                           ),
                           minX: 0,
                           maxX: 6,
@@ -162,7 +174,7 @@ class _EmotionChartState extends State<EmotionChart> {
                             return LineChartBarData(
                               spots: entry.value,
                               isCurved: true,
-                              color: _getColor(entry.key), 
+                              color: _getColor(entry.key),
                               barWidth: 3,
                               isStrokeCapRound: true,
                               dotData: FlDotData(show: true),
@@ -224,7 +236,6 @@ class _EmotionChartState extends State<EmotionChart> {
       child: text,
     );
   }
-
 
   Color _getColor(String emotion) {
     switch (emotion.trim()) {

@@ -4,18 +4,28 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class EmotionChartData {
   static final supabase = Supabase.instance.client;
 
-  static Future<Map<String, List<FlSpot>>> fetchEmotionData(String userId, List<String> emotions) async {
+  static Future<Map<String, List<FlSpot>>> fetchEmotionData(
+      String userId, List<String> emotions, String timeRange) async {
     try {
-      
+      DateTime startDate;
+      if (timeRange == 'Weekly') {
+        startDate = DateTime.now().subtract(const Duration(days: 7));
+      } else if (timeRange == 'Monthly') {
+        startDate = DateTime.now().subtract(const Duration(days: 30));
+      } else if (timeRange == 'Yearly') {
+        startDate = DateTime.now().subtract(const Duration(days: 365));
+      } else {
+        throw ArgumentError('Invalid time range: $timeRange');
+      }
+
       final response = await supabase
           .from('emotion_tracking')
           .select('emotion, timestamp')
           .eq('user_id', userId)
-          .gte('timestamp', DateTime.now().subtract(const Duration(days: 7)).toIso8601String())
+          .gte('timestamp', startDate.toIso8601String())
           .order('timestamp', ascending: true);
 
       if (response.isEmpty) {
-        print("No data found for user: $userId");
         return {};
       }
 

@@ -1,5 +1,6 @@
 import 'package:fix_emotion/settings-modules/app_version_page.dart';
 import 'package:fix_emotion/settings-modules/change_password_page.dart';
+import 'package:fix_emotion/settings-modules/chart_options_page.dart';
 import 'package:fix_emotion/settings-modules/delete_data_page.dart';
 import 'package:fix_emotion/settings-modules/developer_info_page.dart';
 import 'package:fix_emotion/settings-modules/feedback_page.dart';
@@ -24,10 +25,10 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final AuthenticationService _authService = AuthenticationService();
+  String selectedOption = 'Weekly'; // Default chart option
 
   @override
   Widget build(BuildContext context) {
-    
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -61,12 +62,12 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: 20),
                       _buildSectionHeader('Notifications', isDarkMode),
                       _buildSettingsTile(Icons.notifications, 'Notification Settings', isDarkMode, () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationSettingsPage(userId: widget.userId,)));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationSettingsPage(userId: widget.userId)));
                       }),
                       const SizedBox(height: 20),
                       _buildSectionHeader('Privacy', isDarkMode),
                       _buildSettingsTile(Icons.lock, 'Privacy', isDarkMode, () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacySettingsPage(userId: widget.userId,)));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacySettingsPage(userId: widget.userId)));
                       }),
                       _buildSettingsTile(Icons.delete, 'Delete Data', isDarkMode, () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => DeletePage(
@@ -84,13 +85,27 @@ class _SettingsPageState extends State<SettingsPage> {
                           MaterialPageRoute(builder: (context) => ThemeSettingsPage()),
                         );
                       }),
-                       _buildSettingsTile(Icons.feedback, 'Send Feedback', isDarkMode, () {
+                      _buildSettingsTile(Icons.timeline, 'Chart Options', isDarkMode, () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => FeedbackPage(userId: widget.userId, userEmail: widget.userEmail,)),
+                          MaterialPageRoute(
+                            builder: (context) => ChartOptionsPage(
+                              currentOption: selectedOption,
+                              onOptionSelected: (option) {
+                                setState(() {
+                                  selectedOption = option;
+                                });
+                              },
+                            ),
+                          ),
                         );
                       }),
-
+                      _buildSettingsTile(Icons.feedback, 'Send Feedback', isDarkMode, () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FeedbackPage(userId: widget.userId, userEmail: widget.userEmail)),
+                        );
+                      }),
                       _buildSectionHeader('Security', isDarkMode),
                       _buildSettingsTile(Icons.history, 'Login Activity', isDarkMode, () {
                         Navigator.push(
@@ -236,25 +251,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error logging out: ${e.toString()}')),
-      );
-    }
-  }
-
-  Future<void> _updatePrivacySettings(String setting, bool value) async {
-    try {
-      final userId = await _authService.getCurrentUserId();
-
-      await Supabase.instance.client
-          .from('user_permissions')
-          .update({setting: value})
-          .eq('user_id', userId!);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$setting updated successfully!')),
-      );
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error updating $setting: ${error.toString()}')),
       );
     }
   }

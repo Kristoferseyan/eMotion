@@ -17,14 +17,26 @@ class EmotionService {
       (emotion, count) => MapEntry(emotion, count / totalEmotions),
     );
     return normalizeProbabilities(emotionProbabilities);
+    
   }
-  Map<String, double> normalizeProbabilities(Map<String, double> probabilities) {
-    if (probabilities.isEmpty) {
-      return {};
-    }
-    final sum = probabilities.values.reduce((value, element) => value + element);
-    return probabilities.map((key, value) => MapEntry(key, value / sum));
+Map<String, double> normalizeProbabilities(Map<String, double> probabilities) {
+  if (probabilities.isEmpty) {
+    return {};
   }
+
+  
+  const surpriseBias = 0.3; 
+  probabilities.update("Surprise", (value) => (value - surpriseBias).clamp(0.0, 1.0),
+      ifAbsent: () => 0.0);
+
+  
+  final sum = probabilities.values.reduce((value, element) => value + element);
+  if (sum == 0) {
+    return probabilities.map((key, value) => MapEntry(key, 0.0));
+  }
+
+  return probabilities.map((key, value) => MapEntry(key, value / sum));
+}
   Map<String, int> mapProbabilitiesToScores(Map<String, double> probabilities) {
     return probabilities.map((key, value) => MapEntry(key, (value * 100).round()));
   }

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:fix_emotion/dashboard-modules/module-boxes/custom_layout.dart';
 import 'package:fix_emotion/dashboard-modules/notifiaction_page.dart';
+import 'package:fix_emotion/settings-modules/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../auth-modules/authentication_service.dart';
 import '../auth-modules/login-modules/login.dart';
 import '../graph/emotion-chart/emotion_chart.dart';
@@ -19,6 +19,7 @@ class DashboardLayout extends StatefulWidget {
 }
 
 class _DashboardLayoutState extends State<DashboardLayout> with WidgetsBindingObserver {
+  String timeRange = 'Weekly';
   String selectedEmotion = 'Happiness';
   String? userName;
   int unreadNotificationCount = 0;
@@ -49,6 +50,18 @@ class _DashboardLayoutState extends State<DashboardLayout> with WidgetsBindingOb
     _fetchUnreadNotifications();
     _startPollingNotifications();
     _initializeNotifications();
+    _fetchTimeRangeFromSettings(); 
+  }
+
+  Future<void> _fetchTimeRangeFromSettings() async {
+    try {
+      final settingsTimeRange = await SettingsService.getChartTimeRange(); 
+      setState(() {
+        timeRange = settingsTimeRange ?? 'Weekly'; 
+      });
+    } catch (error) {
+      print('Error fetching time range from settings: $error');
+    }
   }
 
   void _initializeNotifications() async {
@@ -222,11 +235,17 @@ class _DashboardLayoutState extends State<DashboardLayout> with WidgetsBindingOb
                     userId: widget.userId,
                     userName: userName!,
                     selectedEmotion: selectedEmotion,
+                    timeRange: timeRange,
                     emotions: emotions,
                     unreadNotificationCount: unreadNotificationCount,
                     onEmotionChanged: (newEmotion) {
                       setState(() {
                         selectedEmotion = newEmotion;
+                      });
+                    },
+                    onTimeRangeChanged: (newTimeRange) {
+                      setState(() {
+                        timeRange = newTimeRange;
                       });
                     },
                     onProfileButtonPressed: () => _navigateToProfilePage(context),
@@ -269,6 +288,8 @@ class DashboardBody extends StatelessWidget {
   final int unreadNotificationCount;
   final ValueChanged<String> markAsRead;
   final VoidCallback refreshNotifications; 
+  final String timeRange;
+  final ValueChanged<String> onTimeRangeChanged; 
 
   const DashboardBody({
     Key? key,
@@ -282,7 +303,7 @@ class DashboardBody extends StatelessWidget {
     required this.showNotifications,
     required this.unreadNotificationCount,
     required this.markAsRead,
-    required this.refreshNotifications, 
+    required this.refreshNotifications, required this.timeRange, required this.onTimeRangeChanged, 
   }) : super(key: key);
 
   @override
@@ -308,6 +329,7 @@ class DashboardBody extends StatelessWidget {
                     onEmotionChanged(newEmotions.first);
                   }
                 },
+                timeRange: timeRange,
               ),
             ),
             const SizedBox(height: 20),
