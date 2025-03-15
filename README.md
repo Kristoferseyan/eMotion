@@ -24,11 +24,10 @@ The recommended way to install *eMotion* is by downloading the APK file directly
 3. View your emotion analytics on the dashboard. You can also save sessions for future reference or training.
 
 ## Images
+![loginPage](https://github.com/user-attachments/assets/4c809596-bc2b-4db4-85ac-d1efc6701a39) ![dashboard](https://github.com/user-attachments/assets/997bc85a-8377-4d18-baac-410216c64514)
 
-![462550979_1299228401530108_4127669552789472928_n](https://github.com/user-attachments/assets/43e9c8cd-352f-4150-9911-169892cf5a64)
-![462560521_1146152576873808_1408802509518551428_n](https://github.com/user-attachments/assets/2ce0cb7c-66df-4c94-87d7-145b676146c2)
-![467480079_906724648257334_1046464899780018800_n](https://github.com/user-attachments/assets/9f10c7da-cefe-45ed-8a28-70502209ae17)
-![465083507_1421558575468044_2149800283820622970_n](https://github.com/user-attachments/assets/8c79f153-cec8-4e9a-91e7-a40f73655dd9)
+![analytics](https://github.com/user-attachments/assets/6e979bf4-1bfd-4781-849a-59522b2685c8) ![tracking](https://github.com/user-attachments/assets/af6595a0-5ba8-4b88-a74e-35ac17a259e4)
+
 
 
 ## Citation
